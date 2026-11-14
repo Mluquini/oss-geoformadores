@@ -5,8 +5,18 @@ window.DADOS_REAIS = {
   2020
  ],
  "status": {
-  "texto": "Dados reais da NASA em 12 dos 12 locais da Terra (média de uma célula de 2°). Marte usa relevo e gelo; a Lua usa temperatura, relevo e gelo.",
+  "n_com": 12,
+  "n_total": 12,
   "terra_sem_dado": [],
+  "marte_usa": [
+   "relevo",
+   "gelo"
+  ],
+  "lua_usa": [
+   "temperatura",
+   "relevo",
+   "gelo"
+  ],
   "completo": false
  },
  "faixas": {
@@ -49,15 +59,51 @@ window.DADOS_REAIS = {
    "vento": 0.0
   }
  },
+ "faixas_busca": {
+  "amplitude": {
+   "min": 0.0,
+   "max": 60.0,
+   "unidade": "°C (variação ao longo do ano: máx. − mín. das médias mensais)",
+   "motivo": "Nas células calculadas vai de ~5 a ~49 °C; 60 dá folga. Mede variação ao longo do ANO na Terra, não o ciclo dia/noite."
+  },
+  "poeira": {
+   "min": 0.0,
+   "max": 300.0,
+   "unidade": "µg/m³ (poeira em suspensão, média anual)",
+   "motivo": "Nas células calculadas vai de ~0,4 a ~400 µg/m³ (95% abaixo de ~200); acima de 300 a nota satura em 1."
+  },
+  "geologia": {
+   "min": 0.99,
+   "max": 1.1,
+   "unidade": "índice de quartzo do ASTER (sem unidade)",
+   "motivo": "Nas células calculadas vai de ~0,993 a ~1,099. Só existe para a Terra: serve para um alvo personalizado ('rocha rica em quartzo'), e NÃO é comparável com Marte e a Lua."
+  }
+ },
  "fontes": {
   "terra": [
-   "temperatura: MOD11C3 v061",
-   "gelo: MOD10CM (neve) + MOD11C3 (T<0 °C) v61 / 061",
-   "relevo: SRTMGL30 v002",
-   "vento: M2TMNXFLX (SPEED) e M2TMNXAER (DUSMASS) v5.12.4"
+   {
+    "aspecto": "temperatura",
+    "produto": "MOD11C3",
+    "versao": "061"
+   },
+   {
+    "aspecto": "gelo",
+    "produto": "MOD10CM + MOD11C3",
+    "versao": "61 / 061"
+   },
+   {
+    "aspecto": "relevo",
+    "produto": "SRTMGL30",
+    "versao": "002"
+   },
+   {
+    "aspecto": "vento",
+    "produto": "M2TMNXFLX (SPEED) + M2TMNXAER (DUSMASS)",
+    "versao": "5.12.4"
+   }
   ],
   "complementos": [
-   "ETOPO 2022 (NOAA), só onde falta SRTM: não é produto NASA."
+   "etopo2022"
   ],
   "marte": [
    "MGS/MOLA: MGS-M-MOLA-5-MEGDR-L3-V1.0",
@@ -73,15 +119,30 @@ window.DADOS_REAIS = {
  "terra": [
   {
    "id": "atacama",
-   "nome": "Deserto do Atacama",
-   "pais": "Chile",
+   "nome": {
+    "pt": "Deserto do Atacama",
+    "en": "Atacama Desert"
+   },
+   "pais": {
+    "pt": "Chile",
+    "en": "Chile"
+   },
    "tipo": "deserto",
    "lat": -24.5,
    "lon": -69.25,
-   "descricao": "Um dos lugares mais secos do planeta. O solo quase sem vida lembra o de Marte.",
+   "descricao": {
+    "pt": "Um dos lugares mais secos do planeta. O solo quase sem vida lembra o de Marte.",
+    "en": "One of the driest places on the planet. The almost lifeless soil resembles Mars."
+   },
    "util_para_testar": {
-    "marte": "Testar robôs que procuram sinais de vida em solo extremamente seco.",
-    "lua": "Testar painéis solares e poeira fina em sol forte e ar muito seco."
+    "marte": {
+     "pt": "Testar robôs que procuram sinais de vida em solo extremamente seco.",
+     "en": "Test robots that search for signs of life in extremely dry soil."
+    },
+    "lua": {
+     "pt": "Testar painéis solares e poeira fina em sol forte e ar muito seco.",
+     "en": "Test solar panels and fine dust in strong sun and very dry air."
+    }
    },
    "celula": {
     "lat": -25.0,
@@ -220,15 +281,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "vales-secos",
-   "nome": "Vales Secos de McMurdo",
-   "pais": "Antártida",
+   "nome": {
+    "pt": "Vales Secos de McMurdo",
+    "en": "McMurdo Dry Valleys"
+   },
+   "pais": {
+    "pt": "Antártida",
+    "en": "Antarctica"
+   },
    "tipo": "polar",
    "lat": -77.5,
    "lon": 162.0,
-   "descricao": "Vales muito secos, com ventos fortes e solo congelado, cercados por geleiras.",
+   "descricao": {
+    "pt": "Vales muito secos, com ventos fortes e solo congelado, cercados por geleiras.",
+    "en": "Very dry valleys, with strong winds and frozen ground, surrounded by glaciers."
+   },
    "util_para_testar": {
-    "marte": "Testar brocas que buscam gelo e micróbios embaixo do solo congelado.",
-    "lua": "Testar equipamentos que precisam funcionar em frio extremo."
+    "marte": {
+     "pt": "Testar brocas que buscam gelo e micróbios embaixo do solo congelado.",
+     "en": "Test drills that look for ice and microbes beneath frozen ground."
+    },
+    "lua": {
+     "pt": "Testar equipamentos que precisam funcionar em frio extremo.",
+     "en": "Test equipment that must work in extreme cold."
+    }
    },
    "celula": {
     "lat": -77.0,
@@ -367,15 +443,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "lut",
-   "nome": "Deserto do Lut",
-   "pais": "Irã",
+   "nome": {
+    "pt": "Deserto do Lut",
+    "en": "Lut Desert"
+   },
+   "pais": {
+    "pt": "Irã",
+    "en": "Iran"
+   },
    "tipo": "deserto",
    "lat": 30.5,
    "lon": 58.5,
-   "descricao": "Já registrou as temperaturas de superfície mais altas da Terra. Tem dunas e formas esculpidas pelo vento.",
+   "descricao": {
+    "pt": "Em 7 anos de dados do satélite MODIS da NASA, foi o ponto mais quente da Terra em 5 deles (máxima de 70,7 °C na superfície, em 2005). Tem dunas e formas esculpidas pelo vento.",
+    "en": "In 7 years of data from NASA's MODIS satellite, it was the hottest spot on Earth in 5 of them (maximum of 70.7 °C at the surface, in 2005). It has dunes and wind-sculpted formations."
+   },
    "util_para_testar": {
-    "marte": "Estudar como o vento esculpe rochas (os 'yardangs'), igual acontece em Marte.",
-    "lua": "Testar o resfriamento de equipamentos sob calor extremo."
+    "marte": {
+     "pt": "Estudar como o vento esculpe rochas (os 'yardangs'), igual acontece em Marte.",
+     "en": "Study how wind sculpts rock (the 'yardangs'), just as it does on Mars."
+    },
+    "lua": {
+     "pt": "Testar o resfriamento de equipamentos sob calor extremo.",
+     "en": "Test the cooling of equipment under extreme heat."
+    }
    },
    "celula": {
     "lat": 31.0,
@@ -514,15 +605,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "danakil",
-   "nome": "Depressão de Danakil (Dallol)",
-   "pais": "Etiópia",
+   "nome": {
+    "pt": "Depressão de Danakil (Dallol)",
+    "en": "Danakil Depression (Dallol)"
+   },
+   "pais": {
+    "pt": "Etiópia",
+    "en": "Ethiopia"
+   },
    "tipo": "vulcânico",
    "lat": 14.24,
    "lon": 40.3,
-   "descricao": "Lagos ácidos, sal e atividade vulcânica. Um dos ambientes mais extremos da Terra.",
+   "descricao": {
+    "pt": "Lagos ácidos, sal e atividade vulcânica. Um dos ambientes mais extremos da Terra.",
+    "en": "Acidic lakes, salt and volcanic activity. One of the most extreme environments on Earth."
+   },
    "util_para_testar": {
-    "marte": "Testar instrumentos que identificam minerais formados em água ácida.",
-    "lua": "Testar a resistência de materiais a calor e química agressiva."
+    "marte": {
+     "pt": "Testar instrumentos que identificam minerais formados em água ácida.",
+     "en": "Test instruments that identify minerals formed in acidic water."
+    },
+    "lua": {
+     "pt": "Testar a resistência de materiais a calor e química agressiva.",
+     "en": "Test how materials withstand heat and harsh chemistry."
+    }
    },
    "celula": {
     "lat": 15.0,
@@ -661,15 +767,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "mauna-kea",
-   "nome": "Mauna Kea",
-   "pais": "Havaí, EUA",
+   "nome": {
+    "pt": "Mauna Kea",
+    "en": "Mauna Kea"
+   },
+   "pais": {
+    "pt": "Havaí, EUA",
+    "en": "Hawaii, USA"
+   },
    "tipo": "vulcânico",
    "lat": 19.82,
    "lon": -155.47,
-   "descricao": "Vulcão de cinza e basalto, com o cume a mais de 4.000 m de altitude.",
+   "descricao": {
+    "pt": "Vulcão de cinza e basalto, com o cume a mais de 4.000 m de altitude.",
+    "en": "A volcano of ash and basalt, with a summit above 4,000 m."
+   },
    "util_para_testar": {
-    "marte": "Testar como tirar água e oxigênio do solo vulcânico (ISRU).",
-    "lua": "Testar a construção de bases usando o solo local, como o regolito lunar."
+    "marte": {
+     "pt": "Testar como tirar água e oxigênio do solo vulcânico (ISRU).",
+     "en": "Test how to extract water and oxygen from volcanic soil (ISRU)."
+    },
+    "lua": {
+     "pt": "Testar a construção de bases usando o solo local, como o regolito lunar.",
+     "en": "Test building bases from local soil, like lunar regolith."
+    }
    },
    "celula": {
     "lat": 19.0,
@@ -808,15 +929,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "holuhraun",
-   "nome": "Campo de lava de Holuhraun",
-   "pais": "Islândia",
+   "nome": {
+    "pt": "Campo de lava de Holuhraun",
+    "en": "Holuhraun lava field"
+   },
+   "pais": {
+    "pt": "Islândia",
+    "en": "Iceland"
+   },
    "tipo": "vulcânico",
    "lat": 64.85,
    "lon": -16.83,
-   "descricao": "Lava basáltica recente em um lugar frio, perto de geleiras.",
+   "descricao": {
+    "pt": "Lava basáltica recente em um lugar frio, perto de geleiras.",
+    "en": "Recent basaltic lava in a cold place, near glaciers."
+   },
    "util_para_testar": {
-    "marte": "Treinar a navegação de rovers sobre lava áspera e irregular.",
-    "lua": "Testar rodas e pés de pouso sobre terreno basáltico."
+    "marte": {
+     "pt": "Treinar a navegação de rovers sobre lava áspera e irregular.",
+     "en": "Train rover navigation over rough, jagged lava."
+    },
+    "lua": {
+     "pt": "Testar rodas e pés de pouso sobre terreno basáltico.",
+     "en": "Test wheels and landing feet on basaltic terrain."
+    }
    },
    "celula": {
     "lat": 65.0,
@@ -955,15 +1091,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "haughton",
-   "nome": "Cratera de Haughton",
-   "pais": "Ilha Devon, Canadá",
+   "nome": {
+    "pt": "Cratera de Haughton",
+    "en": "Haughton Crater"
+   },
+   "pais": {
+    "pt": "Ilha Devon, Canadá",
+    "en": "Devon Island, Canada"
+   },
    "tipo": "polar",
    "lat": 75.38,
    "lon": -89.68,
-   "descricao": "Cratera de impacto em deserto polar. A NASA já fez treinos de missão aqui.",
+   "descricao": {
+    "pt": "Cratera de impacto em deserto polar. Aqui funciona o Projeto Haughton-Mars, apoiado pela NASA, com testes de robôs e treino de astronautas.",
+    "en": "Impact crater in a polar desert. Home of the Haughton-Mars Project, supported by NASA, with robot tests and astronaut training."
+   },
    "util_para_testar": {
-    "marte": "Simular uma missão tripulada inteira: trajes, veículos e comunicação com atraso.",
-    "lua": "Treinar astronautas a estudar uma cratera de impacto."
+    "marte": {
+     "pt": "Simular uma missão tripulada inteira: trajes, veículos e comunicação com atraso.",
+     "en": "Simulate a whole crewed mission: suits, vehicles and communication with delay."
+    },
+    "lua": {
+     "pt": "Treinar astronautas a estudar uma cratera de impacto.",
+     "en": "Train astronauts to study an impact crater."
+    }
    },
    "celula": {
     "lat": 75.0,
@@ -1102,15 +1253,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "namibe",
-   "nome": "Deserto do Namibe",
-   "pais": "Namíbia",
+   "nome": {
+    "pt": "Deserto do Namibe",
+    "en": "Namib Desert"
+   },
+   "pais": {
+    "pt": "Namíbia",
+    "en": "Namibia"
+   },
    "tipo": "deserto",
    "lat": -24.75,
    "lon": 15.3,
-   "descricao": "Dunas gigantes e vento constante, como os campos de dunas de Marte.",
+   "descricao": {
+    "pt": "Dunas gigantes e vento constante, como os campos de dunas de Marte.",
+    "en": "Giant dunes and constant wind, like the dune fields of Mars."
+   },
    "util_para_testar": {
-    "marte": "Testar rovers subindo dunas e estudar como as dunas se movem.",
-    "lua": "Testar filtros e vedações contra poeira fina."
+    "marte": {
+     "pt": "Testar rovers subindo dunas e estudar como as dunas se movem.",
+     "en": "Test rovers climbing dunes and study how dunes move."
+    },
+    "lua": {
+     "pt": "Testar filtros e vedações contra poeira fina.",
+     "en": "Test filters and seals against fine dust."
+    }
    },
    "celula": {
     "lat": -25.0,
@@ -1249,15 +1415,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "lanzarote",
-   "nome": "Tubos de lava de Lanzarote",
-   "pais": "Canárias, Espanha",
+   "nome": {
+    "pt": "Tubos de lava de Lanzarote",
+    "en": "Lanzarote lava tubes"
+   },
+   "pais": {
+    "pt": "Canárias, Espanha",
+    "en": "Canary Islands, Spain"
+   },
    "tipo": "caverna",
    "lat": 29.16,
    "lon": -13.44,
-   "descricao": "Túneis formados por lava, como os que existem na Lua e em Marte.",
+   "descricao": {
+    "pt": "Túneis formados por lava, como os que existem na Lua e em Marte.",
+    "en": "Tunnels formed by lava, like those found on the Moon and Mars."
+   },
    "util_para_testar": {
-    "marte": "Testar drones e robôs que mapeiam cavernas no escuro.",
-    "lua": "Estudar tubos de lava como abrigo contra radiação para uma base lunar."
+    "marte": {
+     "pt": "Testar drones e robôs que mapeiam cavernas no escuro.",
+     "en": "Test drones and robots that map caves in the dark."
+    },
+    "lua": {
+     "pt": "Estudar tubos de lava como abrigo contra radiação para uma base lunar.",
+     "en": "Study lava tubes as shelter from radiation for a lunar base."
+    }
    },
    "celula": {
     "lat": 29.0,
@@ -1396,15 +1577,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "lava-beds",
-   "nome": "Lava Beds",
-   "pais": "Califórnia, EUA",
+   "nome": {
+    "pt": "Lava Beds",
+    "en": "Lava Beds"
+   },
+   "pais": {
+    "pt": "Califórnia, EUA",
+    "en": "California, USA"
+   },
    "tipo": "caverna",
    "lat": 41.71,
    "lon": -121.51,
-   "descricao": "Centenas de cavernas de lava, algumas com gelo lá dentro.",
+   "descricao": {
+    "pt": "Centenas de cavernas de lava, algumas com gelo lá dentro.",
+    "en": "Hundreds of lava caves, some with ice inside."
+   },
    "util_para_testar": {
-    "marte": "Testar sensores que procuram gelo e vida microbiana dentro de cavernas.",
-    "lua": "Testar a comunicação por rádio entre o fundo de uma caverna e a superfície."
+    "marte": {
+     "pt": "Testar sensores que procuram gelo e vida microbiana dentro de cavernas.",
+     "en": "Test sensors that look for ice and microbial life inside caves."
+    },
+    "lua": {
+     "pt": "Testar a comunicação por rádio entre o fundo de uma caverna e a superfície.",
+     "en": "Test radio communication between the bottom of a cave and the surface."
+    }
    },
    "celula": {
     "lat": 41.0,
@@ -1543,15 +1739,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "utah-mdrs",
-   "nome": "Deserto de San Rafael (MDRS)",
-   "pais": "Utah, EUA",
+   "nome": {
+    "pt": "Deserto de San Rafael (MDRS)",
+    "en": "San Rafael Desert (MDRS)"
+   },
+   "pais": {
+    "pt": "Utah, EUA",
+    "en": "Utah, USA"
+   },
    "tipo": "deserto",
    "lat": 38.41,
    "lon": -110.79,
-   "descricao": "Rochas vermelhas e sedimentares. Tem uma estação de simulação de Marte.",
+   "descricao": {
+    "pt": "Rochas vermelhas e sedimentares. Tem uma estação de simulação de Marte.",
+    "en": "Red, sedimentary rocks. Home to a Mars simulation station."
+   },
    "util_para_testar": {
-    "marte": "Fazer simulações de semanas vivendo isolado, como numa base em Marte.",
-    "lua": "Treinar caminhadas com traje e coleta de amostras."
+    "marte": {
+     "pt": "Fazer simulações de semanas vivendo isolado, como numa base em Marte.",
+     "en": "Run simulations of weeks living in isolation, as in a Mars base."
+    },
+    "lua": {
+     "pt": "Treinar caminhadas com traje e coleta de amostras.",
+     "en": "Practice spacewalks in a suit and sample collection."
+    }
    },
    "celula": {
     "lat": 39.0,
@@ -1690,15 +1901,30 @@ window.DADOS_REAIS = {
   },
   {
    "id": "svalbard",
-   "nome": "Svalbard (Bockfjord)",
-   "pais": "Noruega",
+   "nome": {
+    "pt": "Svalbard (Bockfjord)",
+    "en": "Svalbard (Bockfjord)"
+   },
+   "pais": {
+    "pt": "Noruega",
+    "en": "Norway"
+   },
    "tipo": "polar",
    "lat": 79.4,
    "lon": 13.3,
-   "descricao": "Vulcões antigos no meio do gelo do Ártico.",
+   "descricao": {
+    "pt": "Vulcões antigos no meio do gelo do Ártico.",
+    "en": "Ancient volcanoes in the middle of Arctic ice."
+   },
    "util_para_testar": {
-    "marte": "Testar instrumentos de rovers (a NASA já testou peças do Curiosity aqui).",
-    "lua": "Testar a busca por gelo em regiões frias e escuras, como os polos da Lua."
+    "marte": {
+     "pt": "Testar instrumentos de rovers (a NASA já testou aqui, em Bockfjord, protótipos de instrumentos do Curiosity: CheMin e SAM).",
+     "en": "Test rover instruments (NASA has tested prototypes of Curiosity instruments here, in Bockfjord: CheMin and SAM)."
+    },
+    "lua": {
+     "pt": "Testar a busca por gelo em regiões frias e escuras, como os polos da Lua.",
+     "en": "Test the search for ice in cold, dark regions, like the Moon's poles."
+    }
    },
    "celula": {
     "lat": 79.0,
@@ -1839,8 +2065,14 @@ window.DADOS_REAIS = {
  "marte": [
   {
    "id": "jezero",
-   "nome": "Cratera Jezero",
-   "descricao": "Antigo delta de rio. É onde o rover Perseverance trabalha.",
+   "nome": {
+    "pt": "Cratera Jezero",
+    "en": "Jezero Crater"
+   },
+   "descricao": {
+    "pt": "Antigo delta de rio. É onde o rover Perseverance trabalha.",
+    "en": "Ancient river delta. This is where the Perseverance rover works."
+   },
    "lat": 18.4082,
    "lon_leste": 77.6873,
    "coord_verificada": true,
@@ -1850,12 +2082,21 @@ window.DADOS_REAIS = {
     "gelo": 0.03531,
     "vento": null
    },
-   "resumo": "rugosidade do relevo 417 m · água no solo 3,5% (em massa)"
+   "valores": {
+    "relevo_m": 416.669,
+    "agua_pct": 3.531
+   }
   },
   {
    "id": "gale",
-   "nome": "Cratera Gale",
-   "descricao": "Cratera com uma montanha de camadas no meio. É onde o rover Curiosity trabalha.",
+   "nome": {
+    "pt": "Cratera Gale",
+    "en": "Gale Crater"
+   },
+   "descricao": {
+    "pt": "Cratera com uma montanha de camadas no meio. É onde o rover Curiosity trabalha.",
+    "en": "Crater with a layered mountain in the middle. This is where the Curiosity rover works."
+   },
    "lat": -5.3672,
    "lon_leste": 137.811,
    "coord_verificada": true,
@@ -1865,12 +2106,21 @@ window.DADOS_REAIS = {
     "gelo": 0.054029999999999995,
     "vento": null
    },
-   "resumo": "rugosidade do relevo 1033 m · água no solo 5,4% (em massa)"
+   "valores": {
+    "relevo_m": 1032.5669,
+    "agua_pct": 5.403
+   }
   },
   {
    "id": "meridiani",
-   "nome": "Meridiani Planum",
-   "descricao": "Planície com hematita, um mineral ligado à água. O rover Opportunity explorou aqui.",
+   "nome": {
+    "pt": "Meridiani Planum",
+    "en": "Meridiani Planum"
+   },
+   "descricao": {
+    "pt": "Planície com hematita, um mineral ligado à água. O rover Opportunity explorou aqui.",
+    "en": "Plain with hematite, a mineral linked to water. The Opportunity rover explored here."
+   },
    "lat": -0.04,
    "lon_leste": 356.86,
    "coord_verificada": true,
@@ -1880,12 +2130,21 @@ window.DADOS_REAIS = {
     "gelo": 0.05682,
     "vento": null
    },
-   "resumo": "rugosidade do relevo 151 m · água no solo 5,7% (em massa)"
+   "valores": {
+    "relevo_m": 151.148,
+    "agua_pct": 5.682
+   }
   },
   {
    "id": "valles",
-   "nome": "Valles Marineris",
-   "descricao": "O maior cânion do Sistema Solar, com até 7 km de profundidade.",
+   "nome": {
+    "pt": "Valles Marineris",
+    "en": "Valles Marineris"
+   },
+   "descricao": {
+    "pt": "O maior cânion do Sistema Solar, com até 7 km de profundidade.",
+    "en": "The largest canyon in the Solar System, up to 7 km deep."
+   },
    "lat": -14.0059,
    "lon_leste": 301.4123,
    "coord_verificada": true,
@@ -1895,12 +2154,21 @@ window.DADOS_REAIS = {
     "gelo": 0.03306,
     "vento": null
    },
-   "resumo": "rugosidade do relevo 3190 m · água no solo 3,3% (em massa)"
+   "valores": {
+    "relevo_m": 3190.4977,
+    "agua_pct": 3.306
+   }
   },
   {
    "id": "hellas",
-   "nome": "Bacia de Hellas",
-   "descricao": "Cratera de impacto gigante, o ponto mais baixo de Marte. Muitas tempestades de poeira.",
+   "nome": {
+    "pt": "Bacia de Hellas",
+    "en": "Hellas Basin"
+   },
+   "descricao": {
+    "pt": "Cratera de impacto gigante, o ponto mais baixo de Marte. Muitas tempestades de poeira.",
+    "en": "Giant impact basin, the lowest point on Mars. Many dust storms."
+   },
    "lat": -42.4301,
    "lon_leste": 70.5025,
    "coord_verificada": true,
@@ -1910,12 +2178,21 @@ window.DADOS_REAIS = {
     "gelo": 0.04156,
     "vento": null
    },
-   "resumo": "rugosidade do relevo 356 m · água no solo 4,2% (em massa)"
+   "valores": {
+    "relevo_m": 355.8036,
+    "agua_pct": 4.156
+   }
   },
   {
    "id": "utopia",
-   "nome": "Utopia Planitia",
-   "descricao": "Planície enorme com muito gelo embaixo do solo. O Viking 2 pousou aqui.",
+   "nome": {
+    "pt": "Utopia Planitia",
+    "en": "Utopia Planitia"
+   },
+   "descricao": {
+    "pt": "Planície enorme com muito gelo embaixo do solo. O Viking 2 pousou aqui.",
+    "en": "Huge plain with lots of ice under the soil. Viking 2 landed here."
+   },
    "lat": 46.7363,
    "lon_leste": 117.5168,
    "coord_verificada": true,
@@ -1925,14 +2202,23 @@ window.DADOS_REAIS = {
     "gelo": 0.04229,
     "vento": null
    },
-   "resumo": "rugosidade do relevo 51 m · água no solo 4,2% (em massa)"
+   "valores": {
+    "relevo_m": 51.4689,
+    "agua_pct": 4.229
+   }
   }
  ],
  "lua": [
   {
    "id": "shackleton",
-   "nome": "Polo Sul (Cratera Shackleton)",
-   "descricao": "O fundo da cratera nunca recebe sol. Pode guardar gelo de água. Alvo do programa Artemis.",
+   "nome": {
+    "pt": "Polo Sul (Cratera Shackleton)",
+    "en": "South Pole (Shackleton Crater)"
+   },
+   "descricao": {
+    "pt": "O fundo da cratera nunca recebe sol. Pode guardar gelo de água. Alvo do programa Artemis.",
+    "en": "The crater floor never sees sunlight. It may hold water ice. A target of the Artemis program."
+   },
    "lat": -89.67,
    "lon_leste": 129.78,
    "coord_verificada": true,
@@ -1942,12 +2228,23 @@ window.DADOS_REAIS = {
     "gelo": 0.1317,
     "vento": null
    },
-   "resumo": "temperatura média −177 °C (máx. 75 °C) · rugosidade do relevo 954 m · área em armadilha fria 13%"
+   "valores": {
+    "temperatura_C": -176.87739999999997,
+    "temperatura_max_C": 74.65000000000003,
+    "relevo_m": 953.5098,
+    "armadilha_fria_pct": 13.170000000000002
+   }
   },
   {
    "id": "tranquillitatis",
-   "nome": "Mare Tranquillitatis",
-   "descricao": "Planície de lava basáltica. É onde a Apollo 11 pousou.",
+   "nome": {
+    "pt": "Mare Tranquillitatis",
+    "en": "Mare Tranquillitatis"
+   },
+   "descricao": {
+    "pt": "Planície de lava basáltica. É onde a Apollo 11 pousou.",
+    "en": "Basaltic lava plain. This is where Apollo 11 landed."
+   },
    "lat": 8.3487,
    "lon_leste": 30.8346,
    "coord_verificada": true,
@@ -1957,12 +2254,23 @@ window.DADOS_REAIS = {
     "gelo": 0.0,
     "vento": null
    },
-   "resumo": "temperatura média −56 °C (máx. 121 °C) · rugosidade do relevo 146 m · área em armadilha fria 0%"
+   "valores": {
+    "temperatura_C": -55.674499999999966,
+    "temperatura_max_C": 121.18,
+    "relevo_m": 146.1436,
+    "armadilha_fria_pct": 0.0
+   }
   },
   {
    "id": "tycho",
-   "nome": "Cratera Tycho",
-   "descricao": "Cratera jovem com paredes altas e raios brilhantes que dá para ver da Terra.",
+   "nome": {
+    "pt": "Cratera Tycho",
+    "en": "Tycho Crater"
+   },
+   "descricao": {
+    "pt": "Cratera jovem com paredes altas e raios brilhantes que dá para ver da Terra.",
+    "en": "Young crater with high walls and bright rays that can be seen from Earth."
+   },
    "lat": -43.2958,
    "lon_leste": 348.7847,
    "coord_verificada": true,
@@ -1972,12 +2280,23 @@ window.DADOS_REAIS = {
     "gelo": 0.0,
     "vento": null
    },
-   "resumo": "temperatura média −64 °C (máx. 75 °C) · rugosidade do relevo 494 m · área em armadilha fria 0%"
+   "valores": {
+    "temperatura_C": -63.93259999999998,
+    "temperatura_max_C": 75.18,
+    "relevo_m": 493.6862,
+    "armadilha_fria_pct": 0.0
+   }
   },
   {
    "id": "malapert",
-   "nome": "Monte Malapert",
-   "descricao": "Montanha perto do polo sul, com boa vista para a Terra (bom para comunicação).",
+   "nome": {
+    "pt": "Monte Malapert",
+    "en": "Malapert Mountain"
+   },
+   "descricao": {
+    "pt": "Montanha perto do polo sul, com boa vista para a Terra (bom para comunicação).",
+    "en": "Mountain near the south pole with a good view of Earth (good for communication)."
+   },
    "lat": -85.98,
    "lon_leste": 358.33,
    "coord_verificada": true,
@@ -1987,7 +2306,12 @@ window.DADOS_REAIS = {
     "gelo": 0.0257,
     "vento": null
    },
-   "resumo": "temperatura média −159 °C (máx. 69 °C) · rugosidade do relevo 1524 m · área em armadilha fria 3%"
+   "valores": {
+    "temperatura_C": -158.72209999999998,
+    "temperatura_max_C": 68.93,
+    "relevo_m": 1523.9914,
+    "armadilha_fria_pct": 2.5700000000000003
+   }
   }
  ]
 };

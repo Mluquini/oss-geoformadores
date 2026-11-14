@@ -41,6 +41,26 @@
       "vento": 0.0
     }
   },
+  "faixas_busca": {
+    "amplitude": {
+      "min": 0.0,
+      "max": 60.0,
+      "unidade": "°C (variação ao longo do ano: máx. − mín. das médias mensais)",
+      "motivo": "Nas células calculadas vai de ~5 a ~49 °C; 60 dá folga. Mede variação ao longo do ANO na Terra, não o ciclo dia/noite."
+    },
+    "poeira": {
+      "min": 0.0,
+      "max": 300.0,
+      "unidade": "µg/m³ (poeira em suspensão, média anual)",
+      "motivo": "Nas células calculadas vai de ~0,4 a ~400 µg/m³ (95% abaixo de ~200); acima de 300 a nota satura em 1."
+    },
+    "geologia": {
+      "min": 0.99,
+      "max": 1.1,
+      "unidade": "índice de quartzo do ASTER (sem unidade)",
+      "motivo": "Nas células calculadas vai de ~0,993 a ~1,099. Só existe para a Terra: serve para um alvo personalizado ('rocha rica em quartzo'), e NÃO é comparável com Marte e a Lua."
+    }
+  },
   "notas_marte": {
     "jezero": {
       "temperatura": null,

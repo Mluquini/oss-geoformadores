@@ -65,6 +65,22 @@ FAIXAS = {
         motivo="Nas células calculadas as médias anuais do MERRA-2 vão de ~4 a ~15 m/s; acima de 12 a nota satura em 1. "
                "Não é o vento a 10 m. Marte e Lua não têm medição comparável (o vento da Terra não entra em nenhum ranking)."),
 }
+# Faixas fixas dos aspectos EXTRAS, usados só no modo "Planejar missão" (o alvo é definido pelo usuário e comparado
+# com as células da Terra). Não entram na comparação Terra x Marte/Lua. Escolhidas olhando os valores reais das células
+# calculadas (com folga), e NÃO são limites físicos absolutos.
+FAIXAS_BUSCA = {
+    "amplitude": dict(
+        min=0.0, max=60.0, unidade="°C (variação ao longo do ano: máx. − mín. das médias mensais)",
+        motivo="Nas células calculadas vai de ~5 a ~49 °C; 60 dá folga. Mede variação ao longo do ANO na Terra, não o ciclo dia/noite."),
+    "poeira": dict(
+        min=0.0, max=300.0, unidade="µg/m³ (poeira em suspensão, média anual)",
+        motivo="Nas células calculadas vai de ~0,4 a ~400 µg/m³ (95% abaixo de ~200); acima de 300 a nota satura em 1."),
+    "geologia": dict(
+        min=0.99, max=1.10, unidade="índice de quartzo do ASTER (sem unidade)",
+        motivo="Nas células calculadas vai de ~0,993 a ~1,099. Só existe para a Terra: serve para um alvo personalizado "
+               "('rocha rica em quartzo'), e NÃO é comparável com Marte e a Lua."),
+}
+
 GEOLOGIA_NOTA = (
     "Geologia foi RETIRADA do projeto: não há dado comparável entre os três corpos (Terra: índice de quartzo do ASTER; "
     "Lua: Christiansen Feature do Diviner; Marte: sem dado), e uma faixa 0-1 comum exigiria calibração com espectros de "
@@ -123,6 +139,20 @@ def notas_lua(local):
         relevo=normalizar(a["relevo"]["valor"], "relevo"),
         gelo=normalizar(a["gelo"]["valor"], "gelo"),
         vento=None)
+
+
+def centros_dos_locais(pasta_dados):
+    """Centro da célula de 2° de cada um dos locais do site (para saber quais rankings guardar)."""
+    arq = Path(pasta_dados) / "textos" / "earth_sites.js"
+    if not arq.exists():
+        return set()
+    linhas = [l for l in arq.read_text(encoding="utf-8").splitlines() if not l.strip().startswith("//")]
+    t = "\n".join(linhas)
+    locais = json.loads(t[t.index("["): t.rindex("]") + 1])
+    def centro(v, base):
+        i = min(max(int(math.floor((v + base) / 2.0)), 0), int(2 * base / 2.0) - 1)
+        return -base + 1.0 + 2.0 * i
+    return {(centro(l["lat"], 90), centro(l["lon"], 180)) for l in locais}
 
 
 def ranking(terra_notas, alvos, pesos):
@@ -325,6 +355,9 @@ def escrever_relatorio(earth, marte, lua, pasta):
 - **Grandezas diferentes sob o mesmo nome:** "gelo" (neve na superfície x água enterrada x área fria), "temperatura" (LST do MODIS
   dia+noite / 2 x temperatura bolométrica média x temperatura anual modelada do PRP) e "relevo" (σ da elevação em janelas
   de tamanhos parecidos mas resoluções distintas).
+- **Relevo da Terra:** o SRTMGL30 (NASA) vai de 90°N a 60°S, mas o radar só cobriu 60°N a 56°S; acima de 60°N os valores
+  são quase com certeza do GTOPO30 (USGS) embutido no produto. No extremo sul (McMurdo) o relevo é do ETOPO 2022 (NOAA),
+  que não é produto NASA. **Vento da Terra:** o MERRA-2 é uma reanálise (modelo corrigido por observações), não medida direta.
 - **Temperatura da Lua nos polos** vem do PRP, que é um produto derivado/modelado pela equipe Diviner, não uma medição direta.
 - **Marte:** só relevo (MOLA) e água (GRS) foram obtidos. O GRS tem pegada de ~300 km e vê só ~1 m de profundidade; o produto
   suavizado usado aqui não cobre as latitudes mais altas.
@@ -343,6 +376,9 @@ def main():
     ap.add_argument("--dados", default="data")
     ap.add_argument("--relatorio", default="relatorio")
     ap.add_argument("--conferir", action="store_true")
+    ap.add_argument("--limite-ranking", type=int, default=2000,
+                    help="se houver mais células que isto (ex.: grade do mundo todo), o ranking por célula só é gravado "
+                         "para as células dos locais do site, para o similaridade.json não ficar gigante (padrão: 2000)")
     ap.add_argument("--autoteste", action="store_true")
     a = ap.parse_args()
     if a.autoteste:
@@ -360,7 +396,7 @@ def main():
     alvos_l = [dict(id=l["id"], nome=l["nome"], notas=notas_lua(l)) for l in lua["locais"]]
     saida = dict(
         gerado_por="scripts/04_normalizar.py", faixas={k: v for k, v in FAIXAS.items() if v},
-        geologia_nota=GEOLOGIA_NOTA, pesos=PESOS,
+        geologia_nota=GEOLOGIA_NOTA, pesos=PESOS, faixas_busca=FAIXAS_BUSCA,
         notas_marte={x["id"]: x["notas"] for x in alvos_m}, notas_lua={x["id"]: x["notas"] for x in alvos_l},
         celulas=[])
     if earth:
@@ -372,6 +408,13 @@ def main():
                 lat=cel["lat"], lon=cel["lon"], notas={k: (None if v is None else round(v, 4)) for k, v in n.items()},
                 marte=ranking(n, alvos_m, PESOS["marte"]), lua=ranking(n, alvos_l, PESOS["lua"])))
         print(f"  {len(saida['celulas'])} células da Terra com ao menos um aspecto")
+        if len(saida["celulas"]) > a.limite_ranking:
+            manter = centros_dos_locais(d)
+            antes = len(saida["celulas"])
+            saida["celulas"] = [c_ for c_ in saida["celulas"] if (c_["lat"], c_["lon"]) in manter]
+            saida["ranking_reduzido"] = f"só as {len(saida['celulas'])} células dos locais do site (de {antes}); veja --limite-ranking"
+            print(f"  AVISO: {antes} células passam do limite ({a.limite_ranking}); o ranking por célula foi gravado só para "
+                  f"as {len(saida['celulas'])} dos locais do site. A busca do site usa data/celulas.js e não depende disto.")
     else:
         print("  AVISO: data/earth_grid.json não existe ainda (rode 01_terra.py). Só o relatório de Marte/Lua será gerado.")
     c.salvar_json(saida, d / "similaridade.json")

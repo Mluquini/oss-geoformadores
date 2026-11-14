@@ -55,9 +55,16 @@ Se o `pyhdf` falhar ao instalar (não testei no Colab), rode `!apt-get install -
 # 4.5 Semelhança + relatório + conferência
 !python scripts/04_normalizar.py --dados data --relatorio relatorio --conferir
 
-# 4.6 Atualizar o SITE com os dados novos (gera data/dados_reais.js)
+# 4.6 Atualizar o SITE com os dados novos (gera data/dados_reais.js e data/celulas.js)
 !python scripts/05_exportar_site.py --dados data
 ```
+
+**Conferir se os dados são verdadeiros** (relê os arquivos brutos da NASA com código independente e confere todas as células):
+`!python scripts/07_verificar_dados.py`. O resultado fica em `relatorio/verificacao_dados.md`. Se alguma verificação falhar, o script sai com erro.
+
+**Para o modo "Planejar missão" buscar no mundo todo**, rode o passo 4.4 (o `01_terra.py` **sem** `--zonas`) antes do 4.5 e do 4.6.
+Com muitas células, o `04_normalizar.py` só grava o ranking por célula para os locais do site (opção `--limite-ranking`); a busca
+do site usa o `data/celulas.js`, que o `05` gera com todas as células de terra.
 
 Espaço em disco: ~1 GB por ano de MODIS temperatura, ~0,3 GB de SRTM, ~0,3 GB de ASTER, 0,5 GB de ETOPO, mais o MERRA-2
 (não medi). O Colab tem bastante espaço; só não apague a pasta `raw/` no meio do caminho (ela vale como cache).

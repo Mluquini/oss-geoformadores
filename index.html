@@ -1,44 +1,126 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Globo de Análogos</title>
-  <meta name="description" content="Clique num lugar da Terra e descubra quais regiões de Marte ou da Lua são mais parecidas. NASA Space Apps 2026: Terrestrial Analogs.">
+  <title>Analog Globe</title>
+  <meta name="description" content="Click a place on Earth and find out which regions of Mars or the Moon are most similar. NASA Space Apps 2026: Terrestrial Analogs.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ===== CABEÇALHO: título, botão Marte/Lua e filtros ===== -->
+  <!-- Todos os textos fixos usam data-i18n*: o inglês e o português ficam em i18n.js -->
+
+  <!-- ===== HEADER: title, mode, language, Mars/Moon button and filters ===== -->
   <header class="topo">
     <div class="titulo">
-      <h1>Globo de Análogos</h1>
-      <p>Clique num ponto da Terra para ver os lugares mais parecidos em outro mundo.</p>
+      <h1 data-i18n="app.title">Analog Globe</h1>
+      <p data-i18n="app.sub">Click a point on Earth to see the most similar places on another world.</p>
+    </div>
+
+    <!-- Idioma: English (padrão) ou Português -->
+    <div class="idioma" role="group" aria-label="Language" data-i18n-attr="aria-label:lang.aria">
+      <button class="idioma-btn ativo" type="button" data-lang="en" aria-pressed="true" lang="en">EN</button>
+      <button class="idioma-btn" type="button" data-lang="pt" aria-pressed="false" lang="pt">PT</button>
+    </div>
+
+    <!-- Modo do site: Explorar (lugar da Terra -> Marte/Lua) ou Planejar missão (busca reversa) -->
+    <div class="modo" role="group" aria-label="Site mode" data-i18n-attr="aria-label:mode.aria">
+      <button id="modo-explorar" class="modo-btn ativo" type="button" data-i18n="mode.explore">🌍 Explore</button>
+      <button id="modo-planejar" class="modo-btn" type="button" data-i18n="mode.plan">🛰️ Plan a mission</button>
     </div>
 
     <!-- Botão para escolher o alvo: Marte ou Lua -->
-    <div class="alvo" role="group" aria-label="Comparar com">
-      <button id="btn-marte" class="alvo-btn ativo" data-alvo="marte">🔴 Marte</button>
-      <button id="btn-lua"   class="alvo-btn"       data-alvo="lua">⚪ Lua</button>
+    <div class="alvo" role="group" aria-label="Compare with" data-i18n-attr="aria-label:target.aria">
+      <button id="btn-marte" class="alvo-btn ativo" data-alvo="marte" data-i18n="target.mars">🔴 Mars</button>
+      <button id="btn-lua"   class="alvo-btn"       data-alvo="lua"   data-i18n="target.moon">⚪ Moon</button>
     </div>
 
     <!-- Filtros por tipo de ambiente (o script.js cria as caixinhas) -->
-    <div id="filtros" class="filtros" aria-label="Filtrar por tipo"></div>
+    <div id="filtros" class="filtros" aria-label="Filter by type" data-i18n-attr="aria-label:filters.aria"></div>
   </header>
-
-  <!-- Aviso de status dos dados: o texto vem de data/dados_reais.js (gerado pelo pipeline) -->
-  <div class="aviso" id="aviso" role="status">Carregando dados…</div>
 
   <!-- ===== O GLOBO 3D ===== -->
   <main>
+    <!-- Guia de uso pequeno, no canto superior esquerdo do globo (recolhível) -->
+    <aside class="guia" id="guia" aria-label="Usage guide" data-i18n-attr="aria-label:guide.aria">
+      <button class="guia-btn" id="guia-btn" type="button" aria-expanded="true" aria-controls="guia-corpo">❔ How to use</button>
+      <div class="guia-corpo" id="guia-corpo">
+        <ol>
+          <li data-i18n-html="guide.1"></li>
+          <li data-i18n-html="guide.2"></li>
+          <li data-i18n-html="guide.3"></li>
+          <li data-i18n-html="guide.4"></li>
+          <li data-i18n-html="guide.5"></li>
+        </ol>
+      </div>
+    </aside>
     <div id="globo"></div>
+    <!-- Legenda do mapa de calor (só no modo Planejar missão) -->
+    <div id="plano-legenda" class="legenda-calor" hidden>
+      <span id="leg-min" data-i18n="legend.min0">less similar</span>
+      <span class="leg-barra" aria-hidden="true"></span>
+      <span id="leg-max" data-i18n="legend.max0">more similar</span>
+    </div>
     <!-- Lista de locais: outra forma de escolher, boa no celular -->
-    <nav id="lista-locais" class="lista-locais" aria-label="Lista de locais"></nav>
+    <nav id="lista-locais" class="lista-locais" aria-label="List of places" data-i18n-attr="aria-label:list.aria"></nav>
   </main>
+
+  <!-- ===== PLANEJAR MISSÃO: gaveta com o alvo e o Top 5 ===== -->
+  <aside id="plano" class="plano" hidden aria-label="Plan a mission" data-i18n-attr="aria-label:plan.aria">
+    <button id="plano-fechar" class="fechar" type="button" aria-label="Back to Explore mode" data-i18n-attr="aria-label:plan.close.aria">✕</button>
+    <h2 data-i18n="plan.title">🛰️ Plan a mission</h2>
+    <p class="desc" data-i18n="plan.desc"></p>
+
+    <div class="abas2" role="group" aria-label="Target type" data-i18n-attr="aria-label:plan.tabs.aria">
+      <button id="aba-real" class="aba2 ativo" type="button" data-i18n="plan.tab.real">Real target</button>
+      <button id="aba-custom" class="aba2" type="button" data-i18n="plan.tab.custom">Custom target</button>
+    </div>
+
+    <section id="bloco-real">
+      <label class="rotulo-campo" for="alvo-real-menu" data-i18n="plan.real.label"></label>
+      <select id="alvo-real-menu"></select>
+      <p class="nota" id="alvo-real-info"></p>
+    </section>
+
+    <section id="bloco-custom" hidden>
+      <p class="nota" data-i18n-html="plan.custom.note"></p>
+      <div id="modelos" class="modelos"></div>
+      <div id="sliders" class="sliders"></div>
+    </section>
+
+    <h3 data-i18n="plan.best">Best places on Earth</h3>
+    <p class="nota" id="plano-resumo"></p>
+    <ol id="plano-resultados" class="plano-resultados"></ol>
+    <p class="nota" data-i18n-html="plan.warn"></p>
+  </aside>
+
+  <aside id="plano-detalhe" class="painel plano-detalhe" hidden aria-label="Place details" data-i18n-attr="aria-label:pd.aria">
+    <button id="plano-detalhe-fechar" class="fechar" type="button" aria-label="Close" data-i18n-attr="aria-label:close">✕</button>
+    <p id="pd-selos" class="pd-selos"></p>
+    <h2 id="pd-nome"></h2>
+    <p id="pd-coord" class="desc"></p>
+    <figure class="foto" id="pd-foto" hidden>
+      <img id="pd-foto-img" alt="" loading="lazy">
+      <figcaption id="pd-foto-credito"></figcaption>
+    </figure>
+    <p id="pd-pct" class="pd-pct"></p>
+    <p id="pd-cobertura" class="nota"></p>
+
+    <h3 data-i18n="pd.vs">Target × this place</h3>
+    <div class="radar-caixa"><canvas id="pd-grafico"></canvas></div>
+    <p id="pd-nota-grafico" class="nota"></p>
+
+    <div class="caixa combina"><h3 data-i18n="pd.match"></h3><ul id="pd-combina"></ul></div>
+    <div class="caixa falha"><h3 data-i18n="pd.nomatch"></h3><ul id="pd-nao-combina"></ul></div>
+    <div class="caixa util"><h3 data-i18n="pd.tests"></h3><ul id="pd-testes"></ul></div>
+    <div class="caixa aviso-fixo" data-i18n-html="pd.warn"></div>
+    <p class="fontes" id="pd-fontes"></p>
+  </aside>
 
   <!-- ===== PAINEL que abre ao clicar num ponto ===== -->
   <aside id="painel" class="painel" hidden>
-    <button id="fechar" class="fechar" aria-label="Fechar painel">✕</button>
+    <button id="fechar" class="fechar" aria-label="Close panel" data-i18n-attr="aria-label:panel.close">✕</button>
 
     <p id="p-tipo" class="etiqueta"></p>
     <h2 id="p-nome"></h2>
@@ -49,80 +131,82 @@
     <p id="p-desc" class="desc"></p>
 
     <!-- Outro botão Marte/Lua, para trocar sem fechar o painel -->
-    <div class="alvo" role="group" aria-label="Comparar com">
-      <button class="alvo-btn ativo" data-alvo="marte">🔴 Marte</button>
-      <button class="alvo-btn"       data-alvo="lua">⚪ Lua</button>
+    <div class="alvo" role="group" aria-label="Compare with" data-i18n-attr="aria-label:target.aria">
+      <button class="alvo-btn ativo" data-alvo="marte" data-i18n="target.mars">🔴 Mars</button>
+      <button class="alvo-btn"       data-alvo="lua"   data-i18n="target.moon">⚪ Moon</button>
     </div>
 
     <h3 id="p-titulo-top"></h3>
     <ol id="p-top3" class="top3"></ol>
     <p id="p-cobertura" class="nota"></p>
 
-    <h3>Comparação dos aspectos</h3>
+    <h3 data-i18n="panel.compare">Comparison of aspects</h3>
     <div class="radar-caixa"><canvas id="radar"></canvas></div>
     <p id="p-nota-radar" class="nota"></p>
-    <p id="p-nota-lua" class="nota" hidden>Na Lua não existe vento nem atmosfera, então "vento/poeira" <strong>não se aplica</strong> e fica fora do cálculo.</p>
+    <p id="p-nota-lua" class="nota" hidden data-i18n-html="panel.moonnote"></p>
 
-    <h3>Valores medidos neste local</h3>
+    <h3 data-i18n="panel.values">Values measured at this place</h3>
     <table id="p-valores" class="valores"></table>
     <p id="p-celula" class="nota"></p>
 
     <div class="caixa falha">
-      <h3>⚠️ Onde a analogia falha</h3>
+      <h3 data-i18n="panel.fails">⚠️ Where the analogy fails</h3>
       <ul id="p-falha"></ul>
     </div>
 
     <div class="caixa util">
-      <h3>🧪 Útil para testar</h3>
+      <h3 data-i18n="panel.useful">🧪 Useful for testing</h3>
       <p id="p-util"></p>
     </div>
 
     <p id="p-fontes" class="fontes"></p>
   </aside>
 
-  <!-- ===== COMO CALCULAMOS ===== -->
+  <!-- ===== COMO CALCULAMOS / HOW WE CALCULATE ===== -->
   <section class="como">
-    <h2>Como calculamos</h2>
-    <p>Cada lugar recebe uma <strong>nota de 0 a 1</strong> em até 4 aspectos. Para a nota ser comparável entre a Terra, Marte e a Lua, usamos <strong>a mesma faixa física para os três</strong> (tabela abaixo), e não uma faixa diferente para cada planeta.</p>
+    <h2 data-i18n="como.title">How we calculate</h2>
+    <p data-i18n-html="como.p1"></p>
     <ul>
-      <li><strong>Temperatura</strong>: temperatura média da superfície (Terra: média anual de dia e noite do MODIS; Lua: média ao longo do dia lunar, Diviner).</li>
-      <li><strong>Relevo</strong>: rugosidade, isto é, o desvio padrão da elevação numa janela de ~2° (Terra: SRTM; Marte: MOLA; Lua: LOLA).</li>
-      <li><strong>Gelo</strong>: um indicador comum, mas de <em>coisas diferentes</em>. Terra: fração do tempo com neve e com temperatura abaixo de 0 °C. Marte: água no solo (% em massa, GRS). Lua: fração da área em "armadilha fria" (máxima abaixo de 110 K).</li>
-      <li><strong>Vento/poeira</strong>: Terra via MERRA-2 (vento no nível mais baixo do modelo, ~50–70 m, e não a 10 m). Marte não tem medição global de vento e a Lua não tem atmosfera, então o vento da Terra aparece no painel, mas não entra em nenhum ranking.</li>
+      <li data-i18n-html="como.l.temp"></li>
+      <li data-i18n-html="como.l.relevo"></li>
+      <li data-i18n-html="como.l.gelo"></li>
+      <li data-i18n-html="como.l.vento"></li>
     </ul>
-    <p>Para comparar um lugar da Terra com um de Marte (ou da Lua):</p>
+    <p data-i18n="como.p2"></p>
     <ol>
-      <li>Usamos só os aspectos que existem <strong>nos dois lados</strong>. Se um aspecto não tem dado, ele fica de fora, e não vira zero.</li>
-      <li>Para cada aspecto, calculamos a <strong>diferença</strong> entre as notas e elevamos ao quadrado.</li>
-      <li>Multiplicamos pelo <strong>peso</strong> do aspecto. Os pesos que sobraram são <strong>renormalizados</strong> para somar 100%.</li>
-      <li>Somamos e tiramos a <strong>raiz quadrada</strong>: é a distância (0 = iguais, 1 = opostos).</li>
-      <li><strong>Semelhança = 100% − distância</strong>.</li>
+      <li data-i18n-html="como.s1"></li>
+      <li data-i18n-html="como.s2"></li>
+      <li data-i18n-html="como.s3"></li>
+      <li data-i18n-html="como.s4"></li>
+      <li data-i18n-html="como.s5"></li>
     </ol>
-    <p class="formula">semelhança = 100% × (1 − √( Σ peso′ × (nota<sub>Terra</sub> − nota<sub>alvo</sub>)² ))</p>
-    <p class="nota">Cada resultado informa <strong>quanto do peso total</strong> entrou na conta. Com poucos aspectos, a porcentagem diz menos sobre a semelhança como um todo.</p>
+    <p class="formula" data-i18n-html="como.formula"></p>
+    <p class="nota" data-i18n-html="como.cov"></p>
 
-    <h3>Pesos de cada aspecto</h3>
+    <h3 data-i18n="como.weights">Weight of each aspect</h3>
     <table class="pesos" id="tabela-pesos"></table>
-    <p class="nota">São os pesos do desafio (Marte: temperatura 25%, relevo 20%, gelo 15%, geologia 25%, vento 15%; Lua: 30%, 25%, 30%, 15% e 0%) <strong>sem a geologia</strong>, renormalizados para somar 100%.</p>
+    <p class="nota" data-i18n-html="como.weights.note"></p>
 
-    <h3>Faixas físicas fixas (nota 0 a 1)</h3>
+    <h3 data-i18n="como.ranges">Fixed physical ranges (score 0 to 1)</h3>
     <table class="pesos" id="tabela-faixas"></table>
 
-    <h3>De onde vêm os dados</h3>
+    <h3 data-i18n="como.sources">Where the data comes from</h3>
     <ul id="lista-fontes"></ul>
 
-    <h3>Limitações</h3>
+    <h3 data-i18n="como.limits">Limitations</h3>
     <ul>
-      <li>Gravidade, atmosfera e radiação <strong>não</strong> são reproduzidas por nenhum lugar da Terra.</li>
-      <li>A <strong>geologia</strong> ficou fora do projeto: os índices da Terra (ASTER), da Lua (Diviner) e de Marte (sem dado) não medem a mesma coisa, e compará-los exigiria uma calibração que não temos.</li>
-      <li>Os valores da Terra são <strong>médias de uma célula de 2°</strong> (~220 km) ao redor do local, e não do ponto exato. Em Marte e na Lua, a janela é um círculo de ~2° de diâmetro.</li>
-      <li>Os centros dos locais de Marte e da Lua vêm do catálogo oficial da IAU. Em Marte e na Lua cada local é um ponto central, mas são feições grandes (Meridiani Planum tem ~1000 km), então a janela de ~2° pode não representar a feição inteira.</li>
-      <li>Os dados da Terra cobrem um ano (ver abaixo); não são uma climatologia de décadas.</li>
+      <li data-i18n-html="como.lim.1"></li>
+      <li data-i18n-html="como.lim.2"></li>
+      <li data-i18n-html="como.lim.3"></li>
+      <li data-i18n-html="como.lim.4"></li>
+      <li data-i18n-html="como.lim.5"></li>
+      <li data-i18n-html="como.lim.6"></li>
     </ul>
     <p class="nota" id="como-gerado"></p>
+    <p class="nota" data-i18n-html="como.verified"></p>
   </section>
 
-  <footer class="rodape">NASA Space Apps Challenge 2026 · Desafio Terrestrial Analogs<br>Fotos dos lugares: Wikimedia Commons, com licença livre (autor e licença de cada foto aparecem no painel e em assets/lugares/CREDITOS.md)</footer>
+  <footer class="rodape" data-i18n-html="footer"></footer>
 
   <!-- ===== Bibliotecas (vêm da internet) ===== -->
   <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js"></script>
@@ -133,7 +217,13 @@
   <!-- Fotos dos lugares e créditos (gerado por scripts/06_baixar_imagens.py) -->
   <script src="data/imagens.js"></script>
 
+  <!-- Células da Terra para a busca reversa (gerado por scripts/05_exportar_site.py) -->
+  <script src="data/celulas.js"></script>
+
   <!-- ===== Nosso código ===== -->
+  <script src="i18n.js"></script>
+  <script src="busca.js"></script>
   <script src="script.js"></script>
+  <script src="planejar.js"></script>
 </body>
 </html>

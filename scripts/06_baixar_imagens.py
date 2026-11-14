@@ -30,7 +30,7 @@ API = "https://commons.wikimedia.org/w/api.php"
 UA = "GloboDeAnalogos-projeto-escolar/1.0"   # nome genérico do programa (sem dados pessoais)
 LARGURA = 900
 
-# id do lugar (igual ao de data/exemplo/earth_sites.js) -> arquivo no Wikimedia Commons
+# id do lugar (igual ao de data/textos/earth_sites.js) -> arquivo no Wikimedia Commons
 FOTOS = {
     "atacama":     "File:Atacama Desert Landscape (iced moment 870-CC).jpg",
     "vales-secos": "File:Wright Valley 2013 02.jpg",

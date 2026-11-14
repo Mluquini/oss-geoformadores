@@ -627,8 +627,7 @@ METADADOS_PRODUTOS = {
     "relevo": dict(
         produto="SRTMGL30", versao="002", instrumento="SRTM (Shuttle)", resolucao="30 arco-seg (~1 km), células de 2°",
         link="https://doi.org/10.5067/MEASURES/SRTM/SRTMGL30.002", unidade="m (elevação, desvio padrão) e graus (declividade)",
-        metodo="Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30\". "
-               "Cobertura SRTM: 60°N a 56°S. Fora disso usamos ETOPO 2022 60\" (NOAA, COMPLEMENTO), só pixels acima do nível do mar."),
+        metodo="Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30\". O SRTMGL30 (NASA, LP DAAC) vai de 90°N a 60°S, mas o radar do SRTM só cobriu 60°N a 56°S: acima de 60°N (Holuhraun, Haughton, Svalbard) os valores vêm, quase com certeza, do GTOPO30 (USGS), que o produto usa para preencher o que o radar não alcançou. Fora do SRTMGL30 (extremo sul, McMurdo) usamos ETOPO 2022 60\" (NOAA, COMPLEMENTO, não é NASA), só pixels acima do nível do mar."),
     "geologia": dict(
         produto="AG5KMMOH", versao="041", instrumento="Terra/ASTER (GED)", resolucao="0,05° (células de 2°)",
         link="https://doi.org/10.5067/COMMUNITY/ASTER_GED/AG5KMMOH.041", unidade="índice sem unidade (≈1)",
@@ -773,7 +772,7 @@ def main():
     c.salvar_json(dict(
         corpo="Terra", gerado_por="scripts/01_terra.py", passo_graus=PASSO, anos=a.anos, regiao=a.regiao,
         aspectos=METADADOS_PRODUTOS, log=log, problemas=problemas,
-        complementos=["ETOPO 2022 (NOAA), só onde falta SRTM: não é produto NASA."],
+        complementos=["ETOPO 2022 (NOAA), usado só onde o SRTMGL30 não tem dado (extremo sul, McMurdo): não é produto NASA."],
         celulas=celulas), saida / "earth_grid.json")
     if problemas:
         print("\nPROBLEMAS (campos ficaram null):")

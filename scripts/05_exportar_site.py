@@ -11,9 +11,11 @@ O que ele faz, em português simples:
   2. Para cada um dos 12 locais da Terra do site, acha a célula de 2° que contém o local e junta:
      valores medidos, notas 0-1 e o ranking de Marte e da Lua (calculado no 04_normalizar.py).
   3. Escreve um texto de status que diz, sem inventar, o que já é dado real e o que ainda falta.
+  4. Escreve data/celulas.js: as células de TERRA em lista compacta, para o modo "Planejar missão" (busca reversa).
 
-Os textos dos locais (nome, descrição, "útil para testar") vêm de data/exemplo/*.js. Só os TEXTOS:
-nenhum número de exemplo é usado.
+Os textos dos locais (nome, descrição, "útil para testar"), em português e inglês, vêm de data/textos/*.js. Só os
+TEXTOS: nenhum número de dado fica nesses arquivos. O site monta as frases no idioma escolhido a partir de números e
+códigos, por isso este script não grava frases prontas.
 
 Como rodar (depois de 01, 02, 03 e 04):
     python scripts/05_exportar_site.py --dados data
@@ -25,31 +27,11 @@ import sys
 from datetime import date
 from pathlib import Path
 
-NOMES = dict(temperatura="temperatura", relevo="relevo", gelo="gelo", vento="vento/poeira")
-
-
 def ler_js_array(caminho):
     """Lê um arquivo `window.X = [ ...JSON... ];` e devolve a lista."""
     linhas = [l for l in Path(caminho).read_text(encoding="utf-8").splitlines() if not l.strip().startswith("//")]
     t = "\n".join(linhas)
     return json.loads(t[t.index("["): t.rindex("]") + 1])
-
-
-def num(x, casas=1):
-    """Número no formato brasileiro (vírgula decimal)."""
-    if x is None:
-        return None
-    s = f"{x:.{casas}f}".replace(".", ",")
-    return s.replace("-", "−")
-
-
-def lista_pt(itens):
-    itens = list(itens)
-    if not itens:
-        return ""
-    if len(itens) == 1:
-        return itens[0]
-    return ", ".join(itens[:-1]) + " e " + itens[-1]
 
 
 def centro_da_celula(lat, lon, passo=2.0):
@@ -82,9 +64,9 @@ def main():
     sim = json.load(open(d / "similaridade.json", encoding="utf-8"))
     marte = json.load(open(d / "mars_sites.json", encoding="utf-8"))
     lua = json.load(open(d / "moon_sites.json", encoding="utf-8"))
-    meta_terra = ler_js_array(d / "exemplo" / "earth_sites.js")
-    meta_marte = {m["id"]: m for m in ler_js_array(d / "exemplo" / "mars_sites.js")}
-    meta_lua = {m["id"]: m for m in ler_js_array(d / "exemplo" / "moon_sites.js")}
+    meta_terra = ler_js_array(d / "textos" / "earth_sites.js")
+    meta_marte = {m["id"]: m for m in ler_js_array(d / "textos" / "mars_sites.js")}
+    meta_lua = {m["id"]: m for m in ler_js_array(d / "textos" / "moon_sites.js")}
     cel_grid = {(c["lat"], c["lon"]): c for c in grid["celulas"]}
     cel_sim = {(c["lat"], c["lon"]): c for c in sim["celulas"]}
 
@@ -110,41 +92,29 @@ def main():
         terra.append(item)
 
     # ---------------- Marte e Lua ----------------
-    def alvo(js, meta, notas, resumo_fn):
+    def alvo(js, meta, notas, valores_fn):
         out = []
         for l in js["locais"]:
-            md = meta.get(l["id"], {})
-            out.append(dict(id=l["id"], nome=l["nome"], descricao=md.get("descricao", ""), lat=l["lat"],
+            md = meta[l["id"]]
+            out.append(dict(id=l["id"], nome=md["nome"], descricao=md["descricao"], lat=l["lat"],
                             lon_leste=l["lon_leste"], coord_verificada=l.get("coord_verificada", False),
-                            notas=notas[l["id"]], resumo=resumo_fn(l)))
+                            notas=notas[l["id"]], valores=valores_fn(l)))
         return out
 
-    def resumo_marte(l):
+    def valores_marte(l):
         a_ = l["aspectos"]
-        p = []
-        if a_["relevo"]["valor"] is not None:
-            p.append(f"rugosidade do relevo {num(a_['relevo']['valor'], 0)} m")
-        if a_["gelo"]["valor"] is not None:
-            p.append(f"água no solo {num(a_['gelo']['valor'], 1)}% (em massa)")
-        return " · ".join(p)
+        return dict(relevo_m=a_["relevo"]["valor"], agua_pct=a_["gelo"]["valor"])
 
-    def resumo_lua(l):
+    def valores_lua(l):
         a_ = l["aspectos"]
-        p = []
         t = a_["temperatura"]
-        if t["valor"] is not None:
-            s = f"temperatura média {num(t['valor'] - 273.15, 0)} °C"
-            if t.get("maximo_K") is not None:
-                s += f" (máx. {num(t['maximo_K'] - 273.15, 0)} °C)"
-            p.append(s)
-        if a_["relevo"]["valor"] is not None:
-            p.append(f"rugosidade do relevo {num(a_['relevo']['valor'], 0)} m")
-        if a_["gelo"]["valor"] is not None:
-            p.append(f"área em armadilha fria {num(100 * a_['gelo']['valor'], 0)}%")
-        return " · ".join(p)
+        return dict(temperatura_C=None if t["valor"] is None else t["valor"] - 273.15,
+                    temperatura_max_C=None if t.get("maximo_K") is None else t["maximo_K"] - 273.15,
+                    relevo_m=a_["relevo"]["valor"],
+                    armadilha_fria_pct=None if a_["gelo"]["valor"] is None else 100 * a_["gelo"]["valor"])
 
-    lista_marte = alvo(marte, meta_marte, sim["notas_marte"], resumo_marte)
-    lista_lua = alvo(lua, meta_lua, sim["notas_lua"], resumo_lua)
+    lista_marte = alvo(marte, meta_marte, sim["notas_marte"], valores_marte)
+    lista_lua = alvo(lua, meta_lua, sim["notas_lua"], valores_lua)
 
     # ---------------- Status (calculado do que realmente existe) ----------------
     def aspectos_com_dado(notas_por_item):
@@ -154,13 +124,10 @@ def main():
     asp_terra = aspectos_com_dado([t["notas"] for t in terra if t["tem_dado"]])
     asp_marte = aspectos_com_dado([x["notas"] for x in lista_marte])
     asp_lua = aspectos_com_dado([x["notas"] for x in lista_lua])
-    sem_terra = [NOMES[k] for k in ("temperatura", "relevo", "gelo", "vento") if k not in asp_terra]
+    sem_terra = [k for k in ("temperatura", "relevo", "gelo", "vento") if k not in asp_terra]
     n_com = sum(1 for t in terra if t["tem_dado"])
-    partes = [f"Dados reais da NASA em {n_com} dos {len(terra)} locais da Terra (média de uma célula de 2°)."]
-    if sem_terra:
-        partes.append(f"Ainda sem dado na Terra: {lista_pt(sem_terra)}.")
-    partes.append(f"Marte usa {lista_pt(NOMES[k] for k in asp_marte)}; a Lua usa {lista_pt(NOMES[k] for k in asp_lua)}.")
-    status = dict(texto=" ".join(partes), terra_sem_dado=sem_terra,
+    # Só números e códigos: o site monta a frase no idioma escolhido.
+    status = dict(n_com=n_com, n_total=len(terra), terra_sem_dado=sem_terra, marte_usa=asp_marte, lua_usa=asp_lua,
                   completo=not sem_terra and {"temperatura", "relevo", "gelo"} <= set(asp_marte))
 
     # ---------------- Fontes ----------------
@@ -172,25 +139,46 @@ def main():
         gelo=tem_valor("gelo", ["frac_neve", "frac_T_abaixo_0C"]),
         relevo=tem_valor("relevo", ["rugosidade_desvio_m"]),
         vento=tem_valor("vento", ["vento_ms", "poeira_ugm3"]))
-    fontes_terra = []
-    for k, v in grid["aspectos"].items():
-        if k == "geologia" or not presentes.get(k):
-            continue
-        fontes_terra.append(f"{k}: {v['produto']} v{v['versao']}")
-    comp = grid.get("complementos") or []
+    # Produto e versão de cada aspecto da Terra (nomes neutros; o site traduz o nome do aspecto).
+    PRODUTOS_TERRA = dict(temperatura=("MOD11C3", "061"), gelo=("MOD10CM + MOD11C3", "61 / 061"),
+                          relevo=("SRTMGL30", "002"), vento=("M2TMNXFLX (SPEED) + M2TMNXAER (DUSMASS)", "5.12.4"))
+    fontes_terra = [dict(aspecto=k, produto=p, versao=v) for k, (p, v) in PRODUTOS_TERRA.items() if presentes.get(k)]
+    complementos = ["etopo2022"] if grid.get("complementos") else []
     saida = dict(
         gerado_em=date.today().isoformat(), anos_terra=grid.get("anos"), status=status,
-        faixas=sim["faixas"], pesos=sim["pesos"],
-        fontes=dict(terra=fontes_terra, complementos=comp, marte=produtos_unicos(marte), lua=produtos_unicos(lua)),
+        faixas=sim["faixas"], pesos=sim["pesos"], faixas_busca=sim.get("faixas_busca", {}),
+        fontes=dict(terra=fontes_terra, complementos=complementos, marte=produtos_unicos(marte), lua=produtos_unicos(lua)),
         terra=terra, marte=lista_marte, lua=lista_lua)
+
+    # ---------------- Células para a busca reversa ("Planejar missão") ----------------
+    # Lista compacta: só células de TERRA (as de mar não têm temperatura, relevo nem neve). Arredondado para ficar leve.
+    campos = ["lat", "lon", "temp", "amp", "elev", "rug", "neve", "t0", "vento", "poeira", "qi"]
+
+    def arred(x, n):
+        return None if x is None else round(x, n)
+    linhas = []
+    for c in grid["celulas"]:
+        t, r_, gl, v, ge = c["temperatura"], c["relevo"], c["gelo"], c["vento"], c["geologia"]
+        if t["media_anual_C"] is None and r_["rugosidade_desvio_m"] is None and gl["frac_neve"] is None:
+            continue
+        linhas.append([c["lat"], c["lon"], arred(t["media_anual_C"], 1), arred(t["amplitude_C"], 1),
+                       arred(r_["elevacao_media_m"], 0), arred(r_["rugosidade_desvio_m"], 0),
+                       arred(gl["frac_neve"], 3), arred(gl["frac_T_abaixo_0C"], 3),
+                       arred(v["vento_ms"], 2), arred(v["poeira_ugm3"], 1), arred(ge["indice_quartzo"], 4)])
+    celulas_js = dict(gerado_em=date.today().isoformat(), tamanho_graus=grid.get("passo_graus", 2), campos=campos,
+                      total_celulas_no_grid=len(grid["celulas"]), anos=grid.get("anos"), dados=linhas)
+    (d / "celulas.js").write_text(
+        "// Gerado por scripts/05_exportar_site.py: NÃO edite à mão.\nwindow.CELULAS_TERRA = "
+        + json.dumps(celulas_js, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
+    print(f"salvo: {d / 'celulas.js'}  ({(d / 'celulas.js').stat().st_size / 1024:.0f} KB, {len(linhas)} células de terra)")
 
     destino = d / "dados_reais.js"
     destino.write_text("// Gerado por scripts/05_exportar_site.py: NÃO edite à mão.\nwindow.DADOS_REAIS = "
                        + json.dumps(saida, ensure_ascii=False, indent=1) + ";\n", encoding="utf-8")
     print(f"salvo: {destino}  ({destino.stat().st_size / 1024:.0f} KB)")
-    print("status:", status["texto"])
+    print("status:", status)
     for t in terra:
-        print(f"  {t['nome']:34s} célula ({t['celula']['lat']:g},{t['celula']['lon']:g}) dado={t['tem_dado']}")
+        print(f"  {t['nome']['pt']:34s} célula ({t['celula']['lat']:g},{t['celula']['lon']:g}) dado={t['tem_dado']}")
 
 
 if __name__ == "__main__":

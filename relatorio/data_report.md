@@ -18,11 +18,11 @@ Gerado automaticamente por `scripts/04_normalizar.py` em 2026-11-14.
 | Lua | temperatura | LRO-L-DLRE-5-PRP-V2.0 (dlre_prp_south, versão do produto 2) | 2 | LRO/Diviner | malha triangular (2.880.000 triângulos no polo sul) | derivado de dados de 2009-2016 (ver descrição oficial) | https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab |
 
 Período dos dados da Terra (MODIS e MERRA-2): anos [2020]. SRTM é de fev/2000; (O ASTER GED foi baixado, mas a geologia foi retirada do projeto.)
-**Complementos (fora da NASA):** ETOPO 2022 (NOAA), só onde falta SRTM: não é produto NASA.
+**Complementos (fora da NASA):** ETOPO 2022 (NOAA), usado só onde o SRTMGL30 não tem dado (extremo sul, McMurdo): não é produto NASA.
 ### Métodos da Terra
 - **temperatura**: Por pixel: média dos 12 meses de (LST dia + LST noite)/2, em °C; amplitude = máx - mín das médias mensais; exige ≥9 meses válidos. Por célula: média dos pixels de terra válidos (terra = Percent_land_in_grid ≥ 50; célula exige ≥25% dos pixels de terra válidos).
 - **gelo**: frac_neve = média dos meses com dado (códigos 0-100) de % de neve/100; exige ≥6 meses (meses de noite polar, código 211, ficam de fora: pode subestimar o gelo polar). frac_T_abaixo_0C = fração dos meses com temperatura média diária < 0 °C.
-- **relevo**: Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30". Cobertura SRTM: 60°N a 56°S. Fora disso usamos ETOPO 2022 60" (NOAA, COMPLEMENTO), só pixels acima do nível do mar.
+- **relevo**: Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30". O SRTMGL30 (NASA, LP DAAC) vai de 90°N a 60°S, mas o radar do SRTM só cobriu 60°N a 56°S: acima de 60°N (Holuhraun, Haughton, Svalbard) os valores vêm, quase com certeza, do GTOPO30 (USGS), que o produto usa para preencher o que o radar não alcançou. Fora do SRTMGL30 (extremo sul, McMurdo) usamos ETOPO 2022 60" (NOAA, COMPLEMENTO, não é NASA), só pixels acima do nível do mar.
 - **vento**: Média anual das médias mensais, e média dos pontos da grade dentro de cada célula (inclui oceano). SPEED é a velocidade escalar média (não a magnitude da média dos vetores, que subestima). ATENÇÃO: SPEED não traz a altura nos atributos; o arquivo tem HLML (altura do nível mais baixo do modelo, ~50-70 m nos pontos conferidos), então o vento é provavelmente desse nível e NÃO o vento a 10 m: tende a ser maior que o de 10 m.
 
 ## 2. Normalização e semelhança
@@ -66,6 +66,9 @@ Células da Terra sem valor (de 148):
 - **Grandezas diferentes sob o mesmo nome:** "gelo" (neve na superfície x água enterrada x área fria), "temperatura" (LST do MODIS
   dia+noite / 2 x temperatura bolométrica média x temperatura anual modelada do PRP) e "relevo" (σ da elevação em janelas
   de tamanhos parecidos mas resoluções distintas).
+- **Relevo da Terra:** o SRTMGL30 (NASA) vai de 90°N a 60°S, mas o radar só cobriu 60°N a 56°S; acima de 60°N os valores
+  são quase com certeza do GTOPO30 (USGS) embutido no produto. No extremo sul (McMurdo) o relevo é do ETOPO 2022 (NOAA),
+  que não é produto NASA. **Vento da Terra:** o MERRA-2 é uma reanálise (modelo corrigido por observações), não medida direta.
 - **Temperatura da Lua nos polos** vem do PRP, que é um produto derivado/modelado pela equipe Diviner, não uma medição direta.
 - **Marte:** só relevo (MOLA) e água (GRS) foram obtidos. O GRS tem pegada de ~300 km e vê só ~1 m de profundidade; o produto
   suavizado usado aqui não cobre as latitudes mais altas.
