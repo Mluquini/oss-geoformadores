@@ -1,0 +1,6 @@
+# Downloads brutos (grandes) e ambiente virtual ficam fora do GitHub
+raw/
+.venv/
+__pycache__/
+*.pyc
+.env

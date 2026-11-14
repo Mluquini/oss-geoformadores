@@ -1,0 +1,9 @@
+# Para os scripts 02 (Marte), 03 (Lua) e 04 (normalizar): só isto
+numpy
+requests
+
+# Só para o script 01 (Terra):
+earthaccess
+h5py
+pyhdf
+netCDF4

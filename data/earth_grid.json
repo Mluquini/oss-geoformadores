@@ -1,0 +1,3868 @@
+{
+  "corpo": "Terra",
+  "gerado_por": "scripts/01_terra.py",
+  "passo_graus": 2.0,
+  "anos": [
+    2020
+  ],
+  "regiao": [
+    [
+      -27.5,
+      -21.5,
+      -72.25,
+      -66.25
+    ],
+    [
+      -80.5,
+      -74.5,
+      159.0,
+      165.0
+    ],
+    [
+      27.5,
+      33.5,
+      55.5,
+      61.5
+    ],
+    [
+      11.24,
+      17.240000000000002,
+      37.3,
+      43.3
+    ],
+    [
+      16.82,
+      22.82,
+      -158.47,
+      -152.47
+    ],
+    [
+      61.849999999999994,
+      67.85,
+      -19.83,
+      -13.829999999999998
+    ],
+    [
+      72.38,
+      78.38,
+      -92.68,
+      -86.68
+    ],
+    [
+      -27.75,
+      -21.75,
+      12.3,
+      18.3
+    ],
+    [
+      26.16,
+      32.16,
+      -16.439999999999998,
+      -10.44
+    ],
+    [
+      38.71,
+      44.71,
+      -124.51,
+      -118.51
+    ],
+    [
+      35.41,
+      41.41,
+      -113.79,
+      -107.79
+    ],
+    [
+      76.4,
+      82.4,
+      10.3,
+      16.3
+    ],
+    [
+      -83.0,
+      -77.0,
+      97.0,
+      103.0
+    ],
+    [
+      22.0,
+      28.0,
+      7.0,
+      13.0
+    ],
+    [
+      26.0,
+      32.0,
+      84.0,
+      90.0
+    ]
+  ],
+  "aspectos": {
+    "temperatura": {
+      "produto": "MOD11C3",
+      "versao": "061",
+      "instrumento": "Terra/MODIS",
+      "resolucao": "0,05° (agregado em células de 2°)",
+      "link": "https://doi.org/10.5067/MODIS/MOD11C3.061",
+      "unidade_media": "°C",
+      "unidade_amplitude": "°C",
+      "metodo": "Por pixel: média dos 12 meses de (LST dia + LST noite)/2, em °C; amplitude = máx - mín das médias mensais; exige ≥9 meses válidos. Por célula: média dos pixels de terra válidos (terra = Percent_land_in_grid ≥ 50; célula exige ≥25% dos pixels de terra válidos)."
+    },
+    "gelo": {
+      "produto": "MOD10CM (neve) + MOD11C3 (T<0 °C)",
+      "versao": "61 / 061",
+      "instrumento": "Terra/MODIS",
+      "resolucao": "0,05° (células de 2°)",
+      "link": "https://doi.org/10.5067/MODIS/MOD10CM.061",
+      "unidade": "fração do tempo (0 a 1)",
+      "metodo": "frac_neve = média dos meses com dado (códigos 0-100) de % de neve/100; exige ≥6 meses (meses de noite polar, código 211, ficam de fora: pode subestimar o gelo polar). frac_T_abaixo_0C = fração dos meses com temperatura média diária < 0 °C."
+    },
+    "relevo": {
+      "produto": "SRTMGL30",
+      "versao": "002",
+      "instrumento": "SRTM (Shuttle)",
+      "resolucao": "30 arco-seg (~1 km), células de 2°",
+      "link": "https://doi.org/10.5067/MEASURES/SRTM/SRTMGL30.002",
+      "unidade": "m (elevação, desvio padrão) e graus (declividade)",
+      "metodo": "Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30\". Cobertura SRTM: 60°N a 56°S. Fora disso usamos ETOPO 2022 60\" (NOAA, COMPLEMENTO), só pixels acima do nível do mar."
+    },
+    "geologia": {
+      "produto": "AG5KMMOH",
+      "versao": "041",
+      "instrumento": "Terra/ASTER (GED)",
+      "resolucao": "0,05° (células de 2°)",
+      "link": "https://doi.org/10.5067/COMMUNITY/ASTER_GED/AG5KMMOH.041",
+      "unidade": "índice sem unidade (≈1)",
+      "metodo": "Índice de quartzo QI = e11*e11/(e10*e12), bandas ASTER 10-14 (8,3; 8,6; 9,1; 10,6; 11,3 µm); fórmula da literatura (Ninomiya et al.), NÃO conferida contra o artigo nesta execução. Usa UM único mês do GED (ano e mês no log). NÃO é comparável diretamente com o Christiansen Feature da Lua."
+    },
+    "vento": {
+      "produto": "M2TMNXFLX (SPEED) e M2TMNXAER (DUSMASS)",
+      "versao": "5.12.4",
+      "instrumento": "MERRA-2 (reanálise, GMAO/NASA)",
+      "resolucao": "0,5° x 0,625° (células de 2°)",
+      "link": "https://doi.org/10.5067/0JRLVL8YV2Y4",
+      "unidade": "m/s (vento) e µg/m³ (poeira)",
+      "metodo": "Média anual das médias mensais, e média dos pontos da grade dentro de cada célula (inclui oceano). SPEED é a velocidade escalar média (não a magnitude da média dos vetores, que subestima). ATENÇÃO: SPEED não traz a altura nos atributos; o arquivo tem HLML (altura do nível mais baixo do modelo, ~50-70 m nos pontos conferidos), então o vento é provavelmente desse nível e NÃO o vento a 10 m: tende a ser maior que o de 10 m."
+    }
+  },
+  "log": {
+    "merra_SPEED": {
+      "long_name": "surface_wind_speed",
+      "units": "m s-1",
+      "arquivo": "MERRA2_400.tavgM_2d_flx_Nx.202012.nc4",
+      "n_arquivos": 12
+    },
+    "merra_DUSMASS": {
+      "long_name": "Dust Surface Mass Concentration",
+      "units": "kg m-3",
+      "arquivo": "MERRA2_400.tavgM_2d_aer_Nx.202012.nc4",
+      "n_arquivos": 12
+    }
+  },
+  "problemas": {},
+  "complementos": [
+    "ETOPO 2022 (NOAA), só onde falta SRTM: não é produto NASA."
+  ],
+  "celulas": [
+    {
+      "lat": -83.0,
+      "lon": 97.0,
+      "temperatura": {
+        "media_anual_C": -53.674,
+        "amplitude_C": 33.626
+      },
+      "relevo": {
+        "elevacao_media_m": 3451.2,
+        "rugosidade_desvio_m": 53.9,
+        "declividade_media_graus": 0.153,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.349,
+        "poeira_ugm3": 0.452
+      }
+    },
+    {
+      "lat": -83.0,
+      "lon": 99.0,
+      "temperatura": {
+        "media_anual_C": -53.404,
+        "amplitude_C": 33.936
+      },
+      "relevo": {
+        "elevacao_media_m": 3416.7,
+        "rugosidade_desvio_m": 48.8,
+        "declividade_media_graus": 0.12,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.435,
+        "poeira_ugm3": 0.449
+      }
+    },
+    {
+      "lat": -83.0,
+      "lon": 101.0,
+      "temperatura": {
+        "media_anual_C": -53.125,
+        "amplitude_C": 33.939
+      },
+      "relevo": {
+        "elevacao_media_m": 3382.1,
+        "rugosidade_desvio_m": 44.0,
+        "declividade_media_graus": 0.16,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.5,
+        "poeira_ugm3": 0.445
+      }
+    },
+    {
+      "lat": -83.0,
+      "lon": 103.0,
+      "temperatura": {
+        "media_anual_C": -53.034,
+        "amplitude_C": 33.951
+      },
+      "relevo": {
+        "elevacao_media_m": 3345.5,
+        "rugosidade_desvio_m": 40.3,
+        "declividade_media_graus": 0.136,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.527,
+        "poeira_ugm3": 0.44
+      }
+    },
+    {
+      "lat": -81.0,
+      "lon": 97.0,
+      "temperatura": {
+        "media_anual_C": -56.169,
+        "amplitude_C": 32.798
+      },
+      "relevo": {
+        "elevacao_media_m": 3615.9,
+        "rugosidade_desvio_m": 39.3,
+        "declividade_media_graus": 0.103,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 10.552,
+        "poeira_ugm3": 0.465
+      }
+    },
+    {
+      "lat": -81.0,
+      "lon": 99.0,
+      "temperatura": {
+        "media_anual_C": -55.664,
+        "amplitude_C": 32.574
+      },
+      "relevo": {
+        "elevacao_media_m": 3575.5,
+        "rugosidade_desvio_m": 42.4,
+        "declividade_media_graus": 0.108,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 10.996,
+        "poeira_ugm3": 0.464
+      }
+    },
+    {
+      "lat": -81.0,
+      "lon": 101.0,
+      "temperatura": {
+        "media_anual_C": -55.097,
+        "amplitude_C": 32.31
+      },
+      "relevo": {
+        "elevacao_media_m": 3530.6,
+        "rugosidade_desvio_m": 38.5,
+        "declividade_media_graus": 0.123,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.229,
+        "poeira_ugm3": 0.461
+      }
+    },
+    {
+      "lat": -81.0,
+      "lon": 103.0,
+      "temperatura": {
+        "media_anual_C": -54.972,
+        "amplitude_C": 32.458
+      },
+      "relevo": {
+        "elevacao_media_m": 3490.9,
+        "rugosidade_desvio_m": 28.7,
+        "declividade_media_graus": 0.099,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.255,
+        "poeira_ugm3": 0.457
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 97.0,
+      "temperatura": {
+        "media_anual_C": -57.976,
+        "amplitude_C": 31.404
+      },
+      "relevo": {
+        "elevacao_media_m": 3731.9,
+        "rugosidade_desvio_m": 27.1,
+        "declividade_media_graus": 0.086,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 8.736,
+        "poeira_ugm3": 0.481
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 99.0,
+      "temperatura": {
+        "media_anual_C": -56.786,
+        "amplitude_C": 30.807
+      },
+      "relevo": {
+        "elevacao_media_m": 3674.4,
+        "rugosidade_desvio_m": 26.5,
+        "declividade_media_graus": 0.111,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 9.426,
+        "poeira_ugm3": 0.48
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 101.0,
+      "temperatura": {
+        "media_anual_C": -56.159,
+        "amplitude_C": 30.964
+      },
+      "relevo": {
+        "elevacao_media_m": 3610.8,
+        "rugosidade_desvio_m": 25.3,
+        "declividade_media_graus": 0.121,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 10.073,
+        "poeira_ugm3": 0.477
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 103.0,
+      "temperatura": {
+        "media_anual_C": -55.6,
+        "amplitude_C": 31.18
+      },
+      "relevo": {
+        "elevacao_media_m": 3545.9,
+        "rugosidade_desvio_m": 28.0,
+        "declividade_media_graus": 0.125,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 10.382,
+        "poeira_ugm3": 0.472
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 159.0,
+      "temperatura": {
+        "media_anual_C": -33.872,
+        "amplitude_C": 28.227
+      },
+      "relevo": {
+        "elevacao_media_m": 1246.8,
+        "rugosidade_desvio_m": 522.3,
+        "declividade_media_graus": 3.059,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 15.049,
+        "poeira_ugm3": 0.406
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 161.0,
+      "temperatura": {
+        "media_anual_C": -32.492,
+        "amplitude_C": 28.82
+      },
+      "relevo": {
+        "elevacao_media_m": 651.6,
+        "rugosidade_desvio_m": 689.1,
+        "declividade_media_graus": 2.849,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 13.179,
+        "poeira_ugm3": 0.416
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 163.0,
+      "temperatura": {
+        "media_anual_C": -32.581,
+        "amplitude_C": 28.583
+      },
+      "relevo": {
+        "elevacao_media_m": 522.6,
+        "rugosidade_desvio_m": 782.2,
+        "declividade_media_graus": 2.831,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.23,
+        "poeira_ugm3": 0.423
+      }
+    },
+    {
+      "lat": -79.0,
+      "lon": 165.0,
+      "temperatura": {
+        "media_anual_C": -29.312,
+        "amplitude_C": 31.6
+      },
+      "relevo": {
+        "elevacao_media_m": 133.6,
+        "rugosidade_desvio_m": 262.3,
+        "declividade_media_graus": 1.106,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 9.847,
+        "poeira_ugm3": 0.409
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 97.0,
+      "temperatura": {
+        "media_anual_C": -57.138,
+        "amplitude_C": 29.313
+      },
+      "relevo": {
+        "elevacao_media_m": 3724.0,
+        "rugosidade_desvio_m": 23.2,
+        "declividade_media_graus": 0.083,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 7.618,
+        "poeira_ugm3": 0.486
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 99.0,
+      "temperatura": {
+        "media_anual_C": -56.804,
+        "amplitude_C": 29.65
+      },
+      "relevo": {
+        "elevacao_media_m": 3664.4,
+        "rugosidade_desvio_m": 28.0,
+        "declividade_media_graus": 0.09,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 8.088,
+        "poeira_ugm3": 0.483
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 101.0,
+      "temperatura": {
+        "media_anual_C": -56.317,
+        "amplitude_C": 29.964
+      },
+      "relevo": {
+        "elevacao_media_m": 3599.6,
+        "rugosidade_desvio_m": 36.7,
+        "declividade_media_graus": 0.098,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 8.553,
+        "poeira_ugm3": 0.481
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 103.0,
+      "temperatura": {
+        "media_anual_C": -56.757,
+        "amplitude_C": 31.586
+      },
+      "relevo": {
+        "elevacao_media_m": 3546.5,
+        "rugosidade_desvio_m": 22.5,
+        "declividade_media_graus": 0.079,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 8.944,
+        "poeira_ugm3": 0.479
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 159.0,
+      "temperatura": {
+        "media_anual_C": -39.482,
+        "amplitude_C": 26.536
+      },
+      "relevo": {
+        "elevacao_media_m": 2047.2,
+        "rugosidade_desvio_m": 222.9,
+        "declividade_media_graus": 0.787,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 13.351,
+        "poeira_ugm3": 0.393
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 161.0,
+      "temperatura": {
+        "media_anual_C": -31.88,
+        "amplitude_C": 28.512
+      },
+      "relevo": {
+        "elevacao_media_m": 1322.7,
+        "rugosidade_desvio_m": 472.5,
+        "declividade_media_graus": 5.249,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 11.288,
+        "poeira_ugm3": 0.416
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 163.0,
+      "temperatura": {
+        "media_anual_C": -28.642,
+        "amplitude_C": 30.765
+      },
+      "relevo": {
+        "elevacao_media_m": 636.2,
+        "rugosidade_desvio_m": 492.9,
+        "declividade_media_graus": 6.345,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 7.942,
+        "poeira_ugm3": 0.421
+      }
+    },
+    {
+      "lat": -77.0,
+      "lon": 165.0,
+      "temperatura": {
+        "media_anual_C": -28.546,
+        "amplitude_C": 31.039
+      },
+      "relevo": {
+        "elevacao_media_m": 186.7,
+        "rugosidade_desvio_m": 275.1,
+        "declividade_media_graus": 2.789,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 6.917,
+        "poeira_ugm3": 0.416
+      }
+    },
+    {
+      "lat": -75.0,
+      "lon": 159.0,
+      "temperatura": {
+        "media_anual_C": -36.106,
+        "amplitude_C": 25.522
+      },
+      "relevo": {
+        "elevacao_media_m": 1584.5,
+        "rugosidade_desvio_m": 249.7,
+        "declividade_media_graus": 0.779,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 12.891,
+        "poeira_ugm3": 0.389
+      }
+    },
+    {
+      "lat": -75.0,
+      "lon": 161.0,
+      "temperatura": {
+        "media_anual_C": -33.182,
+        "amplitude_C": 25.641
+      },
+      "relevo": {
+        "elevacao_media_m": 1198.3,
+        "rugosidade_desvio_m": 470.3,
+        "declividade_media_graus": 1.578,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 12.329,
+        "poeira_ugm3": 0.407
+      }
+    },
+    {
+      "lat": -75.0,
+      "lon": 163.0,
+      "temperatura": {
+        "media_anual_C": -30.031,
+        "amplitude_C": 26.02
+      },
+      "relevo": {
+        "elevacao_media_m": 629.4,
+        "rugosidade_desvio_m": 740.4,
+        "declividade_media_graus": 4.473,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 9.347,
+        "poeira_ugm3": 0.42
+      }
+    },
+    {
+      "lat": -75.0,
+      "lon": 165.0,
+      "temperatura": {
+        "media_anual_C": -28.7,
+        "amplitude_C": 25.494
+      },
+      "relevo": {
+        "elevacao_media_m": 451.0,
+        "rugosidade_desvio_m": 464.3,
+        "declividade_media_graus": 3.965,
+        "fonte": "ETOPO202"
+      },
+      "gelo": {
+        "frac_neve": 1.0,
+        "frac_T_abaixo_0C": 1.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.998
+      },
+      "vento": {
+        "vento_ms": 7.369,
+        "poeira_ugm3": 0.409
+      }
+    },
+    {
+      "lat": -27.0,
+      "lon": -71.0,
+      "temperatura": {
+        "media_anual_C": 24.284,
+        "amplitude_C": 13.68
+      },
+      "relevo": {
+        "elevacao_media_m": 792.2,
+        "rugosidade_desvio_m": 474.4,
+        "declividade_media_graus": 4.116,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0001
+      },
+      "vento": {
+        "vento_ms": 5.362,
+        "poeira_ugm3": 7.628
+      }
+    },
+    {
+      "lat": -27.0,
+      "lon": -69.0,
+      "temperatura": {
+        "media_anual_C": 12.395,
+        "amplitude_C": 19.799
+      },
+      "relevo": {
+        "elevacao_media_m": 3847.7,
+        "rugosidade_desvio_m": 1092.7,
+        "declividade_media_graus": 6.613,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.061,
+        "frac_T_abaixo_0C": 0.125
+      },
+      "geologia": {
+        "indice_quartzo": 1.0001
+      },
+      "vento": {
+        "vento_ms": 6.11,
+        "poeira_ugm3": 4.797
+      }
+    },
+    {
+      "lat": -27.0,
+      "lon": -67.0,
+      "temperatura": {
+        "media_anual_C": 16.195,
+        "amplitude_C": 17.636
+      },
+      "relevo": {
+        "elevacao_media_m": 3006.9,
+        "rugosidade_desvio_m": 1150.3,
+        "declividade_media_graus": 6.035,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.003,
+        "frac_T_abaixo_0C": 0.018
+      },
+      "geologia": {
+        "indice_quartzo": 1.0042
+      },
+      "vento": {
+        "vento_ms": 5.447,
+        "poeira_ugm3": 7.357
+      }
+    },
+    {
+      "lat": -27.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 9.556,
+        "poeira_ugm3": 9.596
+      }
+    },
+    {
+      "lat": -27.0,
+      "lon": 15.0,
+      "temperatura": {
+        "media_anual_C": 26.514,
+        "amplitude_C": 12.996
+      },
+      "relevo": {
+        "elevacao_media_m": 438.3,
+        "rugosidade_desvio_m": 246.3,
+        "declividade_media_graus": 1.347,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0271
+      },
+      "vento": {
+        "vento_ms": 8.766,
+        "poeira_ugm3": 56.741
+      }
+    },
+    {
+      "lat": -27.0,
+      "lon": 17.0,
+      "temperatura": {
+        "media_anual_C": 26.251,
+        "amplitude_C": 17.795
+      },
+      "relevo": {
+        "elevacao_media_m": 1007.1,
+        "rugosidade_desvio_m": 297.7,
+        "declividade_media_graus": 1.932,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0095
+      },
+      "vento": {
+        "vento_ms": 6.356,
+        "poeira_ugm3": 21.246
+      }
+    },
+    {
+      "lat": -25.0,
+      "lon": -71.0,
+      "temperatura": {
+        "media_anual_C": 24.698,
+        "amplitude_C": 13.101
+      },
+      "relevo": {
+        "elevacao_media_m": 1416.8,
+        "rugosidade_desvio_m": 646.2,
+        "declividade_media_graus": 4.92,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0023
+      },
+      "vento": {
+        "vento_ms": 5.523,
+        "poeira_ugm3": 4.4
+      }
+    },
+    {
+      "lat": -25.0,
+      "lon": -69.0,
+      "temperatura": {
+        "media_anual_C": 17.513,
+        "amplitude_C": 17.531
+      },
+      "relevo": {
+        "elevacao_media_m": 3266.3,
+        "rugosidade_desvio_m": 1053.7,
+        "declividade_media_graus": 4.275,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.012,
+        "frac_T_abaixo_0C": 0.022
+      },
+      "geologia": {
+        "indice_quartzo": 1.0037
+      },
+      "vento": {
+        "vento_ms": 5.814,
+        "poeira_ugm3": 5.926
+      }
+    },
+    {
+      "lat": -25.0,
+      "lon": -67.0,
+      "temperatura": {
+        "media_anual_C": 13.798,
+        "amplitude_C": 17.978
+      },
+      "relevo": {
+        "elevacao_media_m": 3945.5,
+        "rugosidade_desvio_m": 669.4,
+        "declividade_media_graus": 5.745,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.017,
+        "frac_T_abaixo_0C": 0.029
+      },
+      "geologia": {
+        "indice_quartzo": 1.008
+      },
+      "vento": {
+        "vento_ms": 6.073,
+        "poeira_ugm3": 2.603
+      }
+    },
+    {
+      "lat": -25.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 9.265,
+        "poeira_ugm3": 20.694
+      }
+    },
+    {
+      "lat": -25.0,
+      "lon": 15.0,
+      "temperatura": {
+        "media_anual_C": 29.431,
+        "amplitude_C": 14.468
+      },
+      "relevo": {
+        "elevacao_media_m": 653.6,
+        "rugosidade_desvio_m": 304.4,
+        "declividade_media_graus": 1.467,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0382
+      },
+      "vento": {
+        "vento_ms": 7.195,
+        "poeira_ugm3": 96.96
+      }
+    },
+    {
+      "lat": -25.0,
+      "lon": 17.0,
+      "temperatura": {
+        "media_anual_C": 26.326,
+        "amplitude_C": 18.89
+      },
+      "relevo": {
+        "elevacao_media_m": 1321.8,
+        "rugosidade_desvio_m": 204.2,
+        "declividade_media_graus": 1.386,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0046
+      },
+      "vento": {
+        "vento_ms": 6.154,
+        "poeira_ugm3": 16.347
+      }
+    },
+    {
+      "lat": -23.0,
+      "lon": -71.0,
+      "temperatura": {
+        "media_anual_C": 25.534,
+        "amplitude_C": 11.536
+      },
+      "relevo": {
+        "elevacao_media_m": 865.4,
+        "rugosidade_desvio_m": 457.1,
+        "declividade_media_graus": 4.388,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.9933
+      },
+      "vento": {
+        "vento_ms": 5.113,
+        "poeira_ugm3": 3.214
+      }
+    },
+    {
+      "lat": -23.0,
+      "lon": -69.0,
+      "temperatura": {
+        "media_anual_C": 23.836,
+        "amplitude_C": 14.766
+      },
+      "relevo": {
+        "elevacao_media_m": 2268.4,
+        "rugosidade_desvio_m": 790.9,
+        "declividade_media_graus": 2.516,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.003,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.9949
+      },
+      "vento": {
+        "vento_ms": 5.061,
+        "poeira_ugm3": 8.885
+      }
+    },
+    {
+      "lat": -23.0,
+      "lon": -67.0,
+      "temperatura": {
+        "media_anual_C": 12.267,
+        "amplitude_C": 16.565
+      },
+      "relevo": {
+        "elevacao_media_m": 4317.0,
+        "rugosidade_desvio_m": 473.4,
+        "declividade_media_graus": 4.214,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.028,
+        "frac_T_abaixo_0C": 0.016
+      },
+      "geologia": {
+        "indice_quartzo": 1.0066
+      },
+      "vento": {
+        "vento_ms": 7.005,
+        "poeira_ugm3": 2.54
+      }
+    },
+    {
+      "lat": -23.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 8.143,
+        "poeira_ugm3": 43.616
+      }
+    },
+    {
+      "lat": -23.0,
+      "lon": 15.0,
+      "temperatura": {
+        "media_anual_C": 28.402,
+        "amplitude_C": 11.836
+      },
+      "relevo": {
+        "elevacao_media_m": 639.3,
+        "rugosidade_desvio_m": 351.6,
+        "declividade_media_graus": 1.35,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0102
+      },
+      "vento": {
+        "vento_ms": 5.839,
+        "poeira_ugm3": 142.797
+      }
+    },
+    {
+      "lat": -23.0,
+      "lon": 17.0,
+      "temperatura": {
+        "media_anual_C": 25.118,
+        "amplitude_C": 17.779
+      },
+      "relevo": {
+        "elevacao_media_m": 1516.3,
+        "rugosidade_desvio_m": 224.6,
+        "declividade_media_graus": 1.446,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.999
+      },
+      "vento": {
+        "vento_ms": 5.931,
+        "poeira_ugm3": 15.182
+      }
+    },
+    {
+      "lat": 13.0,
+      "lon": 39.0,
+      "temperatura": {
+        "media_anual_C": 25.671,
+        "amplitude_C": 9.892
+      },
+      "relevo": {
+        "elevacao_media_m": 1892.3,
+        "rugosidade_desvio_m": 547.6,
+        "declividade_media_graus": 5.875,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.9995
+      },
+      "vento": {
+        "vento_ms": 3.775,
+        "poeira_ugm3": 45.269
+      }
+    },
+    {
+      "lat": 13.0,
+      "lon": 41.0,
+      "temperatura": {
+        "media_anual_C": 36.904,
+        "amplitude_C": 8.672
+      },
+      "relevo": {
+        "elevacao_media_m": 380.4,
+        "rugosidade_desvio_m": 315.5,
+        "declividade_media_graus": 2.104,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0019
+      },
+      "vento": {
+        "vento_ms": 4.786,
+        "poeira_ugm3": 126.591
+      }
+    },
+    {
+      "lat": 13.0,
+      "lon": 43.0,
+      "temperatura": {
+        "media_anual_C": 33.796,
+        "amplitude_C": 8.894
+      },
+      "relevo": {
+        "elevacao_media_m": 393.4,
+        "rugosidade_desvio_m": 351.7,
+        "declividade_media_graus": 1.973,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0037
+      },
+      "vento": {
+        "vento_ms": 6.76,
+        "poeira_ugm3": 121.063
+      }
+    },
+    {
+      "lat": 15.0,
+      "lon": 39.0,
+      "temperatura": {
+        "media_anual_C": 27.738,
+        "amplitude_C": 10.776
+      },
+      "relevo": {
+        "elevacao_media_m": 1409.1,
+        "rugosidade_desvio_m": 690.4,
+        "declividade_media_graus": 4.654,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0009
+      },
+      "vento": {
+        "vento_ms": 4.811,
+        "poeira_ugm3": 57.427
+      }
+    },
+    {
+      "lat": 15.0,
+      "lon": 41.0,
+      "temperatura": {
+        "media_anual_C": 36.873,
+        "amplitude_C": 9.869
+      },
+      "relevo": {
+        "elevacao_media_m": 145.7,
+        "rugosidade_desvio_m": 244.6,
+        "declividade_media_graus": 1.708,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0075
+      },
+      "vento": {
+        "vento_ms": 5.46,
+        "poeira_ugm3": 133.365
+      }
+    },
+    {
+      "lat": 15.0,
+      "lon": 43.0,
+      "temperatura": {
+        "media_anual_C": 29.503,
+        "amplitude_C": 7.012
+      },
+      "relevo": {
+        "elevacao_media_m": 772.0,
+        "rugosidade_desvio_m": 801.6,
+        "declividade_media_graus": 4.56,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0009
+      },
+      "vento": {
+        "vento_ms": 4.68,
+        "poeira_ugm3": 115.376
+      }
+    },
+    {
+      "lat": 17.0,
+      "lon": -157.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 8.651,
+        "poeira_ugm3": 0.766
+      }
+    },
+    {
+      "lat": 17.0,
+      "lon": -155.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 8.771,
+        "poeira_ugm3": 0.811
+      }
+    },
+    {
+      "lat": 17.0,
+      "lon": -153.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 8.659,
+        "poeira_ugm3": 0.85
+      }
+    },
+    {
+      "lat": 17.0,
+      "lon": 39.0,
+      "temperatura": {
+        "media_anual_C": 31.703,
+        "amplitude_C": 11.382
+      },
+      "relevo": {
+        "elevacao_media_m": 781.4,
+        "rugosidade_desvio_m": 630.2,
+        "declividade_media_graus": 4.718,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0006
+      },
+      "vento": {
+        "vento_ms": 5.147,
+        "poeira_ugm3": 115.317
+      }
+    },
+    {
+      "lat": 17.0,
+      "lon": 41.0,
+      "temperatura": {
+        "media_anual_C": 34.225,
+        "amplitude_C": 8.685
+      },
+      "relevo": {
+        "elevacao_media_m": 34.0,
+        "rugosidade_desvio_m": 43.3,
+        "declividade_media_graus": 0.623,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0046
+      },
+      "vento": {
+        "vento_ms": 4.984,
+        "poeira_ugm3": 119.261
+      }
+    },
+    {
+      "lat": 17.0,
+      "lon": 43.0,
+      "temperatura": {
+        "media_anual_C": 29.86,
+        "amplitude_C": 9.078
+      },
+      "relevo": {
+        "elevacao_media_m": 1052.2,
+        "rugosidade_desvio_m": 840.0,
+        "declividade_media_graus": 3.713,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0033
+      },
+      "vento": {
+        "vento_ms": 4.521,
+        "poeira_ugm3": 123.519
+      }
+    },
+    {
+      "lat": 19.0,
+      "lon": -157.0,
+      "temperatura": {
+        "media_anual_C": 26.095,
+        "amplitude_C": 4.888
+      },
+      "relevo": {
+        "elevacao_media_m": 53.9,
+        "rugosidade_desvio_m": 54.9,
+        "declividade_media_graus": 2.39,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.015
+      },
+      "vento": {
+        "vento_ms": 5.829,
+        "poeira_ugm3": 0.859
+      }
+    },
+    {
+      "lat": 19.0,
+      "lon": -155.0,
+      "temperatura": {
+        "media_anual_C": 20.409,
+        "amplitude_C": 6.223
+      },
+      "relevo": {
+        "elevacao_media_m": 1247.9,
+        "rugosidade_desvio_m": 937.0,
+        "declividade_media_graus": 4.994,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.004,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0067
+      },
+      "vento": {
+        "vento_ms": 7.602,
+        "poeira_ugm3": 0.881
+      }
+    },
+    {
+      "lat": 19.0,
+      "lon": -153.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 7.781,
+        "poeira_ugm3": 0.961
+      }
+    },
+    {
+      "lat": 21.0,
+      "lon": -157.0,
+      "temperatura": {
+        "media_anual_C": 23.283,
+        "amplitude_C": 5.947
+      },
+      "relevo": {
+        "elevacao_media_m": 440.9,
+        "rugosidade_desvio_m": 527.1,
+        "declividade_media_graus": 7.005,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.001,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0031
+      },
+      "vento": {
+        "vento_ms": 6.67,
+        "poeira_ugm3": 0.98
+      }
+    },
+    {
+      "lat": 21.0,
+      "lon": -155.0,
+      "temperatura": {
+        "media_anual_C": 21.955,
+        "amplitude_C": 5.115
+      },
+      "relevo": {
+        "elevacao_media_m": 560.3,
+        "rugosidade_desvio_m": 379.8,
+        "declividade_media_graus": 6.115,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.001,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.9997
+      },
+      "vento": {
+        "vento_ms": 7.262,
+        "poeira_ugm3": 0.977
+      }
+    },
+    {
+      "lat": 21.0,
+      "lon": -153.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 7.329,
+        "poeira_ugm3": 1.026
+      }
+    },
+    {
+      "lat": 23.0,
+      "lon": 7.0,
+      "temperatura": {
+        "media_anual_C": 30.127,
+        "amplitude_C": 20.856
+      },
+      "relevo": {
+        "elevacao_media_m": 1128.6,
+        "rugosidade_desvio_m": 326.1,
+        "declividade_media_graus": 1.444,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.011
+      },
+      "vento": {
+        "vento_ms": 6.1,
+        "poeira_ugm3": 142.595
+      }
+    },
+    {
+      "lat": 23.0,
+      "lon": 9.0,
+      "temperatura": {
+        "media_anual_C": 29.369,
+        "amplitude_C": 22.552
+      },
+      "relevo": {
+        "elevacao_media_m": 843.3,
+        "rugosidade_desvio_m": 138.8,
+        "declividade_media_graus": 0.571,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.058
+      },
+      "vento": {
+        "vento_ms": 5.949,
+        "poeira_ugm3": 175.259
+      }
+    },
+    {
+      "lat": 23.0,
+      "lon": 11.0,
+      "temperatura": {
+        "media_anual_C": 29.443,
+        "amplitude_C": 23.272
+      },
+      "relevo": {
+        "elevacao_media_m": 817.6,
+        "rugosidade_desvio_m": 152.8,
+        "declividade_media_graus": 0.91,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0748
+      },
+      "vento": {
+        "vento_ms": 6.88,
+        "poeira_ugm3": 206.742
+      }
+    },
+    {
+      "lat": 23.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": 28.691,
+        "amplitude_C": 23.839
+      },
+      "relevo": {
+        "elevacao_media_m": 767.1,
+        "rugosidade_desvio_m": 109.1,
+        "declividade_media_graus": 0.586,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0901
+      },
+      "vento": {
+        "vento_ms": 6.971,
+        "poeira_ugm3": 222.748
+      }
+    },
+    {
+      "lat": 25.0,
+      "lon": 7.0,
+      "temperatura": {
+        "media_anual_C": 29.375,
+        "amplitude_C": 22.954
+      },
+      "relevo": {
+        "elevacao_media_m": 1177.1,
+        "rugosidade_desvio_m": 153.9,
+        "declividade_media_graus": 1.35,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0142
+      },
+      "vento": {
+        "vento_ms": 6.11,
+        "poeira_ugm3": 123.152
+      }
+    },
+    {
+      "lat": 25.0,
+      "lon": 9.0,
+      "temperatura": {
+        "media_anual_C": 29.44,
+        "amplitude_C": 23.547
+      },
+      "relevo": {
+        "elevacao_media_m": 1135.5,
+        "rugosidade_desvio_m": 253.3,
+        "declividade_media_graus": 1.539,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0264
+      },
+      "vento": {
+        "vento_ms": 5.935,
+        "poeira_ugm3": 120.324
+      }
+    },
+    {
+      "lat": 25.0,
+      "lon": 11.0,
+      "temperatura": {
+        "media_anual_C": 29.772,
+        "amplitude_C": 24.87
+      },
+      "relevo": {
+        "elevacao_media_m": 839.8,
+        "rugosidade_desvio_m": 169.3,
+        "declividade_media_graus": 1.366,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0519
+      },
+      "vento": {
+        "vento_ms": 6.254,
+        "poeira_ugm3": 143.432
+      }
+    },
+    {
+      "lat": 25.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": 27.276,
+        "amplitude_C": 25.195
+      },
+      "relevo": {
+        "elevacao_media_m": 668.6,
+        "rugosidade_desvio_m": 100.9,
+        "declividade_media_graus": 1.335,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0995
+      },
+      "vento": {
+        "vento_ms": 5.888,
+        "poeira_ugm3": 196.239
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": -15.0,
+      "temperatura": {
+        "media_anual_C": 24.338,
+        "amplitude_C": 11.139
+      },
+      "relevo": {
+        "elevacao_media_m": 231.0,
+        "rugosidade_desvio_m": 333.1,
+        "declividade_media_graus": 2.896,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.009
+      },
+      "vento": {
+        "vento_ms": 7.696,
+        "poeira_ugm3": 114.754
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": -13.0,
+      "temperatura": {
+        "media_anual_C": 25.706,
+        "amplitude_C": 12.913
+      },
+      "relevo": {
+        "elevacao_media_m": 153.0,
+        "rugosidade_desvio_m": 92.2,
+        "declividade_media_graus": 0.402,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0248
+      },
+      "vento": {
+        "vento_ms": 7.595,
+        "poeira_ugm3": 402.342
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": -11.0,
+      "temperatura": {
+        "media_anual_C": 28.023,
+        "amplitude_C": 17.039
+      },
+      "relevo": {
+        "elevacao_media_m": 336.0,
+        "rugosidade_desvio_m": 109.0,
+        "declividade_media_graus": 0.604,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0336
+      },
+      "vento": {
+        "vento_ms": 7.35,
+        "poeira_ugm3": 396.363
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": 7.0,
+      "temperatura": {
+        "media_anual_C": 30.688,
+        "amplitude_C": 25.982
+      },
+      "relevo": {
+        "elevacao_media_m": 575.5,
+        "rugosidade_desvio_m": 200.0,
+        "declividade_media_graus": 1.945,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0517
+      },
+      "vento": {
+        "vento_ms": 6.28,
+        "poeira_ugm3": 225.157
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": 9.0,
+      "temperatura": {
+        "media_anual_C": 30.464,
+        "amplitude_C": 25.838
+      },
+      "relevo": {
+        "elevacao_media_m": 581.7,
+        "rugosidade_desvio_m": 131.8,
+        "declividade_media_graus": 0.787,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0506
+      },
+      "vento": {
+        "vento_ms": 6.493,
+        "poeira_ugm3": 196.308
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": 11.0,
+      "temperatura": {
+        "media_anual_C": 29.421,
+        "amplitude_C": 25.802
+      },
+      "relevo": {
+        "elevacao_media_m": 554.9,
+        "rugosidade_desvio_m": 67.8,
+        "declividade_media_graus": 0.881,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0753
+      },
+      "vento": {
+        "vento_ms": 6.289,
+        "poeira_ugm3": 191.688
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": 28.676,
+        "amplitude_C": 25.659
+      },
+      "relevo": {
+        "elevacao_media_m": 500.9,
+        "rugosidade_desvio_m": 85.9,
+        "declividade_media_graus": 0.766,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0712
+      },
+      "vento": {
+        "vento_ms": 5.867,
+        "poeira_ugm3": 215.493
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": 85.0,
+      "temperatura": {
+        "media_anual_C": 21.833,
+        "amplitude_C": 13.296
+      },
+      "relevo": {
+        "elevacao_media_m": 416.2,
+        "rugosidade_desvio_m": 592.1,
+        "declividade_media_graus": 3.219,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.002,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0004
+      },
+      "vento": {
+        "vento_ms": 4.069,
+        "poeira_ugm3": 39.964
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": 87.0,
+      "temperatura": {
+        "media_anual_C": 15.618,
+        "amplitude_C": 12.206
+      },
+      "relevo": {
+        "elevacao_media_m": 1453.5,
+        "rugosidade_desvio_m": 1691.0,
+        "declividade_media_graus": 8.671,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.092,
+        "frac_T_abaixo_0C": 0.113
+      },
+      "geologia": {
+        "indice_quartzo": 1.0013
+      },
+      "vento": {
+        "vento_ms": 3.772,
+        "poeira_ugm3": 28.49
+      }
+    },
+    {
+      "lat": 27.0,
+      "lon": 89.0,
+      "temperatura": {
+        "media_anual_C": 13.616,
+        "amplitude_C": 11.645
+      },
+      "relevo": {
+        "elevacao_media_m": 1813.1,
+        "rugosidade_desvio_m": 1871.8,
+        "declividade_media_graus": 8.364,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.115,
+        "frac_T_abaixo_0C": 0.137
+      },
+      "geologia": {
+        "indice_quartzo": 1.0006
+      },
+      "vento": {
+        "vento_ms": 3.802,
+        "poeira_ugm3": 20.758
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": -15.0,
+      "temperatura": {
+        "media_anual_C": 22.782,
+        "amplitude_C": 11.163
+      },
+      "relevo": {
+        "elevacao_media_m": 293.6,
+        "rugosidade_desvio_m": 303.1,
+        "declividade_media_graus": 4.895,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.9993
+      },
+      "vento": {
+        "vento_ms": 7.048,
+        "poeira_ugm3": 47.029
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": -13.0,
+      "temperatura": {
+        "media_anual_C": 23.692,
+        "amplitude_C": 10.788
+      },
+      "relevo": {
+        "elevacao_media_m": 137.2,
+        "rugosidade_desvio_m": 114.9,
+        "declividade_media_graus": 2.604,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0011
+      },
+      "vento": {
+        "vento_ms": 7.362,
+        "poeira_ugm3": 64.83
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": -11.0,
+      "temperatura": {
+        "media_anual_C": 25.957,
+        "amplitude_C": 14.222
+      },
+      "relevo": {
+        "elevacao_media_m": 269.2,
+        "rugosidade_desvio_m": 169.6,
+        "declividade_media_graus": 1.956,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0149
+      },
+      "vento": {
+        "vento_ms": 7.068,
+        "poeira_ugm3": 93.556
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": 57.0,
+      "temperatura": {
+        "media_anual_C": 22.945,
+        "amplitude_C": 30.417
+      },
+      "relevo": {
+        "elevacao_media_m": 1915.5,
+        "rugosidade_desvio_m": 703.4,
+        "declividade_media_graus": 3.811,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.013,
+        "frac_T_abaixo_0C": 0.018
+      },
+      "geologia": {
+        "indice_quartzo": 0.9976
+      },
+      "vento": {
+        "vento_ms": 4.977,
+        "poeira_ugm3": 76.024
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": 59.0,
+      "temperatura": {
+        "media_anual_C": 30.675,
+        "amplitude_C": 30.397
+      },
+      "relevo": {
+        "elevacao_media_m": 842.7,
+        "rugosidade_desvio_m": 488.3,
+        "declividade_media_graus": 1.989,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.001
+      },
+      "geologia": {
+        "indice_quartzo": 0.9974
+      },
+      "vento": {
+        "vento_ms": 6.744,
+        "poeira_ugm3": 124.195
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": 61.0,
+      "temperatura": {
+        "media_anual_C": 27.025,
+        "amplitude_C": 29.99
+      },
+      "relevo": {
+        "elevacao_media_m": 1337.1,
+        "rugosidade_desvio_m": 464.8,
+        "declividade_media_graus": 2.327,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.0,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.9997
+      },
+      "vento": {
+        "vento_ms": 6.898,
+        "poeira_ugm3": 117.226
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": 85.0,
+      "temperatura": {
+        "media_anual_C": 2.972,
+        "amplitude_C": 20.381
+      },
+      "relevo": {
+        "elevacao_media_m": 4582.7,
+        "rugosidade_desvio_m": 1234.5,
+        "declividade_media_graus": 10.668,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.246,
+        "frac_T_abaixo_0C": 0.38
+      },
+      "geologia": {
+        "indice_quartzo": 1.0109
+      },
+      "vento": {
+        "vento_ms": 4.266,
+        "poeira_ugm3": 10.045
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": 87.0,
+      "temperatura": {
+        "media_anual_C": 3.844,
+        "amplitude_C": 20.877
+      },
+      "relevo": {
+        "elevacao_media_m": 5005.5,
+        "rugosidade_desvio_m": 485.1,
+        "declividade_media_graus": 8.747,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.103,
+        "frac_T_abaixo_0C": 0.333
+      },
+      "geologia": {
+        "indice_quartzo": 1.0133
+      },
+      "vento": {
+        "vento_ms": 5.181,
+        "poeira_ugm3": 5.566
+      }
+    },
+    {
+      "lat": 29.0,
+      "lon": 89.0,
+      "temperatura": {
+        "media_anual_C": 5.019,
+        "amplitude_C": 17.625
+      },
+      "relevo": {
+        "elevacao_media_m": 4793.9,
+        "rugosidade_desvio_m": 463.1,
+        "declividade_media_graus": 7.99,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.063,
+        "frac_T_abaixo_0C": 0.243
+      },
+      "geologia": {
+        "indice_quartzo": 1.0139
+      },
+      "vento": {
+        "vento_ms": 5.203,
+        "poeira_ugm3": 4.899
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": -15.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 7.018,
+        "poeira_ugm3": 19.944
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": -13.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 7.58,
+        "poeira_ugm3": 20.545
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": -11.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 8.212,
+        "poeira_ugm3": 24.01
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": 57.0,
+      "temperatura": {
+        "media_anual_C": 25.859,
+        "amplitude_C": 31.129
+      },
+      "relevo": {
+        "elevacao_media_m": 1373.6,
+        "rugosidade_desvio_m": 713.1,
+        "declividade_media_graus": 3.108,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.007,
+        "frac_T_abaixo_0C": 0.004
+      },
+      "geologia": {
+        "indice_quartzo": 1.0032
+      },
+      "vento": {
+        "vento_ms": 5.481,
+        "poeira_ugm3": 69.447
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": 59.0,
+      "temperatura": {
+        "media_anual_C": 30.629,
+        "amplitude_C": 31.627
+      },
+      "relevo": {
+        "elevacao_media_m": 811.4,
+        "rugosidade_desvio_m": 404.3,
+        "declividade_media_graus": 1.378,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.001,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0014
+      },
+      "vento": {
+        "vento_ms": 6.483,
+        "poeira_ugm3": 113.903
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": 61.0,
+      "temperatura": {
+        "media_anual_C": 26.773,
+        "amplitude_C": 29.872
+      },
+      "relevo": {
+        "elevacao_media_m": 797.7,
+        "rugosidade_desvio_m": 382.6,
+        "declividade_media_graus": 1.09,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.001,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0054
+      },
+      "vento": {
+        "vento_ms": 7.568,
+        "poeira_ugm3": 188.077
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": 85.0,
+      "temperatura": {
+        "media_anual_C": 2.916,
+        "amplitude_C": 27.101
+      },
+      "relevo": {
+        "elevacao_media_m": 5057.1,
+        "rugosidade_desvio_m": 353.5,
+        "declividade_media_graus": 4.899,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.089,
+        "frac_T_abaixo_0C": 0.411
+      },
+      "geologia": {
+        "indice_quartzo": 1.0106
+      },
+      "vento": {
+        "vento_ms": 6.668,
+        "poeira_ugm3": 5.094
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": 87.0,
+      "temperatura": {
+        "media_anual_C": 2.712,
+        "amplitude_C": 24.553
+      },
+      "relevo": {
+        "elevacao_media_m": 5003.4,
+        "rugosidade_desvio_m": 323.9,
+        "declividade_media_graus": 4.834,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.069,
+        "frac_T_abaixo_0C": 0.413
+      },
+      "geologia": {
+        "indice_quartzo": 1.0114
+      },
+      "vento": {
+        "vento_ms": 6.336,
+        "poeira_ugm3": 5.18
+      }
+    },
+    {
+      "lat": 31.0,
+      "lon": 89.0,
+      "temperatura": {
+        "media_anual_C": 1.986,
+        "amplitude_C": 22.657
+      },
+      "relevo": {
+        "elevacao_media_m": 4947.9,
+        "rugosidade_desvio_m": 297.4,
+        "declividade_media_graus": 4.221,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.102,
+        "frac_T_abaixo_0C": 0.422
+      },
+      "geologia": {
+        "indice_quartzo": 1.0099
+      },
+      "vento": {
+        "vento_ms": 6.47,
+        "poeira_ugm3": 5.073
+      }
+    },
+    {
+      "lat": 33.0,
+      "lon": 57.0,
+      "temperatura": {
+        "media_anual_C": 26.39,
+        "amplitude_C": 32.764
+      },
+      "relevo": {
+        "elevacao_media_m": 1038.4,
+        "rugosidade_desvio_m": 272.8,
+        "declividade_media_graus": 1.813,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.002,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 1.0047
+      },
+      "vento": {
+        "vento_ms": 5.892,
+        "poeira_ugm3": 81.667
+      }
+    },
+    {
+      "lat": 33.0,
+      "lon": 59.0,
+      "temperatura": {
+        "media_anual_C": 22.923,
+        "amplitude_C": 33.023
+      },
+      "relevo": {
+        "elevacao_media_m": 1497.0,
+        "rugosidade_desvio_m": 377.6,
+        "declividade_media_graus": 2.001,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.017,
+        "frac_T_abaixo_0C": 0.012
+      },
+      "geologia": {
+        "indice_quartzo": 0.9994
+      },
+      "vento": {
+        "vento_ms": 7.151,
+        "poeira_ugm3": 75.258
+      }
+    },
+    {
+      "lat": 33.0,
+      "lon": 61.0,
+      "temperatura": {
+        "media_anual_C": 23.959,
+        "amplitude_C": 32.166
+      },
+      "relevo": {
+        "elevacao_media_m": 956.9,
+        "rugosidade_desvio_m": 333.4,
+        "declividade_media_graus": 1.706,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.007,
+        "frac_T_abaixo_0C": 0.001
+      },
+      "geologia": {
+        "indice_quartzo": 0.9999
+      },
+      "vento": {
+        "vento_ms": 8.842,
+        "poeira_ugm3": 126.738
+      }
+    },
+    {
+      "lat": 37.0,
+      "lon": -113.0,
+      "temperatura": {
+        "media_anual_C": 16.409,
+        "amplitude_C": 31.318
+      },
+      "relevo": {
+        "elevacao_media_m": 1752.3,
+        "rugosidade_desvio_m": 467.4,
+        "declividade_media_graus": 4.179,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.072,
+        "frac_T_abaixo_0C": 0.08
+      },
+      "geologia": {
+        "indice_quartzo": 1.0035
+      },
+      "vento": {
+        "vento_ms": 5.625,
+        "poeira_ugm3": 10.542
+      }
+    },
+    {
+      "lat": 37.0,
+      "lon": -111.0,
+      "temperatura": {
+        "media_anual_C": 17.356,
+        "amplitude_C": 33.773
+      },
+      "relevo": {
+        "elevacao_media_m": 1729.8,
+        "rugosidade_desvio_m": 319.6,
+        "declividade_media_graus": 3.445,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.035,
+        "frac_T_abaixo_0C": 0.07
+      },
+      "geologia": {
+        "indice_quartzo": 1.0157
+      },
+      "vento": {
+        "vento_ms": 5.363,
+        "poeira_ugm3": 7.869
+      }
+    },
+    {
+      "lat": 37.0,
+      "lon": -109.0,
+      "temperatura": {
+        "media_anual_C": 15.263,
+        "amplitude_C": 33.287
+      },
+      "relevo": {
+        "elevacao_media_m": 1937.2,
+        "rugosidade_desvio_m": 390.2,
+        "declividade_media_graus": 2.686,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.086,
+        "frac_T_abaixo_0C": 0.153
+      },
+      "geologia": {
+        "indice_quartzo": 1.0059
+      },
+      "vento": {
+        "vento_ms": 5.87,
+        "poeira_ugm3": 6.345
+      }
+    },
+    {
+      "lat": 39.0,
+      "lon": -123.0,
+      "temperatura": {
+        "media_anual_C": 17.367,
+        "amplitude_C": 21.232
+      },
+      "relevo": {
+        "elevacao_media_m": 434.8,
+        "rugosidade_desvio_m": 389.8,
+        "declividade_media_graus": 4.675,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.014,
+        "frac_T_abaixo_0C": 0.0
+      },
+      "geologia": {
+        "indice_quartzo": 0.9987
+      },
+      "vento": {
+        "vento_ms": 5.742,
+        "poeira_ugm3": 6.182
+      }
+    },
+    {
+      "lat": 39.0,
+      "lon": -121.0,
+      "temperatura": {
+        "media_anual_C": 15.924,
+        "amplitude_C": 23.495
+      },
+      "relevo": {
+        "elevacao_media_m": 842.8,
+        "rugosidade_desvio_m": 788.7,
+        "declividade_media_graus": 3.706,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.115,
+        "frac_T_abaixo_0C": 0.048
+      },
+      "geologia": {
+        "indice_quartzo": 0.9986
+      },
+      "vento": {
+        "vento_ms": 4.946,
+        "poeira_ugm3": 7.797
+      }
+    },
+    {
+      "lat": 39.0,
+      "lon": -119.0,
+      "temperatura": {
+        "media_anual_C": 15.629,
+        "amplitude_C": 31.845
+      },
+      "relevo": {
+        "elevacao_media_m": 1743.7,
+        "rugosidade_desvio_m": 476.4,
+        "declividade_media_graus": 4.481,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.086,
+        "frac_T_abaixo_0C": 0.074
+      },
+      "geologia": {
+        "indice_quartzo": 0.9961
+      },
+      "vento": {
+        "vento_ms": 4.422,
+        "poeira_ugm3": 6.928
+      }
+    },
+    {
+      "lat": 39.0,
+      "lon": -113.0,
+      "temperatura": {
+        "media_anual_C": 15.08,
+        "amplitude_C": 36.083
+      },
+      "relevo": {
+        "elevacao_media_m": 1769.4,
+        "rugosidade_desvio_m": 369.8,
+        "declividade_media_graus": 3.223,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.086,
+        "frac_T_abaixo_0C": 0.165
+      },
+      "geologia": {
+        "indice_quartzo": 1.0008
+      },
+      "vento": {
+        "vento_ms": 5.558,
+        "poeira_ugm3": 10.568
+      }
+    },
+    {
+      "lat": 39.0,
+      "lon": -111.0,
+      "temperatura": {
+        "media_anual_C": 12.275,
+        "amplitude_C": 36.684
+      },
+      "relevo": {
+        "elevacao_media_m": 2021.4,
+        "rugosidade_desvio_m": 481.7,
+        "declividade_media_graus": 4.287,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.191,
+        "frac_T_abaixo_0C": 0.249
+      },
+      "geologia": {
+        "indice_quartzo": 1.0053
+      },
+      "vento": {
+        "vento_ms": 5.471,
+        "poeira_ugm3": 7.458
+      }
+    },
+    {
+      "lat": 39.0,
+      "lon": -109.0,
+      "temperatura": {
+        "media_anual_C": 12.686,
+        "amplitude_C": 36.811
+      },
+      "relevo": {
+        "elevacao_media_m": 1960.8,
+        "rugosidade_desvio_m": 396.1,
+        "declividade_media_graus": 4.214,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.176,
+        "frac_T_abaixo_0C": 0.238
+      },
+      "geologia": {
+        "indice_quartzo": 1.0037
+      },
+      "vento": {
+        "vento_ms": 5.335,
+        "poeira_ugm3": 5.772
+      }
+    },
+    {
+      "lat": 41.0,
+      "lon": -123.0,
+      "temperatura": {
+        "media_anual_C": 13.617,
+        "amplitude_C": 25.047
+      },
+      "relevo": {
+        "elevacao_media_m": 952.4,
+        "rugosidade_desvio_m": 507.5,
+        "declividade_media_graus": 7.67,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.103,
+        "frac_T_abaixo_0C": 0.051
+      },
+      "geologia": {
+        "indice_quartzo": 0.9985
+      },
+      "vento": {
+        "vento_ms": 4.008,
+        "poeira_ugm3": 5.017
+      }
+    },
+    {
+      "lat": 41.0,
+      "lon": -121.0,
+      "temperatura": {
+        "media_anual_C": 12.351,
+        "amplitude_C": 29.991
+      },
+      "relevo": {
+        "elevacao_media_m": 1501.4,
+        "rugosidade_desvio_m": 333.2,
+        "declividade_media_graus": 3.506,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.167,
+        "frac_T_abaixo_0C": 0.152
+      },
+      "geologia": {
+        "indice_quartzo": 0.9982
+      },
+      "vento": {
+        "vento_ms": 5.092,
+        "poeira_ugm3": 5.782
+      }
+    },
+    {
+      "lat": 41.0,
+      "lon": -119.0,
+      "temperatura": {
+        "media_anual_C": 15.159,
+        "amplitude_C": 35.276
+      },
+      "relevo": {
+        "elevacao_media_m": 1542.1,
+        "rugosidade_desvio_m": 277.9,
+        "declividade_media_graus": 3.334,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.053,
+        "frac_T_abaixo_0C": 0.133
+      },
+      "geologia": {
+        "indice_quartzo": 0.9984
+      },
+      "vento": {
+        "vento_ms": 4.531,
+        "poeira_ugm3": 7.668
+      }
+    },
+    {
+      "lat": 41.0,
+      "lon": -113.0,
+      "temperatura": {
+        "media_anual_C": 13.773,
+        "amplitude_C": 36.555
+      },
+      "relevo": {
+        "elevacao_media_m": 1456.7,
+        "rugosidade_desvio_m": 260.6,
+        "declividade_media_graus": 2.082,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.108,
+        "frac_T_abaixo_0C": 0.185
+      },
+      "geologia": {
+        "indice_quartzo": 1.0004
+      },
+      "vento": {
+        "vento_ms": 4.958,
+        "poeira_ugm3": 12.7
+      }
+    },
+    {
+      "lat": 41.0,
+      "lon": -111.0,
+      "temperatura": {
+        "media_anual_C": 7.264,
+        "amplitude_C": 35.708
+      },
+      "relevo": {
+        "elevacao_media_m": 2205.4,
+        "rugosidade_desvio_m": 473.7,
+        "declividade_media_graus": 4.522,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.324,
+        "frac_T_abaixo_0C": 0.366
+      },
+      "geologia": {
+        "indice_quartzo": 1.0006
+      },
+      "vento": {
+        "vento_ms": 5.116,
+        "poeira_ugm3": 7.52
+      }
+    },
+    {
+      "lat": 41.0,
+      "lon": -109.0,
+      "temperatura": {
+        "media_anual_C": 9.473,
+        "amplitude_C": 39.664
+      },
+      "relevo": {
+        "elevacao_media_m": 2040.6,
+        "rugosidade_desvio_m": 286.2,
+        "declividade_media_graus": 2.523,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.26,
+        "frac_T_abaixo_0C": 0.309
+      },
+      "geologia": {
+        "indice_quartzo": 1.0022
+      },
+      "vento": {
+        "vento_ms": 6.2,
+        "poeira_ugm3": 5.926
+      }
+    },
+    {
+      "lat": 43.0,
+      "lon": -123.0,
+      "temperatura": {
+        "media_anual_C": 10.622,
+        "amplitude_C": 22.242
+      },
+      "relevo": {
+        "elevacao_media_m": 835.9,
+        "rugosidade_desvio_m": 484.9,
+        "declividade_media_graus": 6.345,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.164,
+        "frac_T_abaixo_0C": 0.076
+      },
+      "geologia": {
+        "indice_quartzo": 0.9983
+      },
+      "vento": {
+        "vento_ms": 3.968,
+        "poeira_ugm3": 3.344
+      }
+    },
+    {
+      "lat": 43.0,
+      "lon": -121.0,
+      "temperatura": {
+        "media_anual_C": 10.348,
+        "amplitude_C": 30.157
+      },
+      "relevo": {
+        "elevacao_media_m": 1513.2,
+        "rugosidade_desvio_m": 200.8,
+        "declividade_media_graus": 2.452,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.2,
+        "frac_T_abaixo_0C": 0.242
+      },
+      "geologia": {
+        "indice_quartzo": 0.9983
+      },
+      "vento": {
+        "vento_ms": 5.063,
+        "poeira_ugm3": 3.957
+      }
+    },
+    {
+      "lat": 43.0,
+      "lon": -119.0,
+      "temperatura": {
+        "media_anual_C": 12.266,
+        "amplitude_C": 35.052
+      },
+      "relevo": {
+        "elevacao_media_m": 1490.4,
+        "rugosidade_desvio_m": 220.6,
+        "declividade_media_graus": 2.481,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.104,
+        "frac_T_abaixo_0C": 0.203
+      },
+      "geologia": {
+        "indice_quartzo": 0.9978
+      },
+      "vento": {
+        "vento_ms": 5.731,
+        "poeira_ugm3": 5.659
+      }
+    },
+    {
+      "lat": 63.0,
+      "lon": -19.0,
+      "temperatura": {
+        "media_anual_C": -1.304,
+        "amplitude_C": 20.822
+      },
+      "relevo": {
+        "elevacao_media_m": 449.4,
+        "rugosidade_desvio_m": 359.7,
+        "declividade_media_graus": 3.835,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.569,
+        "frac_T_abaixo_0C": 0.59
+      },
+      "geologia": {
+        "indice_quartzo": 1.0009
+      },
+      "vento": {
+        "vento_ms": 10.147,
+        "poeira_ugm3": 1.358
+      }
+    },
+    {
+      "lat": 63.0,
+      "lon": -17.0,
+      "temperatura": {
+        "media_anual_C": 0.87,
+        "amplitude_C": 19.987
+      },
+      "relevo": {
+        "elevacao_media_m": 128.1,
+        "rugosidade_desvio_m": 263.6,
+        "declividade_media_graus": 2.556,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.446,
+        "frac_T_abaixo_0C": 0.455
+      },
+      "geologia": {
+        "indice_quartzo": 1.0015
+      },
+      "vento": {
+        "vento_ms": 10.405,
+        "poeira_ugm3": 1.439
+      }
+    },
+    {
+      "lat": 63.0,
+      "lon": -15.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 10.72,
+        "poeira_ugm3": 1.429
+      }
+    },
+    {
+      "lat": 65.0,
+      "lon": -19.0,
+      "temperatura": {
+        "media_anual_C": -3.706,
+        "amplitude_C": 21.787
+      },
+      "relevo": {
+        "elevacao_media_m": 651.4,
+        "rugosidade_desvio_m": 288.3,
+        "declividade_media_graus": 4.879,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.668,
+        "frac_T_abaixo_0C": 0.702
+      },
+      "geologia": {
+        "indice_quartzo": 1.0022
+      },
+      "vento": {
+        "vento_ms": 8.704,
+        "poeira_ugm3": 1.064
+      }
+    },
+    {
+      "lat": 65.0,
+      "lon": -17.0,
+      "temperatura": {
+        "media_anual_C": -4.758,
+        "amplitude_C": 20.978
+      },
+      "relevo": {
+        "elevacao_media_m": 804.6,
+        "rugosidade_desvio_m": 427.8,
+        "declividade_media_graus": 3.174,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.725,
+        "frac_T_abaixo_0C": 0.746
+      },
+      "geologia": {
+        "indice_quartzo": 1.0012
+      },
+      "vento": {
+        "vento_ms": 9.228,
+        "poeira_ugm3": 1.022
+      }
+    },
+    {
+      "lat": 65.0,
+      "lon": -15.0,
+      "temperatura": {
+        "media_anual_C": -2.807,
+        "amplitude_C": 21.082
+      },
+      "relevo": {
+        "elevacao_media_m": 524.2,
+        "rugosidade_desvio_m": 299.0,
+        "declividade_media_graus": 5.281,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.611,
+        "frac_T_abaixo_0C": 0.658
+      },
+      "geologia": {
+        "indice_quartzo": 1.0011
+      },
+      "vento": {
+        "vento_ms": 8.62,
+        "poeira_ugm3": 1.198
+      }
+    },
+    {
+      "lat": 67.0,
+      "lon": -19.0,
+      "temperatura": {
+        "media_anual_C": -3.685,
+        "amplitude_C": 20.874
+      },
+      "relevo": {
+        "elevacao_media_m": 338.1,
+        "rugosidade_desvio_m": 246.3,
+        "declividade_media_graus": 12.883,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.767,
+        "frac_T_abaixo_0C": 0.712
+      },
+      "geologia": {
+        "indice_quartzo": 1.0019
+      },
+      "vento": {
+        "vento_ms": 9.509,
+        "poeira_ugm3": 1.247
+      }
+    },
+    {
+      "lat": 67.0,
+      "lon": -17.0,
+      "temperatura": {
+        "media_anual_C": -1.241,
+        "amplitude_C": 21.809
+      },
+      "relevo": {
+        "elevacao_media_m": 186.2,
+        "rugosidade_desvio_m": 177.8,
+        "declividade_media_graus": 2.845,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.504,
+        "frac_T_abaixo_0C": 0.586
+      },
+      "geologia": {
+        "indice_quartzo": 0.9998
+      },
+      "vento": {
+        "vento_ms": 9.397,
+        "poeira_ugm3": 1.245
+      }
+    },
+    {
+      "lat": 67.0,
+      "lon": -15.0,
+      "temperatura": {
+        "media_anual_C": -1.234,
+        "amplitude_C": 20.654
+      },
+      "relevo": {
+        "elevacao_media_m": 155.4,
+        "rugosidade_desvio_m": 111.3,
+        "declividade_media_graus": 3.011,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.471,
+        "frac_T_abaixo_0C": 0.59
+      },
+      "geologia": {
+        "indice_quartzo": 1.0005
+      },
+      "vento": {
+        "vento_ms": 9.654,
+        "poeira_ugm3": 1.299
+      }
+    },
+    {
+      "lat": 73.0,
+      "lon": -91.0,
+      "temperatura": {
+        "media_anual_C": -18.535,
+        "amplitude_C": 45.941
+      },
+      "relevo": {
+        "elevacao_media_m": 239.6,
+        "rugosidade_desvio_m": 94.1,
+        "declividade_media_graus": 2.155,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.706,
+        "frac_T_abaixo_0C": 0.875
+      },
+      "geologia": {
+        "indice_quartzo": 1.0077
+      },
+      "vento": {
+        "vento_ms": 6.232,
+        "poeira_ugm3": 1.253
+      }
+    },
+    {
+      "lat": 73.0,
+      "lon": -89.0,
+      "temperatura": {
+        "media_anual_C": -18.547,
+        "amplitude_C": 46.685
+      },
+      "relevo": {
+        "elevacao_media_m": 181.3,
+        "rugosidade_desvio_m": 77.1,
+        "declividade_media_graus": 1.398,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.675,
+        "frac_T_abaixo_0C": 0.83
+      },
+      "geologia": {
+        "indice_quartzo": 1.0043
+      },
+      "vento": {
+        "vento_ms": 6.093,
+        "poeira_ugm3": 1.263
+      }
+    },
+    {
+      "lat": 73.0,
+      "lon": -87.0,
+      "temperatura": {
+        "media_anual_C": -18.72,
+        "amplitude_C": 45.59
+      },
+      "relevo": {
+        "elevacao_media_m": 240.1,
+        "rugosidade_desvio_m": 85.8,
+        "declividade_media_graus": 1.287,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.693,
+        "frac_T_abaixo_0C": 0.855
+      },
+      "geologia": {
+        "indice_quartzo": 1.0064
+      },
+      "vento": {
+        "vento_ms": 5.949,
+        "poeira_ugm3": 1.263
+      }
+    },
+    {
+      "lat": 75.0,
+      "lon": -91.0,
+      "temperatura": {
+        "media_anual_C": -19.553,
+        "amplitude_C": 49.323
+      },
+      "relevo": {
+        "elevacao_media_m": 197.5,
+        "rugosidade_desvio_m": 80.6,
+        "declividade_media_graus": 1.69,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.675,
+        "frac_T_abaixo_0C": 0.871
+      },
+      "geologia": {
+        "indice_quartzo": 1.0058
+      },
+      "vento": {
+        "vento_ms": 6.101,
+        "poeira_ugm3": 1.281
+      }
+    },
+    {
+      "lat": 75.0,
+      "lon": -89.0,
+      "temperatura": {
+        "media_anual_C": -19.752,
+        "amplitude_C": 46.224
+      },
+      "relevo": {
+        "elevacao_media_m": 242.4,
+        "rugosidade_desvio_m": 102.4,
+        "declividade_media_graus": 2.32,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.666,
+        "frac_T_abaixo_0C": 0.89
+      },
+      "geologia": {
+        "indice_quartzo": 1.007
+      },
+      "vento": {
+        "vento_ms": 6.015,
+        "poeira_ugm3": 1.296
+      }
+    },
+    {
+      "lat": 75.0,
+      "lon": -87.0,
+      "temperatura": {
+        "media_anual_C": -19.912,
+        "amplitude_C": 45.686
+      },
+      "relevo": {
+        "elevacao_media_m": 352.6,
+        "rugosidade_desvio_m": 137.1,
+        "declividade_media_graus": 2.561,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.706,
+        "frac_T_abaixo_0C": 0.901
+      },
+      "geologia": {
+        "indice_quartzo": 1.0066
+      },
+      "vento": {
+        "vento_ms": 5.852,
+        "poeira_ugm3": 1.303
+      }
+    },
+    {
+      "lat": 77.0,
+      "lon": -91.0,
+      "temperatura": {
+        "media_anual_C": -19.805,
+        "amplitude_C": 48.757
+      },
+      "relevo": {
+        "elevacao_media_m": 160.9,
+        "rugosidade_desvio_m": 126.3,
+        "declividade_media_graus": 2.146,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.723,
+        "frac_T_abaixo_0C": 0.882
+      },
+      "geologia": {
+        "indice_quartzo": 1.0024
+      },
+      "vento": {
+        "vento_ms": 5.443,
+        "poeira_ugm3": 1.333
+      }
+    },
+    {
+      "lat": 77.0,
+      "lon": -89.0,
+      "temperatura": {
+        "media_anual_C": -19.398,
+        "amplitude_C": 46.994
+      },
+      "relevo": {
+        "elevacao_media_m": 208.3,
+        "rugosidade_desvio_m": 167.3,
+        "declividade_media_graus": 3.143,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.71,
+        "frac_T_abaixo_0C": 0.869
+      },
+      "geologia": {
+        "indice_quartzo": 1.0007
+      },
+      "vento": {
+        "vento_ms": 5.211,
+        "poeira_ugm3": 1.345
+      }
+    },
+    {
+      "lat": 77.0,
+      "lon": -87.0,
+      "temperatura": {
+        "media_anual_C": -19.629,
+        "amplitude_C": 49.209
+      },
+      "relevo": {
+        "elevacao_media_m": 309.4,
+        "rugosidade_desvio_m": 264.9,
+        "declividade_media_graus": 2.915,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.72,
+        "frac_T_abaixo_0C": 0.849
+      },
+      "geologia": {
+        "indice_quartzo": 1.0067
+      },
+      "vento": {
+        "vento_ms": 5.236,
+        "poeira_ugm3": 1.383
+      }
+    },
+    {
+      "lat": 77.0,
+      "lon": 11.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 8.773,
+        "poeira_ugm3": 1.733
+      }
+    },
+    {
+      "lat": 77.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": -8.413,
+        "amplitude_C": 32.409
+      },
+      "relevo": {
+        "elevacao_media_m": 99.1,
+        "rugosidade_desvio_m": 153.2,
+        "declividade_media_graus": 5.441,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.527,
+        "frac_T_abaixo_0C": 0.75
+      },
+      "geologia": {
+        "indice_quartzo": 1.008
+      },
+      "vento": {
+        "vento_ms": 8.5,
+        "poeira_ugm3": 1.782
+      }
+    },
+    {
+      "lat": 77.0,
+      "lon": 15.0,
+      "temperatura": {
+        "media_anual_C": -10.77,
+        "amplitude_C": 29.551
+      },
+      "relevo": {
+        "elevacao_media_m": 317.3,
+        "rugosidade_desvio_m": 217.6,
+        "declividade_media_graus": 8.026,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.763,
+        "frac_T_abaixo_0C": 0.818
+      },
+      "geologia": {
+        "indice_quartzo": 1.0029
+      },
+      "vento": {
+        "vento_ms": 8.196,
+        "poeira_ugm3": 1.778
+      }
+    },
+    {
+      "lat": 79.0,
+      "lon": 11.0,
+      "temperatura": {
+        "media_anual_C": -10.469,
+        "amplitude_C": 29.283
+      },
+      "relevo": {
+        "elevacao_media_m": 266.9,
+        "rugosidade_desvio_m": 220.2,
+        "declividade_media_graus": 7.798,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.815,
+        "frac_T_abaixo_0C": 0.835
+      },
+      "geologia": {
+        "indice_quartzo": 1.0017
+      },
+      "vento": {
+        "vento_ms": 7.725,
+        "poeira_ugm3": 1.734
+      }
+    },
+    {
+      "lat": 79.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": -12.925,
+        "amplitude_C": 30.915
+      },
+      "relevo": {
+        "elevacao_media_m": 467.1,
+        "rugosidade_desvio_m": 285.0,
+        "declividade_media_graus": 6.924,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.9,
+        "frac_T_abaixo_0C": 0.877
+      },
+      "geologia": {
+        "indice_quartzo": 0.9996
+      },
+      "vento": {
+        "vento_ms": 6.77,
+        "poeira_ugm3": 1.703
+      }
+    },
+    {
+      "lat": 79.0,
+      "lon": 15.0,
+      "temperatura": {
+        "media_anual_C": -11.554,
+        "amplitude_C": 35.578
+      },
+      "relevo": {
+        "elevacao_media_m": 420.5,
+        "rugosidade_desvio_m": 293.4,
+        "declividade_media_graus": 11.295,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": 0.707,
+        "frac_T_abaixo_0C": 0.775
+      },
+      "geologia": {
+        "indice_quartzo": 1.0035
+      },
+      "vento": {
+        "vento_ms": 6.221,
+        "poeira_ugm3": 1.669
+      }
+    },
+    {
+      "lat": 81.0,
+      "lon": 11.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 8.208,
+        "poeira_ugm3": 1.677
+      }
+    },
+    {
+      "lat": 81.0,
+      "lon": 13.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": null,
+        "rugosidade_desvio_m": null,
+        "declividade_media_graus": null,
+        "fonte": null
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 7.983,
+        "poeira_ugm3": 1.722
+      }
+    },
+    {
+      "lat": 81.0,
+      "lon": 15.0,
+      "temperatura": {
+        "media_anual_C": null,
+        "amplitude_C": null
+      },
+      "relevo": {
+        "elevacao_media_m": 33.6,
+        "rugosidade_desvio_m": 24.1,
+        "declividade_media_graus": 3.666,
+        "fonte": "SRTMGL30"
+      },
+      "gelo": {
+        "frac_neve": null,
+        "frac_T_abaixo_0C": null
+      },
+      "geologia": {
+        "indice_quartzo": null
+      },
+      "vento": {
+        "vento_ms": 7.896,
+        "poeira_ugm3": 1.743
+      }
+    }
+  ]
+}

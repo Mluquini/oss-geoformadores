@@ -1,0 +1,327 @@
+{
+  "corpo": "Lua",
+  "gerado_por": "scripts/03_lua.py",
+  "convencoes": "Longitude em graus Leste. Altura em metros sobre a esfera de referência de 1737,4 km. Temperaturas em K.",
+  "locais": [
+    {
+      "id": "shackleton",
+      "nome": "Polo Sul (Cratera Shackleton)",
+      "lat": -89.67,
+      "lon_leste": 129.78,
+      "coord_verificada": true,
+      "coord_fonte": "Gazetteer of Planetary Nomenclature da IAU (USGS Astrogeology), campos center_lat/center_lon, arquivo MOON_nomenclature_center_pts baixado em 2026-11-14",
+      "janela": "círculo de 1° de raio",
+      "aspectos": {
+        "temperatura": {
+          "valor": 96.2726,
+          "unidade": "K (média anual, ponderada por área)",
+          "produto": "LRO-L-DLRE-5-PRP-V2.0 (dlre_prp_south, versão do produto 2)",
+          "instrumento": "LRO/Diviner",
+          "versao": "2",
+          "periodo": "derivado de dados de 2009-2016 (ver descrição oficial)",
+          "resolucao": "malha triangular (2.880.000 triângulos no polo sul)",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+          "papel": "oficial (valor derivado/modelado pela equipe Diviner, não medida direta)",
+          "metodo": "Média ponderada pela área dos triângulos. Descrição oficial do campo temp_avg: The annual average temperature (K), calculated at a depth of 2 cm below the surface",
+          "maximo_K": 347.8,
+          "temp_max_media_K": 216.48
+        },
+        "relevo": {
+          "valor": 953.5098,
+          "unidade": "m (desvio padrão da elevação na janela)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Círculo de 1° de raio; 89625 pixels."
+        },
+        "gelo": {
+          "valor": 0.1317,
+          "unidade": "fração da área com temperatura máxima anual < 110 K",
+          "produto": "LRO-L-DLRE-5-PRP-V2.0 (campo temp_max)",
+          "instrumento": "LRO/Diviner",
+          "versao": "2",
+          "periodo": "ver PRP",
+          "resolucao": "malha triangular (2.880.000 triângulos no polo sul)",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+          "papel": "oficial",
+          "metodo": "Área com temp_max < 110 K dividida pela área total: 392 km² de 2974 km². LEND (supressão de nêutrons) NÃO foi usado; ver motivo no relatório."
+        },
+        "geologia": {
+          "valor": null,
+          "unidade": "µm (posição do Christiansen Feature)",
+          "produto": "LRO-L-DLRE-5-GDR-V1.0 (dgdr_nen_cf_clc_cyl_032, \"Normalized equatorial noon CF\", V1.0)",
+          "instrumento": "LRO/Diviner",
+          "versao": "V1.0",
+          "periodo": "2009-07-05 a 2010-11-30",
+          "resolucao": "32 pixels/grau, só entre -60° e 60° de latitude",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/cylindrical/img/dgdr_nen_cf_clc_cyl_032_img.img",
+          "papel": "oficial",
+          "motivo_nulo": "O mapa CF do Diviner só cobre ±60° de latitude; este local está fora (ou os pixels são inválidos)."
+        },
+        "vento": {
+          "valor": null,
+          "unidade": "m/s",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não se aplica: a Lua não tem atmosfera, então não há vento nem poeira em suspensão.",
+          "nao_se_aplica": true
+        }
+      },
+      "extras": {
+        "elevacao_media_m": 5.9,
+        "declividade_media_graus": 18.82,
+        "temperatura_fonte": "PRP",
+        "lend": "Não usado: nenhum mapa derivado de LEND verificado no PDS."
+      }
+    },
+    {
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "lat": 8.3487,
+      "lon_leste": 30.8346,
+      "coord_verificada": true,
+      "coord_fonte": "Gazetteer of Planetary Nomenclature da IAU (USGS Astrogeology), campos center_lat/center_lon, arquivo MOON_nomenclature_center_pts baixado em 2026-11-14",
+      "janela": "círculo de 1° de raio",
+      "aspectos": {
+        "temperatura": {
+          "valor": 217.4755,
+          "unidade": "K (média ao longo do dia lunar)",
+          "produto": "LRO-L-DLRE-5-GCP-V1.0 (global_cumul_avg_cyl, coluna tbol, versão do arquivo 002)",
+          "instrumento": "LRO/Diviner",
+          "versao": "002 (arquivo) / produto GCP V1.0",
+          "periodo": "2009-07-05 a 2015-04-01",
+          "resolucao": "0,5° de lat/lon e 0,25 h de hora local",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_00n10n_002.tab",
+          "papel": "oficial",
+          "metodo": "Curva do dia lunar com 71 das 96 faixas de hora local com dado (13 tiles de 0,5°); faixas sem dado interpoladas linearmente (nenhum buraco > 2 h), depois média das 96 faixas. É média das temperaturas bolométricas ao longo da hora local. Máximo e mínimo são valores observados, sem interpolação.",
+          "maximo_K": 394.33,
+          "minimo_K": 93.91
+        },
+        "relevo": {
+          "valor": 146.1436,
+          "unidade": "m (desvio padrão da elevação na janela)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Círculo de 1° de raio; 809 pixels."
+        },
+        "gelo": {
+          "valor": 0.0,
+          "unidade": "fração da área com temperatura máxima < 110 K",
+          "produto": "LRO-L-DLRE-5-GCP-V1.0 (derivado do mesmo GCP)",
+          "instrumento": "LRO/Diviner",
+          "versao": "002",
+          "periodo": "2009-07-05 a 2015-04-01",
+          "resolucao": "0,5° (~15 km): armadilhas frias menores não são resolvidas",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_00n10n_002.tab",
+          "papel": "oficial",
+          "metodo": "Fração dos tiles cujo máximo diário (média sobre o período) é < 110 K. Zero aqui significa 'nenhuma armadilha fria resolvida nesta resolução', e não prova que não existam menores."
+        },
+        "geologia": {
+          "valor": 8.339,
+          "unidade": "µm (posição do Christiansen Feature)",
+          "produto": "LRO-L-DLRE-5-GDR-V1.0 (dgdr_nen_cf_clc_cyl_032, \"Normalized equatorial noon CF\", V1.0)",
+          "instrumento": "LRO/Diviner",
+          "versao": "V1.0",
+          "periodo": "2009-07-05 a 2010-11-30",
+          "resolucao": "32 pixels/grau, só entre -60° e 60° de latitude",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/cylindrical/img/dgdr_nen_cf_clc_cyl_032_img.img",
+          "papel": "oficial",
+          "metodo": "Média na janela de 1666 pixels; desvio 0.102 µm."
+        },
+        "vento": {
+          "valor": null,
+          "unidade": "m/s",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não se aplica: a Lua não tem atmosfera, então não há vento nem poeira em suspensão.",
+          "nao_se_aplica": true
+        }
+      },
+      "extras": {
+        "elevacao_media_m": -956.4,
+        "declividade_media_graus": 1.004,
+        "temperatura_fonte": "GCP",
+        "lend": "Não usado: nenhum mapa derivado de LEND verificado no PDS."
+      }
+    },
+    {
+      "id": "tycho",
+      "nome": "Cratera Tycho",
+      "lat": -43.2958,
+      "lon_leste": 348.7847,
+      "coord_verificada": true,
+      "coord_fonte": "Gazetteer of Planetary Nomenclature da IAU (USGS Astrogeology), campos center_lat/center_lon, arquivo MOON_nomenclature_center_pts baixado em 2026-11-14",
+      "janela": "círculo de 1° de raio",
+      "aspectos": {
+        "temperatura": {
+          "valor": 209.2174,
+          "unidade": "K (média ao longo do dia lunar)",
+          "produto": "LRO-L-DLRE-5-GCP-V1.0 (global_cumul_avg_cyl, coluna tbol, versão do arquivo 002)",
+          "instrumento": "LRO/Diviner",
+          "versao": "002 (arquivo) / produto GCP V1.0",
+          "periodo": "2009-07-05 a 2015-04-01",
+          "resolucao": "0,5° de lat/lon e 0,25 h de hora local",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_50s40s_002.tab",
+          "papel": "oficial",
+          "metodo": "Curva do dia lunar com 71 das 96 faixas de hora local com dado (16 tiles de 0,5°); faixas sem dado interpoladas linearmente (nenhum buraco > 2 h), depois média das 96 faixas. É média das temperaturas bolométricas ao longo da hora local. Máximo e mínimo são valores observados, sem interpolação.",
+          "maximo_K": 348.33,
+          "minimo_K": 114.09
+        },
+        "relevo": {
+          "valor": 493.6862,
+          "unidade": "m (desvio padrão da elevação na janela)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Círculo de 1° de raio; 1104 pixels."
+        },
+        "gelo": {
+          "valor": 0.0,
+          "unidade": "fração da área com temperatura máxima < 110 K",
+          "produto": "LRO-L-DLRE-5-GCP-V1.0 (derivado do mesmo GCP)",
+          "instrumento": "LRO/Diviner",
+          "versao": "002",
+          "periodo": "2009-07-05 a 2015-04-01",
+          "resolucao": "0,5° (~15 km): armadilhas frias menores não são resolvidas",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_50s40s_002.tab",
+          "papel": "oficial",
+          "metodo": "Fração dos tiles cujo máximo diário (média sobre o período) é < 110 K. Zero aqui significa 'nenhuma armadilha fria resolvida nesta resolução', e não prova que não existam menores."
+        },
+        "geologia": {
+          "valor": 7.9147,
+          "unidade": "µm (posição do Christiansen Feature)",
+          "produto": "LRO-L-DLRE-5-GDR-V1.0 (dgdr_nen_cf_clc_cyl_032, \"Normalized equatorial noon CF\", V1.0)",
+          "instrumento": "LRO/Diviner",
+          "versao": "V1.0",
+          "periodo": "2009-07-05 a 2010-11-30",
+          "resolucao": "32 pixels/grau, só entre -60° e 60° de latitude",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/cylindrical/img/dgdr_nen_cf_clc_cyl_032_img.img",
+          "papel": "oficial",
+          "metodo": "Média na janela de 1476 pixels; desvio 0.173 µm."
+        },
+        "vento": {
+          "valor": null,
+          "unidade": "m/s",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não se aplica: a Lua não tem atmosfera, então não há vento nem poeira em suspensão.",
+          "nao_se_aplica": true
+        }
+      },
+      "extras": {
+        "elevacao_media_m": -2951.7,
+        "declividade_media_graus": 5.966,
+        "temperatura_fonte": "GCP",
+        "lend": "Não usado: nenhum mapa derivado de LEND verificado no PDS."
+      }
+    },
+    {
+      "id": "malapert",
+      "nome": "Monte Malapert",
+      "lat": -85.98,
+      "lon_leste": 358.33,
+      "coord_verificada": true,
+      "coord_fonte": "Gazetteer of Planetary Nomenclature da IAU (USGS Astrogeology), campos center_lat/center_lon, arquivo MOON_nomenclature_center_pts baixado em 2026-11-14",
+      "janela": "círculo de 1° de raio",
+      "aspectos": {
+        "temperatura": {
+          "valor": 114.4279,
+          "unidade": "K (média anual, ponderada por área)",
+          "produto": "LRO-L-DLRE-5-PRP-V2.0 (dlre_prp_south, versão do produto 2)",
+          "instrumento": "LRO/Diviner",
+          "versao": "2",
+          "periodo": "derivado de dados de 2009-2016 (ver descrição oficial)",
+          "resolucao": "malha triangular (2.880.000 triângulos no polo sul)",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+          "papel": "oficial (valor derivado/modelado pela equipe Diviner, não medida direta)",
+          "metodo": "Média ponderada pela área dos triângulos. Descrição oficial do campo temp_avg: The annual average temperature (K), calculated at a depth of 2 cm below the surface",
+          "maximo_K": 342.08,
+          "temp_max_media_K": 252.02
+        },
+        "relevo": {
+          "valor": 1523.9914,
+          "unidade": "m (desvio padrão da elevação na janela)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Círculo de 1° de raio; 11565 pixels."
+        },
+        "gelo": {
+          "valor": 0.0257,
+          "unidade": "fração da área com temperatura máxima anual < 110 K",
+          "produto": "LRO-L-DLRE-5-PRP-V2.0 (campo temp_max)",
+          "instrumento": "LRO/Diviner",
+          "versao": "2",
+          "periodo": "ver PRP",
+          "resolucao": "malha triangular (2.880.000 triângulos no polo sul)",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/dlre_prp_south.tab",
+          "papel": "oficial",
+          "metodo": "Área com temp_max < 110 K dividida pela área total: 77 km² de 2986 km². LEND (supressão de nêutrons) NÃO foi usado; ver motivo no relatório."
+        },
+        "geologia": {
+          "valor": null,
+          "unidade": "µm (posição do Christiansen Feature)",
+          "produto": "LRO-L-DLRE-5-GDR-V1.0 (dgdr_nen_cf_clc_cyl_032, \"Normalized equatorial noon CF\", V1.0)",
+          "instrumento": "LRO/Diviner",
+          "versao": "V1.0",
+          "periodo": "2009-07-05 a 2010-11-30",
+          "resolucao": "32 pixels/grau, só entre -60° e 60° de latitude",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/cylindrical/img/dgdr_nen_cf_clc_cyl_032_img.img",
+          "papel": "oficial",
+          "motivo_nulo": "O mapa CF do Diviner só cobre ±60° de latitude; este local está fora (ou os pixels são inválidos)."
+        },
+        "vento": {
+          "valor": null,
+          "unidade": "m/s",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não se aplica: a Lua não tem atmosfera, então não há vento nem poeira em suspensão.",
+          "nao_se_aplica": true
+        }
+      },
+      "extras": {
+        "elevacao_media_m": 1289.1,
+        "declividade_media_graus": 11.972,
+        "temperatura_fonte": "PRP",
+        "lend": "Não usado: nenhum mapa derivado de LEND verificado no PDS."
+      }
+    }
+  ]
+}

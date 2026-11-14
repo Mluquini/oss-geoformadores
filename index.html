@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Globo de Análogos</title>
+  <meta name="description" content="Clique num lugar da Terra e descubra quais regiões de Marte ou da Lua são mais parecidas. NASA Space Apps 2026: Terrestrial Analogs.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== CABEÇALHO: título, botão Marte/Lua e filtros ===== -->
+  <header class="topo">
+    <div class="titulo">
+      <h1>Globo de Análogos</h1>
+      <p>Clique num ponto da Terra para ver os lugares mais parecidos em outro mundo.</p>
+    </div>
+
+    <!-- Botão para escolher o alvo: Marte ou Lua -->
+    <div class="alvo" role="group" aria-label="Comparar com">
+      <button id="btn-marte" class="alvo-btn ativo" data-alvo="marte">🔴 Marte</button>
+      <button id="btn-lua"   class="alvo-btn"       data-alvo="lua">⚪ Lua</button>
+    </div>
+
+    <!-- Filtros por tipo de ambiente (o script.js cria as caixinhas) -->
+    <div id="filtros" class="filtros" aria-label="Filtrar por tipo"></div>
+  </header>
+
+  <!-- Aviso de status dos dados: o texto vem de data/dados_reais.js (gerado pelo pipeline) -->
+  <div class="aviso" id="aviso" role="status">Carregando dados…</div>
+
+  <!-- ===== O GLOBO 3D ===== -->
+  <main>
+    <div id="globo"></div>
+    <!-- Lista de locais: outra forma de escolher, boa no celular -->
+    <nav id="lista-locais" class="lista-locais" aria-label="Lista de locais"></nav>
+  </main>
+
+  <!-- ===== PAINEL que abre ao clicar num ponto ===== -->
+  <aside id="painel" class="painel" hidden>
+    <button id="fechar" class="fechar" aria-label="Fechar painel">✕</button>
+
+    <p id="p-tipo" class="etiqueta"></p>
+    <h2 id="p-nome"></h2>
+    <figure class="foto" id="p-foto" hidden>
+      <img id="p-foto-img" alt="" loading="lazy">
+      <figcaption id="p-foto-credito"></figcaption>
+    </figure>
+    <p id="p-desc" class="desc"></p>
+
+    <!-- Outro botão Marte/Lua, para trocar sem fechar o painel -->
+    <div class="alvo" role="group" aria-label="Comparar com">
+      <button class="alvo-btn ativo" data-alvo="marte">🔴 Marte</button>
+      <button class="alvo-btn"       data-alvo="lua">⚪ Lua</button>
+    </div>
+
+    <h3 id="p-titulo-top"></h3>
+    <ol id="p-top3" class="top3"></ol>
+    <p id="p-cobertura" class="nota"></p>
+
+    <h3>Comparação dos aspectos</h3>
+    <div class="radar-caixa"><canvas id="radar"></canvas></div>
+    <p id="p-nota-radar" class="nota"></p>
+    <p id="p-nota-lua" class="nota" hidden>Na Lua não existe vento nem atmosfera, então "vento/poeira" <strong>não se aplica</strong> e fica fora do cálculo.</p>
+
+    <h3>Valores medidos neste local</h3>
+    <table id="p-valores" class="valores"></table>
+    <p id="p-celula" class="nota"></p>
+
+    <div class="caixa falha">
+      <h3>⚠️ Onde a analogia falha</h3>
+      <ul id="p-falha"></ul>
+    </div>
+
+    <div class="caixa util">
+      <h3>🧪 Útil para testar</h3>
+      <p id="p-util"></p>
+    </div>
+
+    <p id="p-fontes" class="fontes"></p>
+  </aside>
+
+  <!-- ===== COMO CALCULAMOS ===== -->
+  <section class="como">
+    <h2>Como calculamos</h2>
+    <p>Cada lugar recebe uma <strong>nota de 0 a 1</strong> em até 4 aspectos. Para a nota ser comparável entre a Terra, Marte e a Lua, usamos <strong>a mesma faixa física para os três</strong> (tabela abaixo), e não uma faixa diferente para cada planeta.</p>
+    <ul>
+      <li><strong>Temperatura</strong>: temperatura média da superfície (Terra: média anual de dia e noite do MODIS; Lua: média ao longo do dia lunar, Diviner).</li>
+      <li><strong>Relevo</strong>: rugosidade, isto é, o desvio padrão da elevação numa janela de ~2° (Terra: SRTM; Marte: MOLA; Lua: LOLA).</li>
+      <li><strong>Gelo</strong>: um indicador comum, mas de <em>coisas diferentes</em>. Terra: fração do tempo com neve e com temperatura abaixo de 0 °C. Marte: água no solo (% em massa, GRS). Lua: fração da área em "armadilha fria" (máxima abaixo de 110 K).</li>
+      <li><strong>Vento/poeira</strong>: Terra via MERRA-2 (vento no nível mais baixo do modelo, ~50–70 m, e não a 10 m). Marte não tem medição global de vento e a Lua não tem atmosfera, então o vento da Terra aparece no painel, mas não entra em nenhum ranking.</li>
+    </ul>
+    <p>Para comparar um lugar da Terra com um de Marte (ou da Lua):</p>
+    <ol>
+      <li>Usamos só os aspectos que existem <strong>nos dois lados</strong>. Se um aspecto não tem dado, ele fica de fora, e não vira zero.</li>
+      <li>Para cada aspecto, calculamos a <strong>diferença</strong> entre as notas e elevamos ao quadrado.</li>
+      <li>Multiplicamos pelo <strong>peso</strong> do aspecto. Os pesos que sobraram são <strong>renormalizados</strong> para somar 100%.</li>
+      <li>Somamos e tiramos a <strong>raiz quadrada</strong>: é a distância (0 = iguais, 1 = opostos).</li>
+      <li><strong>Semelhança = 100% − distância</strong>.</li>
+    </ol>
+    <p class="formula">semelhança = 100% × (1 − √( Σ peso′ × (nota<sub>Terra</sub> − nota<sub>alvo</sub>)² ))</p>
+    <p class="nota">Cada resultado informa <strong>quanto do peso total</strong> entrou na conta. Com poucos aspectos, a porcentagem diz menos sobre a semelhança como um todo.</p>
+
+    <h3>Pesos de cada aspecto</h3>
+    <table class="pesos" id="tabela-pesos"></table>
+    <p class="nota">São os pesos do desafio (Marte: temperatura 25%, relevo 20%, gelo 15%, geologia 25%, vento 15%; Lua: 30%, 25%, 30%, 15% e 0%) <strong>sem a geologia</strong>, renormalizados para somar 100%.</p>
+
+    <h3>Faixas físicas fixas (nota 0 a 1)</h3>
+    <table class="pesos" id="tabela-faixas"></table>
+
+    <h3>De onde vêm os dados</h3>
+    <ul id="lista-fontes"></ul>
+
+    <h3>Limitações</h3>
+    <ul>
+      <li>Gravidade, atmosfera e radiação <strong>não</strong> são reproduzidas por nenhum lugar da Terra.</li>
+      <li>A <strong>geologia</strong> ficou fora do projeto: os índices da Terra (ASTER), da Lua (Diviner) e de Marte (sem dado) não medem a mesma coisa, e compará-los exigiria uma calibração que não temos.</li>
+      <li>Os valores da Terra são <strong>médias de uma célula de 2°</strong> (~220 km) ao redor do local, e não do ponto exato. Em Marte e na Lua, a janela é um círculo de ~2° de diâmetro.</li>
+      <li>Os centros dos locais de Marte e da Lua vêm do catálogo oficial da IAU. Em Marte e na Lua cada local é um ponto central, mas são feições grandes (Meridiani Planum tem ~1000 km), então a janela de ~2° pode não representar a feição inteira.</li>
+      <li>Os dados da Terra cobrem um ano (ver abaixo); não são uma climatologia de décadas.</li>
+    </ul>
+    <p class="nota" id="como-gerado"></p>
+  </section>
+
+  <footer class="rodape">NASA Space Apps Challenge 2026 · Desafio Terrestrial Analogs<br>Fotos dos lugares: Wikimedia Commons, com licença livre (autor e licença de cada foto aparecem no painel e em assets/lugares/CREDITOS.md)</footer>
+
+  <!-- ===== Bibliotecas (vêm da internet) ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+  <!-- ===== Nossos dados reais (gerado por scripts/05_exportar_site.py) ===== -->
+  <script src="data/dados_reais.js"></script>
+  <!-- Fotos dos lugares e créditos (gerado por scripts/06_baixar_imagens.py) -->
+  <script src="data/imagens.js"></script>
+
+  <!-- ===== Nosso código ===== -->
+  <script src="script.js"></script>
+</body>
+</html>

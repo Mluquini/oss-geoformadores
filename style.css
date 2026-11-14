@@ -1,0 +1,282 @@
+/* =========================================================
+   CORES DO SITE: mude aqui para trocar o visual todo.
+   ========================================================= */
+:root {
+  --fundo: #05070f;          /* quase preto, como o espaço */
+  --fundo-2: #0d1222;        /* caixas e painéis */
+  --borda: #24304d;
+  --texto: #e8ecf6;
+  --texto-fraco: #9aa6c2;
+  --destaque: #7cc4ff;       /* azul claro */
+  --marte: #ff7a45;
+  --lua: #cfd6e4;
+
+  /* cores dos tipos de ambiente (o script.js usa as mesmas) */
+  --deserto: #f4b544;
+  --polar: #6fd3ff;
+  --vulcanico: #ff4d4d;
+  --caverna: #b388ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1, h2, h3 { line-height: 1.2; margin: 0 0 .4em; }
+h3 { font-size: 1rem; color: var(--destaque); margin-top: 1.2em; }
+
+/* ---------- Cabeçalho ---------- */
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--borda);
+}
+.titulo { flex: 1 1 260px; }
+.titulo h1 { font-size: 1.6rem; letter-spacing: .5px; }
+.titulo p { margin: 0; color: var(--texto-fraco); font-size: .95rem; }
+
+/* Botão Marte / Lua */
+.alvo {
+  display: inline-flex;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.alvo-btn {
+  background: transparent;
+  color: var(--texto);
+  border: 0;
+  padding: 10px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  min-height: 44px;            /* fácil de tocar no celular */
+}
+.alvo-btn.ativo[data-alvo="marte"] { background: var(--marte); color: #1a0a03; font-weight: 700; }
+.alvo-btn.ativo[data-alvo="lua"]   { background: var(--lua);   color: #111;    font-weight: 700; }
+
+/* Filtros */
+.filtros { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+.filtro {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  font-size: .95rem;
+  min-height: 40px;
+}
+.filtro input { accent-color: var(--destaque); width: 18px; height: 18px; }
+.bolinha { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+/* Aviso de dados de exemplo */
+.aviso {
+  background: #3a2a00;
+  color: #ffd76a;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: .95rem;
+  border-bottom: 1px solid #6b5000;
+}
+
+/* ---------- Globo ---------- */
+main { position: relative; }
+#globo {
+  width: 100%;
+  height: 70vh;
+  min-height: 380px;
+  overflow: hidden;
+  cursor: grab;
+}
+
+/* Etiqueta que aparece ao passar o mouse num ponto */
+.rotulo {
+  background: rgba(13, 18, 34, .92);
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: .85rem;
+}
+
+/* Lista de locais embaixo do globo */
+.lista-locais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--borda);
+}
+.local-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--fundo-2);
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: .9rem;
+  cursor: pointer;
+  min-height: 40px;
+}
+.local-btn:hover, .local-btn.selecionado { border-color: var(--destaque); }
+
+/* ---------- Painel de detalhes ---------- */
+.painel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(420px, 100%);
+  height: 100%;
+  overflow-y: auto;
+  background: var(--fundo-2);
+  border-left: 1px solid var(--borda);
+  padding: 20px 18px 28px;
+  z-index: 10;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, .5);
+}
+.painel[hidden] { display: none; }
+.fechar {
+  position: sticky;
+  top: 0;
+  float: right;
+  background: var(--fundo);
+  color: var(--texto);
+  border: 1px solid var(--borda);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.etiqueta {
+  display: inline-block;
+  margin: 0 0 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #111;
+}
+.desc { color: var(--texto-fraco); margin-top: 0; }
+
+/* Top 3 */
+.top3 { list-style: none; padding: 0; margin: 0; }
+.top3 li {
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.top3 .linha { display: flex; justify-content: space-between; gap: 10px; font-weight: 600; }
+.top3 .pct { color: var(--destaque); font-variant-numeric: tabular-nums; }
+.barra { height: 6px; background: var(--borda); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.barra span { display: block; height: 100%; background: var(--destaque); }
+.top3 small { color: var(--texto-fraco); display: block; margin-top: 4px; }
+
+/* Radar */
+.radar-caixa { position: relative; width: 100%; max-width: 360px; margin: 0 auto; aspect-ratio: 1; }
+
+.nota { color: var(--texto-fraco); font-size: .9rem; }
+
+/* Caixas "Onde falha" e "Útil para testar" */
+.caixa { border-radius: 10px; padding: 4px 14px 10px; margin-top: 16px; }
+.caixa h3 { margin-top: .8em; }
+.caixa ul { padding-left: 18px; margin: 0; }
+.caixa li { margin-bottom: 6px; }
+.falha { background: #2a1214; border: 1px solid #5c262b; }
+.falha h3 { color: #ff8a8a; }
+.util { background: #0f2419; border: 1px solid #23573a; }
+.util h3 { color: #7ee2a8; }
+
+.fontes { font-size: .8rem; color: var(--texto-fraco); margin-top: 16px; }
+
+/* ---------- Como calculamos ---------- */
+.como {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 28px 16px;
+}
+.formula {
+  background: var(--fundo-2);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  overflow-x: auto;
+}
+.pesos { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.pesos th, .pesos td { border: 1px solid var(--borda); padding: 8px; text-align: left; }
+.pesos th { background: var(--fundo-2); }
+
+.rodape {
+  text-align: center;
+  color: var(--texto-fraco);
+  font-size: .85rem;
+  padding: 20px 16px;
+  border-top: 1px solid var(--borda);
+}
+
+/* ---------- CELULAR: painel vira uma "gaveta" que sobe de baixo ---------- */
+@media (max-width: 700px) {
+  .titulo h1 { font-size: 1.35rem; }
+  #globo { height: 55vh; min-height: 320px; }
+  .painel {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 78vh;
+    border-left: 0;
+    border-top: 1px solid var(--borda);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, .6);
+  }
+}
+
+/* ---------- Dados reais: aviso de status, valores medidos ---------- */
+.aviso.ok { background: #0f2419; color: #7ee2a8; border-bottom-color: #23573a; }
+.aviso.erro { background: #3a1216; color: #ff9a9a; border-bottom-color: #7a2a31; }
+.aviso { line-height: 1.4; }
+
+.top3 small.dados { color: var(--destaque); opacity: .85; }
+.nota strong { color: var(--texto); }
+
+.valores { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.valores td { border-bottom: 1px solid var(--borda); padding: 6px 4px; vertical-align: top; }
+.valores td:last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 12px; }
+.valores td.sd { color: var(--texto-fraco); font-style: italic; }
+
+.como h3 { margin-top: 1.6em; }
+.como ul, .como ol { padding-left: 1.2em; }
+#tabela-faixas td:nth-child(2) { white-space: nowrap; }
+
+/* No computador o painel fica por cima da direita da tela: afasta o aviso para o texto não ficar escondido. */
+@media (min-width: 701px) {
+  body.painel-aberto .aviso { padding-right: 436px; text-align: left; padding-left: 16px; }
+}
+
+/* Gráfico de barras (antes era radar) */
+.radar-caixa { aspect-ratio: auto; max-width: none; height: 300px; }
+
+/* Foto do lugar no painel e na etiqueta do globo */
+.foto { margin: 10px 0 12px; }
+.foto img { display: block; width: 100%; height: 190px; object-fit: cover; border-radius: 12px;
+            border: 1px solid var(--borda); background: #0a0f1f; }
+.foto figcaption { font-size: .72rem; color: var(--texto-fraco); margin-top: 6px; line-height: 1.35; }
+.foto a { color: var(--destaque); }
+.rotulo img { display: block; width: 180px; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px; }
