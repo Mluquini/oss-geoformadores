@@ -1,23 +1,22 @@
-# Como rodar o pipeline no Google Colab
+# How to run the pipeline on Google Colab
 
-> **Estado atual (honesto):** os scripts `02_marte.py`, `03_lua.py`, `04_normalizar.py` e `05_exportar_site.py` foram **rodados de verdade**.
-> O `01_terra.py` rodou com dados reais nas **zonas estratégicas** (MODIS, SRTM/ETOPO e ASTER). O **MERRA-2 (vento e poeira) ainda falha**
-> no download, provavelmente por falta de autorizar o aplicativo "NASA GESDISC DATA ARCHIVE" no perfil Earthdata; o script agora diz o código HTTP.
-> O mundo todo ainda não foi rodado.
+> **Current state (honest):** the scripts `02_marte.py`, `03_lua.py`, `04_normalizar.py` and `05_exportar_site.py` were **really run**.
+> `01_terra.py` ran with real data in the **strategic zones** (MODIS, SRTM/ETOPO, ASTER and MERRA-2). The whole world has not been run yet.
+> If the MERRA-2 download (wind and dust) fails, it is probably because the "NASA GESDISC DATA ARCHIVE" application is not authorized in the Earthdata profile; the script prints the HTTP code.
 
-## 1. Conta Earthdata (grátis)
+## 1. Earthdata account (free)
 
-Crie uma conta em <https://urs.earthdata.nasa.gov>. Depois, em <https://urs.earthdata.nasa.gov/profile>,
-aprove (em "Applications → Authorized Apps") os aplicativos **LP DAAC Data Pool**, **NSIDC DAAC** e **GES DISC**.
-Sem essa aprovação o download dá erro 401/403.
+Create an account at <https://urs.earthdata.nasa.gov>. Then, at <https://urs.earthdata.nasa.gov/profile>,
+approve (under "Applications → Authorized Apps") the applications **LP DAAC Data Pool**, **NSIDC DAAC** and **GES DISC**.
+Without this approval the download fails with error 401/403.
 
-## 2. Guardar a senha com segurança no Colab
+## 2. Keep the password safe in Colab
 
-Na barra da esquerda do Colab, clique na chave 🔑 (**Secrets**) e crie dois segredos:
-`EARTHDATA_USERNAME` e `EARTHDATA_PASSWORD`. Ative "Notebook access" nos dois.
-**Nunca escreva a senha numa célula nem no GitHub.**
+In the left bar of Colab, click the key 🔑 (**Secrets**) and create two secrets:
+`EARTHDATA_USERNAME` and `EARTHDATA_PASSWORD`. Turn on "Notebook access" for both.
+**Never write the password in a cell or on GitHub.**
 
-## 3. Preparar o ambiente (uma célula)
+## 3. Prepare the environment (one cell)
 
 ```python
 import os
@@ -25,76 +24,81 @@ from google.colab import userdata
 os.environ["EARTHDATA_USERNAME"] = userdata.get("EARTHDATA_USERNAME")
 os.environ["EARTHDATA_PASSWORD"] = userdata.get("EARTHDATA_PASSWORD")
 
-!git clone https://github.com/Mluquini/constelacao-zero-nasa.git
-%cd constelacao-zero-nasa
+!git clone https://github.com/Mluquini/oss-geoformadores.git
+%cd oss-geoformadores
 !pip install -q earthaccess h5py pyhdf netCDF4 pandas requests numpy
 ```
 
-Se o `pyhdf` falhar ao instalar (não testei no Colab), rode `!apt-get install -y libhdf4-dev` e tente de novo.
+If `pyhdf` fails to install (not tested on Colab), run `!apt-get install -y libhdf4-dev` and try again.
 
-## 4. Rodar em ordem (cada comando numa célula, pelo caminho do script)
+## 4. Run in order (each command in a cell, using the script path)
 
 ```python
-# 4.1 Testar as contas, sem internet (leva 1 segundo)
+# 4.1 Test the calculations, offline (takes 1 second)
 !python scripts/01_terra.py --autoteste
 !python scripts/04_normalizar.py --autoteste
 
-# 4.2 Marte e Lua (não precisam de senha; ~1,1 GB de download na primeira vez, por causa do polo sul da Lua)
+# 4.2 Mars and Moon (no password needed; ~1.1 GB download the first time, because of the Moon's south pole)
 !python scripts/02_marte.py --raw raw --saida data
 !python scripts/03_lua.py   --raw raw --saida data
 
-# 4.3 TERRA: PRIMEIRO só uma região pequena (Irã, onde fica o Deserto do Lut)
+# 4.2b Mars rovers (ground temperature at Gale and Jezero; ~300 MB the first time), then Mars again
+!python scripts/02b_marte_rovers.py
+!python scripts/02_marte.py --raw raw --saida data
+
+# 4.3 EARTH: FIRST only a small region (Iran, where the Lut Desert is)
 !python scripts/01_terra.py --raw raw --saida data --anos 2020 --regiao 20 40 50 65
 
-# 4.3b Ou, melhor: só as zonas estratégicas (os 12 locais do site + 3 zonas de conferência)
+# 4.3b Or, better: only the strategic zones (the site's 12 places + 3 check zones)
 !python scripts/01_terra.py --raw raw --saida data --anos 2020 --zonas estrategicas
 
-# 4.4 Se o 4.3 deu certo, o mundo todo (opcional)
+# 4.4 If 4.3 worked, the whole world (optional)
 !python scripts/01_terra.py --raw raw --saida data --anos 2020
 
-# 4.5 Semelhança + relatório + conferência
+# 4.5 Similarity + report + sanity check
 !python scripts/04_normalizar.py --dados data --relatorio relatorio --conferir
 
-# 4.6 Atualizar o SITE com os dados novos (gera data/dados_reais.js e data/celulas.js)
+# 4.6 Update the SITE with the new data (writes data/dados_reais.js and data/celulas.js)
 !python scripts/05_exportar_site.py --dados data
 ```
 
-**Conferir se os dados são verdadeiros** (relê os arquivos brutos da NASA com código independente e confere todas as células):
-`!python scripts/07_verificar_dados.py`. O resultado fica em `relatorio/verificacao_dados.md`. Se alguma verificação falhar, o script sai com erro.
+**Check that the data is real** (re-reads the raw NASA files with independent code and checks every cell):
+`!python scripts/07_verificar_dados.py`. The result is saved in `relatorio/verificacao_dados.md`. If any check fails, the script exits with an error.
 
-**Para o modo "Planejar missão" buscar no mundo todo**, rode o passo 4.4 (o `01_terra.py` **sem** `--zonas`) antes do 4.5 e do 4.6.
-Com muitas células, o `04_normalizar.py` só grava o ranking por célula para os locais do site (opção `--limite-ranking`); a busca
-do site usa o `data/celulas.js`, que o `05` gera com todas as células de terra.
+**For the "Plan a mission" mode to search the whole world**, run step 4.4 (`01_terra.py` **without** `--zonas`) before 4.5 and 4.6.
+With many cells, `04_normalizar.py` only saves the per-cell ranking for the site's places (option `--limite-ranking`); the site search
+uses `data/celulas.js`, which `05` generates with all the land cells.
 
-Espaço em disco: ~1 GB por ano de MODIS temperatura, ~0,3 GB de SRTM, ~0,3 GB de ASTER, 0,5 GB de ETOPO, mais o MERRA-2
-(não medi). O Colab tem bastante espaço; só não apague a pasta `raw/` no meio do caminho (ela vale como cache).
+Disk space: ~1 GB per year of MODIS temperature, ~0.3 GB of SRTM, ~0.3 GB of ASTER, 0.5 GB of ETOPO, plus MERRA-2
+(not measured). Colab has plenty of space; just do not delete the `raw/` folder midway (it works as a cache).
 
-Se algum produto falhar, o script **não para nem inventa número**: grava `null` e escreve o motivo em `problemas`
-dentro de `data/earth_grid.json` (e na seção 3 do relatório). Mande esse texto para quem for corrigir.
+If a product fails, the script **does not stop and does not invent a number**: it writes `null` and puts the reason in `problemas`
+inside `data/earth_grid.json` (and in section 3 of the report). Send that text to whoever will fix it.
 
-## 5. Como saber se os números fazem sentido
+## 5. How to tell whether the numbers make sense
 
-O comando `--conferir` (passo 4.5) olha células conhecidas e avisa `ATENÇÃO` quando algo foge do esperado:
+The `--conferir` option (step 4.5) looks at known cells and prints `ATENÇÃO` (warning) when something is off:
 
-| Lugar | O que deve aparecer |
+| Place | What should appear |
 |---|---|
-| Deserto do Lut (Irã) | média anual **muito quente** (> 20 °C), **sem neve** |
-| Interior da Antártida | **muito frio** (< −35 °C), **muito gelo** (neve > 0,8), quase sempre abaixo de 0 °C |
-| Saara | quente (> 20 °C), sem neve |
-| Himalaia/Tibete | relevo **muito rugoso** (> 1000 m) e elevação média > 3000 m |
-| Amazônia | quente e estável (22 a 32 °C), sem neve |
-| Groenlândia | muito frio (< −15 °C), muito gelo |
+| Lut Desert (Iran) | **very hot** yearly mean (> 20 °C), **no snow** |
+| Antarctic interior | **very cold** (< −35 °C), **a lot of ice** (snow > 0.8), almost always below 0 °C |
+| Sahara | hot (> 20 °C), no snow |
+| Himalaya/Tibet | **very rough** relief (> 1000 m) and mean elevation > 3000 m |
+| Amazon | hot and stable (22 to 32 °C), no snow |
+| Greenland | very cold (< −15 °C), a lot of ice |
 
-`ATENÇÃO` não prova que está errado (o limite é uma estimativa), mas é onde olhar primeiro. Confira também:
+A warning does not prove it is wrong (the limit is an estimate), but it is where to look first. Also check:
 
-- **Marte:** Valles Marineris deve ser de longe o mais rugoso; Hellas deve ter a média de elevação mais baixa (cerca de −6,4 km).
-- **Lua:** Tranquillitatis deve ter máxima de ~395 K (cerca de 120 °C) e mínima de ~94 K; Shackleton deve ter parte da área abaixo de 110 K.
-- **Células `null`:** oceanos e a noite polar do MODIS ficam `null`. Veja a % por campo no relatório.
-- **Mapa rápido:** abra `data/earth_grid.json` com `pandas` e faça um gráfico de dispersão de `lon` x `lat` colorido por temperatura.
-  Se parecer o mapa-múndi com os desertos quentes e os polos frios, está no caminho certo.
+- **Mars:** Valles Marineris should be by far the roughest; Hellas should have the lowest mean elevation (about −6.4 km).
+- **Moon:** Tranquillitatis should have a maximum of ~395 K (about 120 °C) and a minimum of ~94 K; Shackleton should have part of its area below 110 K.
+- **`null` cells:** oceans and the MODIS polar night are `null`. See the % per field in the report.
+- **Quick map:** open `data/earth_grid.json` with `pandas` and make a scatter plot of `lon` × `lat` colored by temperature.
+  If it looks like the world map with hot deserts and cold poles, you are on the right track.
 
-## 6. Cuidados com o que o resultado quer dizer
+## 6. What the result means (care when presenting)
 
-Leia a seção 4 do `relatorio/data_report.md` antes de apresentar os números. Em especial:
-em Marte só entram **relevo e gelo** (35% dos pesos originais), então a % de semelhança com Marte diz pouco sobre o todo.
-A **geologia fica de fora** do cálculo, porque os índices dos três corpos não medem a mesma coisa.
+Read section 4 of `relatorio/data_report.md` before presenting the numbers. In particular:
+**geology is left out** of the calculation, because the indexes of the three bodies do not measure the same thing;
+Mars compares fewer aspects than the Moon (3 of 6 at four places, 5 of 6 at Gale and Jezero), so the Mars similarity % says less about the whole;
+and Mars wind is not used, because the rover data does not cover a full year.

@@ -1,8 +1,8 @@
-# Créditos das fotos
+# Photo credits
 
-Todas as fotos vêm do [Wikimedia Commons](https://commons.wikimedia.org), com licença livre. As licenças CC BY e CC BY-SA exigem o crédito abaixo. Reduzimos as fotos para 900 px de largura.
+All photos come from [Wikimedia Commons](https://commons.wikimedia.org), with free licenses. The CC BY and CC BY-SA licenses require the credit below. We reduced the photos to 900 px wide.
 
-| Lugar | Foto | Autor | Licença |
+| Place | Photo | Author | License |
 |---|---|---|---|
 | atacama | [Atacama Desert Landscape (iced moment 870-CC).jpg](<https://commons.wikimedia.org/wiki/File:Atacama_Desert_Landscape_(iced_moment_870-CC).jpg>) | L. Honnorat/ESO | [CC BY 4.0](<https://creativecommons.org/licenses/by/4.0>) |
 | vales-secos | [Wright Valley 2013 02.jpg](<https://commons.wikimedia.org/wiki/File:Wright_Valley_2013_02.jpg>) | Michael Studinger | Public domain |

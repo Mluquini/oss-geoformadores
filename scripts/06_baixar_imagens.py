@@ -105,7 +105,7 @@ def main():
         creditos[lugar] = dict(
             arquivo=f"assets/lugares/{lugar}.jpg",
             titulo=titulo.replace("File:", ""),
-            autor=limpar(m.get("Artist", {}).get("value"), 100) or "autor não informado",
+            autor=limpar(m.get("Artist", {}).get("value"), 100) or "author not provided",
             licenca=licenca,
             licenca_url=limpar(m.get("LicenseUrl", {}).get("value"), 200),
             origem_url=ii["descriptionurl"],
@@ -118,10 +118,10 @@ def main():
         "// Gerado por scripts/06_baixar_imagens.py: NÃO edite à mão.\nwindow.IMAGENS_LUGARES = "
         + json.dumps(creditos, ensure_ascii=False, indent=1) + ";\n", encoding="utf-8")
 
-    linhas = ["# Créditos das fotos\n",
-              "Todas as fotos vêm do [Wikimedia Commons](https://commons.wikimedia.org), com licença livre. "
-              "As licenças CC BY e CC BY-SA exigem o crédito abaixo. Reduzimos as fotos para 900 px de largura.\n",
-              "| Lugar | Foto | Autor | Licença |", "|---|---|---|---|"]
+    linhas = ["# Photo credits\n",
+              "All photos come from [Wikimedia Commons](https://commons.wikimedia.org), with free licenses. "
+              "The CC BY and CC BY-SA licenses require the credit below. We reduced the photos to 900 px wide.\n",
+              "| Place | Photo | Author | License |", "|---|---|---|---|"]
     for lugar, c in creditos.items():
         lic = f"[{c['licenca']}](<{c['licenca_url']}>)" if c["licenca_url"] else c["licenca"]
         linhas.append(f"| {lugar} | [{c['titulo']}](<{c['origem_url']}>) | {c['autor']} | {lic} |")   # <> por causa dos parênteses
