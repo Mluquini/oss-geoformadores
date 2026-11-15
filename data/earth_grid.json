@@ -106,7 +106,7 @@
       "link": "https://doi.org/10.5067/MODIS/MOD11C3.061",
       "unidade_media": "°C",
       "unidade_amplitude": "°C",
-      "metodo": "Por pixel: média dos 12 meses de (LST dia + LST noite)/2, em °C; amplitude = máx - mín das médias mensais; exige ≥9 meses válidos. Por célula: média dos pixels de terra válidos (terra = Percent_land_in_grid ≥ 50; célula exige ≥25% dos pixels de terra válidos)."
+      "metodo": "Por pixel: média dos 12 meses de (LST dia + LST noite)/2, em °C; amplitude = máx - mín das médias mensais; exige ≥9 meses válidos. Por célula: média dos pixels de terra válidos (terra = Percent_land_in_grid ≥ 50; célula exige ≥25% dos pixels de terra válidos). amplitude_diurna_C = média, ao longo do ano, de (LST dia - LST noite): o MODIS/Terra passa por volta de 13h30 e 01h30 (hora local), então é uma aproximação do máximo menos o mínimo do dia (que é um pouco maior)."
     },
     "gelo": {
       "produto": "MOD10CM (neve) + MOD11C3 (T<0 °C)",
@@ -124,7 +124,7 @@
       "resolucao": "30 arco-seg (~1 km), células de 2°",
       "link": "https://doi.org/10.5067/MEASURES/SRTM/SRTMGL30.002",
       "unidade": "m (elevação, desvio padrão) e graus (declividade)",
-      "metodo": "Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30\". O SRTMGL30 (NASA, LP DAAC) vai de 90°N a 60°S, mas o radar do SRTM só cobriu 60°N a 56°S: acima de 60°N (Holuhraun, Haughton, Svalbard) os valores vêm, quase com certeza, do GTOPO30 (USGS), que o produto usa para preencher o que o radar não alcançou. Fora do SRTMGL30 (extremo sul, McMurdo) usamos ETOPO 2022 60\" (NOAA, COMPLEMENTO, não é NASA), só pixels acima do nível do mar."
+      "metodo": "Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30\". O SRTMGL30 (NASA, LP DAAC) vai de 90°N a 60°S, mas o radar do SRTM só cobriu 60°N a 56°S: acima de 60°N (Holuhraun, Haughton, Svalbard) os valores vêm, quase com certeza, do GTOPO30 (USGS), que o produto usa para preencher o que o radar não alcançou. declividade_3km_graus = declividade média depois de juntar blocos de 4x4 pixels (~3,7 km), a MESMA escala usada em Marte (MOLA) e na Lua (LOLA) para as comparações. Fora do SRTMGL30 (extremo sul, McMurdo) usamos ETOPO 2022 60\" (NOAA, COMPLEMENTO, não é NASA), só pixels acima do nível do mar."
     },
     "geologia": {
       "produto": "AG5KMMOH",
@@ -146,18 +146,11 @@
     }
   },
   "log": {
-    "merra_SPEED": {
-      "long_name": "surface_wind_speed",
-      "units": "m s-1",
-      "arquivo": "MERRA2_400.tavgM_2d_flx_Nx.202012.nc4",
-      "n_arquivos": 12
-    },
-    "merra_DUSMASS": {
-      "long_name": "Dust Surface Mass Concentration",
-      "units": "kg m-3",
-      "arquivo": "MERRA2_400.tavgM_2d_aer_Nx.202012.nc4",
-      "n_arquivos": 12
-    }
+    "modis": "ok",
+    "srtm_ordem_bytes": [
+      ">i2"
+    ],
+    "etopo_usado": true
   },
   "problemas": {},
   "complementos": [
@@ -169,12 +162,14 @@
       "lon": 97.0,
       "temperatura": {
         "media_anual_C": -53.674,
-        "amplitude_C": 33.626
+        "amplitude_C": 33.626,
+        "amplitude_diurna_C": 0.876
       },
       "relevo": {
         "elevacao_media_m": 3451.2,
         "rugosidade_desvio_m": 53.9,
         "declividade_media_graus": 0.153,
+        "declividade_3km_graus": 0.127,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -194,12 +189,14 @@
       "lon": 99.0,
       "temperatura": {
         "media_anual_C": -53.404,
-        "amplitude_C": 33.936
+        "amplitude_C": 33.936,
+        "amplitude_diurna_C": 0.918
       },
       "relevo": {
         "elevacao_media_m": 3416.7,
         "rugosidade_desvio_m": 48.8,
         "declividade_media_graus": 0.12,
+        "declividade_3km_graus": 0.101,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -219,12 +216,14 @@
       "lon": 101.0,
       "temperatura": {
         "media_anual_C": -53.125,
-        "amplitude_C": 33.939
+        "amplitude_C": 33.939,
+        "amplitude_diurna_C": 0.844
       },
       "relevo": {
         "elevacao_media_m": 3382.1,
         "rugosidade_desvio_m": 44.0,
         "declividade_media_graus": 0.16,
+        "declividade_3km_graus": 0.125,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -244,12 +243,14 @@
       "lon": 103.0,
       "temperatura": {
         "media_anual_C": -53.034,
-        "amplitude_C": 33.951
+        "amplitude_C": 33.951,
+        "amplitude_diurna_C": 0.602
       },
       "relevo": {
         "elevacao_media_m": 3345.5,
         "rugosidade_desvio_m": 40.3,
         "declividade_media_graus": 0.136,
+        "declividade_3km_graus": 0.104,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -269,12 +270,14 @@
       "lon": 97.0,
       "temperatura": {
         "media_anual_C": -56.169,
-        "amplitude_C": 32.798
+        "amplitude_C": 32.798,
+        "amplitude_diurna_C": 1.764
       },
       "relevo": {
         "elevacao_media_m": 3615.9,
         "rugosidade_desvio_m": 39.3,
         "declividade_media_graus": 0.103,
+        "declividade_3km_graus": 0.095,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -294,12 +297,14 @@
       "lon": 99.0,
       "temperatura": {
         "media_anual_C": -55.664,
-        "amplitude_C": 32.574
+        "amplitude_C": 32.574,
+        "amplitude_diurna_C": 1.678
       },
       "relevo": {
         "elevacao_media_m": 3575.5,
         "rugosidade_desvio_m": 42.4,
         "declividade_media_graus": 0.108,
+        "declividade_3km_graus": 0.099,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -319,12 +324,14 @@
       "lon": 101.0,
       "temperatura": {
         "media_anual_C": -55.097,
-        "amplitude_C": 32.31
+        "amplitude_C": 32.31,
+        "amplitude_diurna_C": 1.506
       },
       "relevo": {
         "elevacao_media_m": 3530.6,
         "rugosidade_desvio_m": 38.5,
         "declividade_media_graus": 0.123,
+        "declividade_3km_graus": 0.106,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -344,12 +351,14 @@
       "lon": 103.0,
       "temperatura": {
         "media_anual_C": -54.972,
-        "amplitude_C": 32.458
+        "amplitude_C": 32.458,
+        "amplitude_diurna_C": 1.274
       },
       "relevo": {
         "elevacao_media_m": 3490.9,
         "rugosidade_desvio_m": 28.7,
         "declividade_media_graus": 0.099,
+        "declividade_3km_graus": 0.087,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -369,12 +378,14 @@
       "lon": 97.0,
       "temperatura": {
         "media_anual_C": -57.976,
-        "amplitude_C": 31.404
+        "amplitude_C": 31.404,
+        "amplitude_diurna_C": 2.849
       },
       "relevo": {
         "elevacao_media_m": 3731.9,
         "rugosidade_desvio_m": 27.1,
         "declividade_media_graus": 0.086,
+        "declividade_3km_graus": 0.08,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -394,12 +405,14 @@
       "lon": 99.0,
       "temperatura": {
         "media_anual_C": -56.786,
-        "amplitude_C": 30.807
+        "amplitude_C": 30.807,
+        "amplitude_diurna_C": 2.646
       },
       "relevo": {
         "elevacao_media_m": 3674.4,
         "rugosidade_desvio_m": 26.5,
         "declividade_media_graus": 0.111,
+        "declividade_3km_graus": 0.1,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -419,12 +432,14 @@
       "lon": 101.0,
       "temperatura": {
         "media_anual_C": -56.159,
-        "amplitude_C": 30.964
+        "amplitude_C": 30.964,
+        "amplitude_diurna_C": 2.61
       },
       "relevo": {
         "elevacao_media_m": 3610.8,
         "rugosidade_desvio_m": 25.3,
         "declividade_media_graus": 0.121,
+        "declividade_3km_graus": 0.11,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -444,12 +459,14 @@
       "lon": 103.0,
       "temperatura": {
         "media_anual_C": -55.6,
-        "amplitude_C": 31.18
+        "amplitude_C": 31.18,
+        "amplitude_diurna_C": 2.408
       },
       "relevo": {
         "elevacao_media_m": 3545.9,
         "rugosidade_desvio_m": 28.0,
         "declividade_media_graus": 0.125,
+        "declividade_3km_graus": 0.112,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -469,12 +486,14 @@
       "lon": 159.0,
       "temperatura": {
         "media_anual_C": -33.872,
-        "amplitude_C": 28.227
+        "amplitude_C": 28.227,
+        "amplitude_diurna_C": 1.17
       },
       "relevo": {
         "elevacao_media_m": 1246.8,
         "rugosidade_desvio_m": 522.3,
         "declividade_media_graus": 3.059,
+        "declividade_3km_graus": 2.636,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -494,12 +513,14 @@
       "lon": 161.0,
       "temperatura": {
         "media_anual_C": -32.492,
-        "amplitude_C": 28.82
+        "amplitude_C": 28.82,
+        "amplitude_diurna_C": 1.236
       },
       "relevo": {
         "elevacao_media_m": 651.6,
         "rugosidade_desvio_m": 689.1,
         "declividade_media_graus": 2.849,
+        "declividade_3km_graus": 2.491,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -519,12 +540,14 @@
       "lon": 163.0,
       "temperatura": {
         "media_anual_C": -32.581,
-        "amplitude_C": 28.583
+        "amplitude_C": 28.583,
+        "amplitude_diurna_C": 1.656
       },
       "relevo": {
         "elevacao_media_m": 522.6,
         "rugosidade_desvio_m": 782.2,
         "declividade_media_graus": 2.831,
+        "declividade_3km_graus": 2.401,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -544,12 +567,14 @@
       "lon": 165.0,
       "temperatura": {
         "media_anual_C": -29.312,
-        "amplitude_C": 31.6
+        "amplitude_C": 31.6,
+        "amplitude_diurna_C": 2.046
       },
       "relevo": {
         "elevacao_media_m": 133.6,
         "rugosidade_desvio_m": 262.3,
         "declividade_media_graus": 1.106,
+        "declividade_3km_graus": 0.974,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -569,12 +594,14 @@
       "lon": 97.0,
       "temperatura": {
         "media_anual_C": -57.138,
-        "amplitude_C": 29.313
+        "amplitude_C": 29.313,
+        "amplitude_diurna_C": 3.605
       },
       "relevo": {
         "elevacao_media_m": 3724.0,
         "rugosidade_desvio_m": 23.2,
         "declividade_media_graus": 0.083,
+        "declividade_3km_graus": 0.077,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -594,12 +621,14 @@
       "lon": 99.0,
       "temperatura": {
         "media_anual_C": -56.804,
-        "amplitude_C": 29.65
+        "amplitude_C": 29.65,
+        "amplitude_diurna_C": 3.448
       },
       "relevo": {
         "elevacao_media_m": 3664.4,
         "rugosidade_desvio_m": 28.0,
         "declividade_media_graus": 0.09,
+        "declividade_3km_graus": 0.084,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -619,12 +648,14 @@
       "lon": 101.0,
       "temperatura": {
         "media_anual_C": -56.317,
-        "amplitude_C": 29.964
+        "amplitude_C": 29.964,
+        "amplitude_diurna_C": 3.212
       },
       "relevo": {
         "elevacao_media_m": 3599.6,
         "rugosidade_desvio_m": 36.7,
         "declividade_media_graus": 0.098,
+        "declividade_3km_graus": 0.094,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -644,12 +675,14 @@
       "lon": 103.0,
       "temperatura": {
         "media_anual_C": -56.757,
-        "amplitude_C": 31.586
+        "amplitude_C": 31.586,
+        "amplitude_diurna_C": 3.321
       },
       "relevo": {
         "elevacao_media_m": 3546.5,
         "rugosidade_desvio_m": 22.5,
         "declividade_media_graus": 0.079,
+        "declividade_3km_graus": 0.075,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -669,12 +702,14 @@
       "lon": 159.0,
       "temperatura": {
         "media_anual_C": -39.482,
-        "amplitude_C": 26.536
+        "amplitude_C": 26.536,
+        "amplitude_diurna_C": 1.456
       },
       "relevo": {
         "elevacao_media_m": 2047.2,
         "rugosidade_desvio_m": 222.9,
         "declividade_media_graus": 0.787,
+        "declividade_3km_graus": 0.693,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -694,12 +729,14 @@
       "lon": 161.0,
       "temperatura": {
         "media_anual_C": -31.88,
-        "amplitude_C": 28.512
+        "amplitude_C": 28.512,
+        "amplitude_diurna_C": 1.921
       },
       "relevo": {
         "elevacao_media_m": 1322.7,
         "rugosidade_desvio_m": 472.5,
         "declividade_media_graus": 5.249,
+        "declividade_3km_graus": 3.894,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -719,12 +756,14 @@
       "lon": 163.0,
       "temperatura": {
         "media_anual_C": -28.642,
-        "amplitude_C": 30.765
+        "amplitude_C": 30.765,
+        "amplitude_diurna_C": 2.097
       },
       "relevo": {
         "elevacao_media_m": 636.2,
         "rugosidade_desvio_m": 492.9,
         "declividade_media_graus": 6.345,
+        "declividade_3km_graus": 4.831,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -744,12 +783,14 @@
       "lon": 165.0,
       "temperatura": {
         "media_anual_C": -28.546,
-        "amplitude_C": 31.039
+        "amplitude_C": 31.039,
+        "amplitude_diurna_C": 2.3
       },
       "relevo": {
         "elevacao_media_m": 186.7,
         "rugosidade_desvio_m": 275.1,
         "declividade_media_graus": 2.789,
+        "declividade_3km_graus": 2.251,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -769,12 +810,14 @@
       "lon": 159.0,
       "temperatura": {
         "media_anual_C": -36.106,
-        "amplitude_C": 25.522
+        "amplitude_C": 25.522,
+        "amplitude_diurna_C": 2.019
       },
       "relevo": {
         "elevacao_media_m": 1584.5,
         "rugosidade_desvio_m": 249.7,
         "declividade_media_graus": 0.779,
+        "declividade_3km_graus": 0.661,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -794,12 +837,14 @@
       "lon": 161.0,
       "temperatura": {
         "media_anual_C": -33.182,
-        "amplitude_C": 25.641
+        "amplitude_C": 25.641,
+        "amplitude_diurna_C": 2.218
       },
       "relevo": {
         "elevacao_media_m": 1198.3,
         "rugosidade_desvio_m": 470.3,
         "declividade_media_graus": 1.578,
+        "declividade_3km_graus": 1.395,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -819,12 +864,14 @@
       "lon": 163.0,
       "temperatura": {
         "media_anual_C": -30.031,
-        "amplitude_C": 26.02
+        "amplitude_C": 26.02,
+        "amplitude_diurna_C": 2.169
       },
       "relevo": {
         "elevacao_media_m": 629.4,
         "rugosidade_desvio_m": 740.4,
         "declividade_media_graus": 4.473,
+        "declividade_3km_graus": 3.787,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -844,12 +891,14 @@
       "lon": 165.0,
       "temperatura": {
         "media_anual_C": -28.7,
-        "amplitude_C": 25.494
+        "amplitude_C": 25.494,
+        "amplitude_diurna_C": 2.995
       },
       "relevo": {
         "elevacao_media_m": 451.0,
         "rugosidade_desvio_m": 464.3,
         "declividade_media_graus": 3.965,
+        "declividade_3km_graus": 3.545,
         "fonte": "ETOPO202"
       },
       "gelo": {
@@ -869,12 +918,14 @@
       "lon": -71.0,
       "temperatura": {
         "media_anual_C": 24.284,
-        "amplitude_C": 13.68
+        "amplitude_C": 13.68,
+        "amplitude_diurna_C": 24.252
       },
       "relevo": {
         "elevacao_media_m": 792.2,
         "rugosidade_desvio_m": 474.4,
         "declividade_media_graus": 4.116,
+        "declividade_3km_graus": 2.088,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -894,12 +945,14 @@
       "lon": -69.0,
       "temperatura": {
         "media_anual_C": 12.395,
-        "amplitude_C": 19.799
+        "amplitude_C": 19.799,
+        "amplitude_diurna_C": 29.681
       },
       "relevo": {
         "elevacao_media_m": 3847.7,
         "rugosidade_desvio_m": 1092.7,
         "declividade_media_graus": 6.613,
+        "declividade_3km_graus": 3.701,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -919,12 +972,14 @@
       "lon": -67.0,
       "temperatura": {
         "media_anual_C": 16.195,
-        "amplitude_C": 17.636
+        "amplitude_C": 17.636,
+        "amplitude_diurna_C": 22.582
       },
       "relevo": {
         "elevacao_media_m": 3006.9,
         "rugosidade_desvio_m": 1150.3,
         "declividade_media_graus": 6.035,
+        "declividade_3km_graus": 3.897,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -944,12 +999,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -969,12 +1026,14 @@
       "lon": 15.0,
       "temperatura": {
         "media_anual_C": 26.514,
-        "amplitude_C": 12.996
+        "amplitude_C": 12.996,
+        "amplitude_diurna_C": 22.708
       },
       "relevo": {
         "elevacao_media_m": 438.3,
         "rugosidade_desvio_m": 246.3,
         "declividade_media_graus": 1.347,
+        "declividade_3km_graus": 0.876,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -994,12 +1053,14 @@
       "lon": 17.0,
       "temperatura": {
         "media_anual_C": 26.251,
-        "amplitude_C": 17.795
+        "amplitude_C": 17.795,
+        "amplitude_diurna_C": 21.238
       },
       "relevo": {
         "elevacao_media_m": 1007.1,
         "rugosidade_desvio_m": 297.7,
         "declividade_media_graus": 1.932,
+        "declividade_3km_graus": 1.046,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1019,12 +1080,14 @@
       "lon": -71.0,
       "temperatura": {
         "media_anual_C": 24.698,
-        "amplitude_C": 13.101
+        "amplitude_C": 13.101,
+        "amplitude_diurna_C": 28.446
       },
       "relevo": {
         "elevacao_media_m": 1416.8,
         "rugosidade_desvio_m": 646.2,
         "declividade_media_graus": 4.92,
+        "declividade_3km_graus": 2.629,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1044,12 +1107,14 @@
       "lon": -69.0,
       "temperatura": {
         "media_anual_C": 17.513,
-        "amplitude_C": 17.531
+        "amplitude_C": 17.531,
+        "amplitude_diurna_C": 33.544
       },
       "relevo": {
         "elevacao_media_m": 3266.3,
         "rugosidade_desvio_m": 1053.7,
         "declividade_media_graus": 4.275,
+        "declividade_3km_graus": 2.764,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1069,12 +1134,14 @@
       "lon": -67.0,
       "temperatura": {
         "media_anual_C": 13.798,
-        "amplitude_C": 17.978
+        "amplitude_C": 17.978,
+        "amplitude_diurna_C": 27.548
       },
       "relevo": {
         "elevacao_media_m": 3945.5,
         "rugosidade_desvio_m": 669.4,
         "declividade_media_graus": 5.745,
+        "declividade_3km_graus": 3.544,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1094,12 +1161,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -1119,12 +1188,14 @@
       "lon": 15.0,
       "temperatura": {
         "media_anual_C": 29.431,
-        "amplitude_C": 14.468
+        "amplitude_C": 14.468,
+        "amplitude_diurna_C": 26.3
       },
       "relevo": {
         "elevacao_media_m": 653.6,
         "rugosidade_desvio_m": 304.4,
         "declividade_media_graus": 1.467,
+        "declividade_3km_graus": 0.771,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1144,12 +1215,14 @@
       "lon": 17.0,
       "temperatura": {
         "media_anual_C": 26.326,
-        "amplitude_C": 18.89
+        "amplitude_C": 18.89,
+        "amplitude_diurna_C": 21.713
       },
       "relevo": {
         "elevacao_media_m": 1321.8,
         "rugosidade_desvio_m": 204.2,
         "declividade_media_graus": 1.386,
+        "declividade_3km_graus": 0.733,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1169,12 +1242,14 @@
       "lon": -71.0,
       "temperatura": {
         "media_anual_C": 25.534,
-        "amplitude_C": 11.536
+        "amplitude_C": 11.536,
+        "amplitude_diurna_C": 29.455
       },
       "relevo": {
         "elevacao_media_m": 865.4,
         "rugosidade_desvio_m": 457.1,
         "declividade_media_graus": 4.388,
+        "declividade_3km_graus": 2.549,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1194,12 +1269,14 @@
       "lon": -69.0,
       "temperatura": {
         "media_anual_C": 23.836,
-        "amplitude_C": 14.766
+        "amplitude_C": 14.766,
+        "amplitude_diurna_C": 33.233
       },
       "relevo": {
         "elevacao_media_m": 2268.4,
         "rugosidade_desvio_m": 790.9,
         "declividade_media_graus": 2.516,
+        "declividade_3km_graus": 1.837,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1219,12 +1296,14 @@
       "lon": -67.0,
       "temperatura": {
         "media_anual_C": 12.267,
-        "amplitude_C": 16.565
+        "amplitude_C": 16.565,
+        "amplitude_diurna_C": 29.51
       },
       "relevo": {
         "elevacao_media_m": 4317.0,
         "rugosidade_desvio_m": 473.4,
         "declividade_media_graus": 4.214,
+        "declividade_3km_graus": 2.428,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1244,12 +1323,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -1269,12 +1350,14 @@
       "lon": 15.0,
       "temperatura": {
         "media_anual_C": 28.402,
-        "amplitude_C": 11.836
+        "amplitude_C": 11.836,
+        "amplitude_diurna_C": 23.0
       },
       "relevo": {
         "elevacao_media_m": 639.3,
         "rugosidade_desvio_m": 351.6,
         "declividade_media_graus": 1.35,
+        "declividade_3km_graus": 0.753,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1294,12 +1377,14 @@
       "lon": 17.0,
       "temperatura": {
         "media_anual_C": 25.118,
-        "amplitude_C": 17.779
+        "amplitude_C": 17.779,
+        "amplitude_diurna_C": 21.042
       },
       "relevo": {
         "elevacao_media_m": 1516.3,
         "rugosidade_desvio_m": 224.6,
         "declividade_media_graus": 1.446,
+        "declividade_3km_graus": 0.774,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1319,12 +1404,14 @@
       "lon": 39.0,
       "temperatura": {
         "media_anual_C": 25.671,
-        "amplitude_C": 9.892
+        "amplitude_C": 9.892,
+        "amplitude_diurna_C": 17.546
       },
       "relevo": {
         "elevacao_media_m": 1892.3,
         "rugosidade_desvio_m": 547.6,
         "declividade_media_graus": 5.875,
+        "declividade_3km_graus": 2.656,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1344,12 +1431,14 @@
       "lon": 41.0,
       "temperatura": {
         "media_anual_C": 36.904,
-        "amplitude_C": 8.672
+        "amplitude_C": 8.672,
+        "amplitude_diurna_C": 17.652
       },
       "relevo": {
         "elevacao_media_m": 380.4,
         "rugosidade_desvio_m": 315.5,
         "declividade_media_graus": 2.104,
+        "declividade_3km_graus": 1.342,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1369,12 +1458,14 @@
       "lon": 43.0,
       "temperatura": {
         "media_anual_C": 33.796,
-        "amplitude_C": 8.894
+        "amplitude_C": 8.894,
+        "amplitude_diurna_C": 16.116
       },
       "relevo": {
         "elevacao_media_m": 393.4,
         "rugosidade_desvio_m": 351.7,
         "declividade_media_graus": 1.973,
+        "declividade_3km_graus": 1.187,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1394,12 +1485,14 @@
       "lon": 39.0,
       "temperatura": {
         "media_anual_C": 27.738,
-        "amplitude_C": 10.776
+        "amplitude_C": 10.776,
+        "amplitude_diurna_C": 16.439
       },
       "relevo": {
         "elevacao_media_m": 1409.1,
         "rugosidade_desvio_m": 690.4,
         "declividade_media_graus": 4.654,
+        "declividade_3km_graus": 2.233,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1419,12 +1512,14 @@
       "lon": 41.0,
       "temperatura": {
         "media_anual_C": 36.873,
-        "amplitude_C": 9.869
+        "amplitude_C": 9.869,
+        "amplitude_diurna_C": 16.538
       },
       "relevo": {
         "elevacao_media_m": 145.7,
         "rugosidade_desvio_m": 244.6,
         "declividade_media_graus": 1.708,
+        "declividade_3km_graus": 1.03,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1444,12 +1539,14 @@
       "lon": 43.0,
       "temperatura": {
         "media_anual_C": 29.503,
-        "amplitude_C": 7.012
+        "amplitude_C": 7.012,
+        "amplitude_diurna_C": 14.679
       },
       "relevo": {
         "elevacao_media_m": 772.0,
         "rugosidade_desvio_m": 801.6,
         "declividade_media_graus": 4.56,
+        "declividade_3km_graus": 2.298,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1469,12 +1566,14 @@
       "lon": -157.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -1494,12 +1593,14 @@
       "lon": -155.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -1519,12 +1620,14 @@
       "lon": -153.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -1544,12 +1647,14 @@
       "lon": 39.0,
       "temperatura": {
         "media_anual_C": 31.703,
-        "amplitude_C": 11.382
+        "amplitude_C": 11.382,
+        "amplitude_diurna_C": 16.212
       },
       "relevo": {
         "elevacao_media_m": 781.4,
         "rugosidade_desvio_m": 630.2,
         "declividade_media_graus": 4.718,
+        "declividade_3km_graus": 2.322,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1569,12 +1674,14 @@
       "lon": 41.0,
       "temperatura": {
         "media_anual_C": 34.225,
-        "amplitude_C": 8.685
+        "amplitude_C": 8.685,
+        "amplitude_diurna_C": 14.058
       },
       "relevo": {
         "elevacao_media_m": 34.0,
         "rugosidade_desvio_m": 43.3,
         "declividade_media_graus": 0.623,
+        "declividade_3km_graus": 0.44,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1594,12 +1701,14 @@
       "lon": 43.0,
       "temperatura": {
         "media_anual_C": 29.86,
-        "amplitude_C": 9.078
+        "amplitude_C": 9.078,
+        "amplitude_diurna_C": 15.328
       },
       "relevo": {
         "elevacao_media_m": 1052.2,
         "rugosidade_desvio_m": 840.0,
         "declividade_media_graus": 3.713,
+        "declividade_3km_graus": 1.815,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1619,12 +1728,14 @@
       "lon": -157.0,
       "temperatura": {
         "media_anual_C": 26.095,
-        "amplitude_C": 4.888
+        "amplitude_C": 4.888,
+        "amplitude_diurna_C": 13.408
       },
       "relevo": {
         "elevacao_media_m": 53.9,
         "rugosidade_desvio_m": 54.9,
         "declividade_media_graus": 2.39,
+        "declividade_3km_graus": 3.442,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1644,12 +1755,14 @@
       "lon": -155.0,
       "temperatura": {
         "media_anual_C": 20.409,
-        "amplitude_C": 6.223
+        "amplitude_C": 6.223,
+        "amplitude_diurna_C": 15.125
       },
       "relevo": {
         "elevacao_media_m": 1247.9,
         "rugosidade_desvio_m": 937.0,
         "declividade_media_graus": 4.994,
+        "declividade_3km_graus": 4.757,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1669,12 +1782,14 @@
       "lon": -153.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -1694,12 +1809,14 @@
       "lon": -157.0,
       "temperatura": {
         "media_anual_C": 23.283,
-        "amplitude_C": 5.947
+        "amplitude_C": 5.947,
+        "amplitude_diurna_C": 10.678
       },
       "relevo": {
         "elevacao_media_m": 440.9,
         "rugosidade_desvio_m": 527.1,
         "declividade_media_graus": 7.005,
+        "declividade_3km_graus": 5.042,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1719,12 +1836,14 @@
       "lon": -155.0,
       "temperatura": {
         "media_anual_C": 21.955,
-        "amplitude_C": 5.115
+        "amplitude_C": 5.115,
+        "amplitude_diurna_C": 9.679
       },
       "relevo": {
         "elevacao_media_m": 560.3,
         "rugosidade_desvio_m": 379.8,
         "declividade_media_graus": 6.115,
+        "declividade_3km_graus": 4.689,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1744,12 +1863,14 @@
       "lon": -153.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -1769,12 +1890,14 @@
       "lon": 7.0,
       "temperatura": {
         "media_anual_C": 30.127,
-        "amplitude_C": 20.856
+        "amplitude_C": 20.856,
+        "amplitude_diurna_C": 21.225
       },
       "relevo": {
         "elevacao_media_m": 1128.6,
         "rugosidade_desvio_m": 326.1,
         "declividade_media_graus": 1.444,
+        "declividade_3km_graus": 0.688,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1794,12 +1917,14 @@
       "lon": 9.0,
       "temperatura": {
         "media_anual_C": 29.369,
-        "amplitude_C": 22.552
+        "amplitude_C": 22.552,
+        "amplitude_diurna_C": 21.452
       },
       "relevo": {
         "elevacao_media_m": 843.3,
         "rugosidade_desvio_m": 138.8,
         "declividade_media_graus": 0.571,
+        "declividade_3km_graus": 0.286,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1819,12 +1944,14 @@
       "lon": 11.0,
       "temperatura": {
         "media_anual_C": 29.443,
-        "amplitude_C": 23.272
+        "amplitude_C": 23.272,
+        "amplitude_diurna_C": 19.421
       },
       "relevo": {
         "elevacao_media_m": 817.6,
         "rugosidade_desvio_m": 152.8,
         "declividade_media_graus": 0.91,
+        "declividade_3km_graus": 0.459,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1844,12 +1971,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": 28.691,
-        "amplitude_C": 23.839
+        "amplitude_C": 23.839,
+        "amplitude_diurna_C": 20.154
       },
       "relevo": {
         "elevacao_media_m": 767.1,
         "rugosidade_desvio_m": 109.1,
         "declividade_media_graus": 0.586,
+        "declividade_3km_graus": 0.341,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1869,12 +1998,14 @@
       "lon": 7.0,
       "temperatura": {
         "media_anual_C": 29.375,
-        "amplitude_C": 22.954
+        "amplitude_C": 22.954,
+        "amplitude_diurna_C": 22.69
       },
       "relevo": {
         "elevacao_media_m": 1177.1,
         "rugosidade_desvio_m": 153.9,
         "declividade_media_graus": 1.35,
+        "declividade_3km_graus": 0.679,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1894,12 +2025,14 @@
       "lon": 9.0,
       "temperatura": {
         "media_anual_C": 29.44,
-        "amplitude_C": 23.547
+        "amplitude_C": 23.547,
+        "amplitude_diurna_C": 20.157
       },
       "relevo": {
         "elevacao_media_m": 1135.5,
         "rugosidade_desvio_m": 253.3,
         "declividade_media_graus": 1.539,
+        "declividade_3km_graus": 0.799,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1919,12 +2052,14 @@
       "lon": 11.0,
       "temperatura": {
         "media_anual_C": 29.772,
-        "amplitude_C": 24.87
+        "amplitude_C": 24.87,
+        "amplitude_diurna_C": 21.215
       },
       "relevo": {
         "elevacao_media_m": 839.8,
         "rugosidade_desvio_m": 169.3,
         "declividade_media_graus": 1.366,
+        "declividade_3km_graus": 0.558,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1944,12 +2079,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": 27.276,
-        "amplitude_C": 25.195
+        "amplitude_C": 25.195,
+        "amplitude_diurna_C": 19.809
       },
       "relevo": {
         "elevacao_media_m": 668.6,
         "rugosidade_desvio_m": 100.9,
         "declividade_media_graus": 1.335,
+        "declividade_3km_graus": 0.151,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1969,12 +2106,14 @@
       "lon": -15.0,
       "temperatura": {
         "media_anual_C": 24.338,
-        "amplitude_C": 11.139
+        "amplitude_C": 11.139,
+        "amplitude_diurna_C": 15.727
       },
       "relevo": {
         "elevacao_media_m": 231.0,
         "rugosidade_desvio_m": 333.1,
         "declividade_media_graus": 2.896,
+        "declividade_3km_graus": 1.475,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -1994,12 +2133,14 @@
       "lon": -13.0,
       "temperatura": {
         "media_anual_C": 25.706,
-        "amplitude_C": 12.913
+        "amplitude_C": 12.913,
+        "amplitude_diurna_C": 18.396
       },
       "relevo": {
         "elevacao_media_m": 153.0,
         "rugosidade_desvio_m": 92.2,
         "declividade_media_graus": 0.402,
+        "declividade_3km_graus": 0.259,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2019,12 +2160,14 @@
       "lon": -11.0,
       "temperatura": {
         "media_anual_C": 28.023,
-        "amplitude_C": 17.039
+        "amplitude_C": 17.039,
+        "amplitude_diurna_C": 20.127
       },
       "relevo": {
         "elevacao_media_m": 336.0,
         "rugosidade_desvio_m": 109.0,
         "declividade_media_graus": 0.604,
+        "declividade_3km_graus": 0.323,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2044,12 +2187,14 @@
       "lon": 7.0,
       "temperatura": {
         "media_anual_C": 30.688,
-        "amplitude_C": 25.982
+        "amplitude_C": 25.982,
+        "amplitude_diurna_C": 20.529
       },
       "relevo": {
         "elevacao_media_m": 575.5,
         "rugosidade_desvio_m": 200.0,
         "declividade_media_graus": 1.945,
+        "declividade_3km_graus": 0.621,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2069,12 +2214,14 @@
       "lon": 9.0,
       "temperatura": {
         "media_anual_C": 30.464,
-        "amplitude_C": 25.838
+        "amplitude_C": 25.838,
+        "amplitude_diurna_C": 21.384
       },
       "relevo": {
         "elevacao_media_m": 581.7,
         "rugosidade_desvio_m": 131.8,
         "declividade_media_graus": 0.787,
+        "declividade_3km_graus": 0.311,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2094,12 +2241,14 @@
       "lon": 11.0,
       "temperatura": {
         "media_anual_C": 29.421,
-        "amplitude_C": 25.802
+        "amplitude_C": 25.802,
+        "amplitude_diurna_C": 21.667
       },
       "relevo": {
         "elevacao_media_m": 554.9,
         "rugosidade_desvio_m": 67.8,
         "declividade_media_graus": 0.881,
+        "declividade_3km_graus": 0.192,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2119,12 +2268,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": 28.676,
-        "amplitude_C": 25.659
+        "amplitude_C": 25.659,
+        "amplitude_diurna_C": 20.239
       },
       "relevo": {
         "elevacao_media_m": 500.9,
         "rugosidade_desvio_m": 85.9,
         "declividade_media_graus": 0.766,
+        "declividade_3km_graus": 0.212,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2144,12 +2295,14 @@
       "lon": 85.0,
       "temperatura": {
         "media_anual_C": 21.833,
-        "amplitude_C": 13.296
+        "amplitude_C": 13.296,
+        "amplitude_diurna_C": 8.305
       },
       "relevo": {
         "elevacao_media_m": 416.2,
         "rugosidade_desvio_m": 592.1,
         "declividade_media_graus": 3.219,
+        "declividade_3km_graus": 1.404,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2169,12 +2322,14 @@
       "lon": 87.0,
       "temperatura": {
         "media_anual_C": 15.618,
-        "amplitude_C": 12.206
+        "amplitude_C": 12.206,
+        "amplitude_diurna_C": 9.52
       },
       "relevo": {
         "elevacao_media_m": 1453.5,
         "rugosidade_desvio_m": 1691.0,
         "declividade_media_graus": 8.671,
+        "declividade_3km_graus": 3.819,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2194,12 +2349,14 @@
       "lon": 89.0,
       "temperatura": {
         "media_anual_C": 13.616,
-        "amplitude_C": 11.645
+        "amplitude_C": 11.645,
+        "amplitude_diurna_C": 10.061
       },
       "relevo": {
         "elevacao_media_m": 1813.1,
         "rugosidade_desvio_m": 1871.8,
         "declividade_media_graus": 8.364,
+        "declividade_3km_graus": 3.8,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2219,12 +2376,14 @@
       "lon": -15.0,
       "temperatura": {
         "media_anual_C": 22.782,
-        "amplitude_C": 11.163
+        "amplitude_C": 11.163,
+        "amplitude_diurna_C": 14.971
       },
       "relevo": {
         "elevacao_media_m": 293.6,
         "rugosidade_desvio_m": 303.1,
         "declividade_media_graus": 4.895,
+        "declividade_3km_graus": 2.912,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2244,12 +2403,14 @@
       "lon": -13.0,
       "temperatura": {
         "media_anual_C": 23.692,
-        "amplitude_C": 10.788
+        "amplitude_C": 10.788,
+        "amplitude_diurna_C": 16.306
       },
       "relevo": {
         "elevacao_media_m": 137.2,
         "rugosidade_desvio_m": 114.9,
         "declividade_media_graus": 2.604,
+        "declividade_3km_graus": 1.36,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2269,12 +2430,14 @@
       "lon": -11.0,
       "temperatura": {
         "media_anual_C": 25.957,
-        "amplitude_C": 14.222
+        "amplitude_C": 14.222,
+        "amplitude_diurna_C": 18.496
       },
       "relevo": {
         "elevacao_media_m": 269.2,
         "rugosidade_desvio_m": 169.6,
         "declividade_media_graus": 1.956,
+        "declividade_3km_graus": 0.939,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2294,12 +2457,14 @@
       "lon": 57.0,
       "temperatura": {
         "media_anual_C": 22.945,
-        "amplitude_C": 30.417
+        "amplitude_C": 30.417,
+        "amplitude_diurna_C": 21.55
       },
       "relevo": {
         "elevacao_media_m": 1915.5,
         "rugosidade_desvio_m": 703.4,
         "declividade_media_graus": 3.811,
+        "declividade_3km_graus": 2.377,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2319,12 +2484,14 @@
       "lon": 59.0,
       "temperatura": {
         "media_anual_C": 30.675,
-        "amplitude_C": 30.397
+        "amplitude_C": 30.397,
+        "amplitude_diurna_C": 24.103
       },
       "relevo": {
         "elevacao_media_m": 842.7,
         "rugosidade_desvio_m": 488.3,
         "declividade_media_graus": 1.989,
+        "declividade_3km_graus": 1.312,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2344,12 +2511,14 @@
       "lon": 61.0,
       "temperatura": {
         "media_anual_C": 27.025,
-        "amplitude_C": 29.99
+        "amplitude_C": 29.99,
+        "amplitude_diurna_C": 23.624
       },
       "relevo": {
         "elevacao_media_m": 1337.1,
         "rugosidade_desvio_m": 464.8,
         "declividade_media_graus": 2.327,
+        "declividade_3km_graus": 1.483,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2369,12 +2538,14 @@
       "lon": 85.0,
       "temperatura": {
         "media_anual_C": 2.972,
-        "amplitude_C": 20.381
+        "amplitude_C": 20.381,
+        "amplitude_diurna_C": 20.349
       },
       "relevo": {
         "elevacao_media_m": 4582.7,
         "rugosidade_desvio_m": 1234.5,
         "declividade_media_graus": 10.668,
+        "declividade_3km_graus": 4.732,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2394,12 +2565,14 @@
       "lon": 87.0,
       "temperatura": {
         "media_anual_C": 3.844,
-        "amplitude_C": 20.877
+        "amplitude_C": 20.877,
+        "amplitude_diurna_C": 23.283
       },
       "relevo": {
         "elevacao_media_m": 5005.5,
         "rugosidade_desvio_m": 485.1,
         "declividade_media_graus": 8.747,
+        "declividade_3km_graus": 3.597,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2419,12 +2592,14 @@
       "lon": 89.0,
       "temperatura": {
         "media_anual_C": 5.019,
-        "amplitude_C": 17.625
+        "amplitude_C": 17.625,
+        "amplitude_diurna_C": 23.328
       },
       "relevo": {
         "elevacao_media_m": 4793.9,
         "rugosidade_desvio_m": 463.1,
         "declividade_media_graus": 7.99,
+        "declividade_3km_graus": 3.401,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2444,12 +2619,14 @@
       "lon": -15.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -2469,12 +2646,14 @@
       "lon": -13.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -2494,12 +2673,14 @@
       "lon": -11.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -2519,12 +2700,14 @@
       "lon": 57.0,
       "temperatura": {
         "media_anual_C": 25.859,
-        "amplitude_C": 31.129
+        "amplitude_C": 31.129,
+        "amplitude_diurna_C": 23.393
       },
       "relevo": {
         "elevacao_media_m": 1373.6,
         "rugosidade_desvio_m": 713.1,
         "declividade_media_graus": 3.108,
+        "declividade_3km_graus": 1.986,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2544,12 +2727,14 @@
       "lon": 59.0,
       "temperatura": {
         "media_anual_C": 30.629,
-        "amplitude_C": 31.627
+        "amplitude_C": 31.627,
+        "amplitude_diurna_C": 26.873
       },
       "relevo": {
         "elevacao_media_m": 811.4,
         "rugosidade_desvio_m": 404.3,
         "declividade_media_graus": 1.378,
+        "declividade_3km_graus": 0.75,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2569,12 +2754,14 @@
       "lon": 61.0,
       "temperatura": {
         "media_anual_C": 26.773,
-        "amplitude_C": 29.872
+        "amplitude_C": 29.872,
+        "amplitude_diurna_C": 21.557
       },
       "relevo": {
         "elevacao_media_m": 797.7,
         "rugosidade_desvio_m": 382.6,
         "declividade_media_graus": 1.09,
+        "declividade_3km_graus": 0.703,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2594,12 +2781,14 @@
       "lon": 85.0,
       "temperatura": {
         "media_anual_C": 2.916,
-        "amplitude_C": 27.101
+        "amplitude_C": 27.101,
+        "amplitude_diurna_C": 24.651
       },
       "relevo": {
         "elevacao_media_m": 5057.1,
         "rugosidade_desvio_m": 353.5,
         "declividade_media_graus": 4.899,
+        "declividade_3km_graus": 2.168,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2619,12 +2808,14 @@
       "lon": 87.0,
       "temperatura": {
         "media_anual_C": 2.712,
-        "amplitude_C": 24.553
+        "amplitude_C": 24.553,
+        "amplitude_diurna_C": 24.284
       },
       "relevo": {
         "elevacao_media_m": 5003.4,
         "rugosidade_desvio_m": 323.9,
         "declividade_media_graus": 4.834,
+        "declividade_3km_graus": 2.28,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2644,12 +2835,14 @@
       "lon": 89.0,
       "temperatura": {
         "media_anual_C": 1.986,
-        "amplitude_C": 22.657
+        "amplitude_C": 22.657,
+        "amplitude_diurna_C": 22.698
       },
       "relevo": {
         "elevacao_media_m": 4947.9,
         "rugosidade_desvio_m": 297.4,
         "declividade_media_graus": 4.221,
+        "declividade_3km_graus": 1.701,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2669,12 +2862,14 @@
       "lon": 57.0,
       "temperatura": {
         "media_anual_C": 26.39,
-        "amplitude_C": 32.764
+        "amplitude_C": 32.764,
+        "amplitude_diurna_C": 23.527
       },
       "relevo": {
         "elevacao_media_m": 1038.4,
         "rugosidade_desvio_m": 272.8,
         "declividade_media_graus": 1.813,
+        "declividade_3km_graus": 1.198,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2694,12 +2889,14 @@
       "lon": 59.0,
       "temperatura": {
         "media_anual_C": 22.923,
-        "amplitude_C": 33.023
+        "amplitude_C": 33.023,
+        "amplitude_diurna_C": 23.979
       },
       "relevo": {
         "elevacao_media_m": 1497.0,
         "rugosidade_desvio_m": 377.6,
         "declividade_media_graus": 2.001,
+        "declividade_3km_graus": 1.328,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2719,12 +2916,14 @@
       "lon": 61.0,
       "temperatura": {
         "media_anual_C": 23.959,
-        "amplitude_C": 32.166
+        "amplitude_C": 32.166,
+        "amplitude_diurna_C": 20.444
       },
       "relevo": {
         "elevacao_media_m": 956.9,
         "rugosidade_desvio_m": 333.4,
         "declividade_media_graus": 1.706,
+        "declividade_3km_graus": 1.034,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2744,12 +2943,14 @@
       "lon": -113.0,
       "temperatura": {
         "media_anual_C": 16.409,
-        "amplitude_C": 31.318
+        "amplitude_C": 31.318,
+        "amplitude_diurna_C": 18.699
       },
       "relevo": {
         "elevacao_media_m": 1752.3,
         "rugosidade_desvio_m": 467.4,
         "declividade_media_graus": 4.179,
+        "declividade_3km_graus": 2.248,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2769,12 +2970,14 @@
       "lon": -111.0,
       "temperatura": {
         "media_anual_C": 17.356,
-        "amplitude_C": 33.773
+        "amplitude_C": 33.773,
+        "amplitude_diurna_C": 19.265
       },
       "relevo": {
         "elevacao_media_m": 1729.8,
         "rugosidade_desvio_m": 319.6,
         "declividade_media_graus": 3.445,
+        "declividade_3km_graus": 1.713,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2794,12 +2997,14 @@
       "lon": -109.0,
       "temperatura": {
         "media_anual_C": 15.263,
-        "amplitude_C": 33.287
+        "amplitude_C": 33.287,
+        "amplitude_diurna_C": 20.549
       },
       "relevo": {
         "elevacao_media_m": 1937.2,
         "rugosidade_desvio_m": 390.2,
         "declividade_media_graus": 2.686,
+        "declividade_3km_graus": 1.394,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2819,12 +3024,14 @@
       "lon": -123.0,
       "temperatura": {
         "media_anual_C": 17.367,
-        "amplitude_C": 21.232
+        "amplitude_C": 21.232,
+        "amplitude_diurna_C": 12.811
       },
       "relevo": {
         "elevacao_media_m": 434.8,
         "rugosidade_desvio_m": 389.8,
         "declividade_media_graus": 4.675,
+        "declividade_3km_graus": 2.043,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2844,12 +3051,14 @@
       "lon": -121.0,
       "temperatura": {
         "media_anual_C": 15.924,
-        "amplitude_C": 23.495
+        "amplitude_C": 23.495,
+        "amplitude_diurna_C": 12.999
       },
       "relevo": {
         "elevacao_media_m": 842.8,
         "rugosidade_desvio_m": 788.7,
         "declividade_media_graus": 3.706,
+        "declividade_3km_graus": 1.621,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2869,12 +3078,14 @@
       "lon": -119.0,
       "temperatura": {
         "media_anual_C": 15.629,
-        "amplitude_C": 31.845
+        "amplitude_C": 31.845,
+        "amplitude_diurna_C": 21.39
       },
       "relevo": {
         "elevacao_media_m": 1743.7,
         "rugosidade_desvio_m": 476.4,
         "declividade_media_graus": 4.481,
+        "declividade_3km_graus": 2.57,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2894,12 +3105,14 @@
       "lon": -113.0,
       "temperatura": {
         "media_anual_C": 15.08,
-        "amplitude_C": 36.083
+        "amplitude_C": 36.083,
+        "amplitude_diurna_C": 21.175
       },
       "relevo": {
         "elevacao_media_m": 1769.4,
         "rugosidade_desvio_m": 369.8,
         "declividade_media_graus": 3.223,
+        "declividade_3km_graus": 2.126,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2919,12 +3132,14 @@
       "lon": -111.0,
       "temperatura": {
         "media_anual_C": 12.275,
-        "amplitude_C": 36.684
+        "amplitude_C": 36.684,
+        "amplitude_diurna_C": 18.188
       },
       "relevo": {
         "elevacao_media_m": 2021.4,
         "rugosidade_desvio_m": 481.7,
         "declividade_media_graus": 4.287,
+        "declividade_3km_graus": 2.352,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2944,12 +3159,14 @@
       "lon": -109.0,
       "temperatura": {
         "media_anual_C": 12.686,
-        "amplitude_C": 36.811
+        "amplitude_C": 36.811,
+        "amplitude_diurna_C": 17.634
       },
       "relevo": {
         "elevacao_media_m": 1960.8,
         "rugosidade_desvio_m": 396.1,
         "declividade_media_graus": 4.214,
+        "declividade_3km_graus": 2.085,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2969,12 +3186,14 @@
       "lon": -123.0,
       "temperatura": {
         "media_anual_C": 13.617,
-        "amplitude_C": 25.047
+        "amplitude_C": 25.047,
+        "amplitude_diurna_C": 10.256
       },
       "relevo": {
         "elevacao_media_m": 952.4,
         "rugosidade_desvio_m": 507.5,
         "declividade_media_graus": 7.67,
+        "declividade_3km_graus": 3.213,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -2994,12 +3213,14 @@
       "lon": -121.0,
       "temperatura": {
         "media_anual_C": 12.351,
-        "amplitude_C": 29.991
+        "amplitude_C": 29.991,
+        "amplitude_diurna_C": 15.635
       },
       "relevo": {
         "elevacao_media_m": 1501.4,
         "rugosidade_desvio_m": 333.2,
         "declividade_media_graus": 3.506,
+        "declividade_3km_graus": 1.96,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3019,12 +3240,14 @@
       "lon": -119.0,
       "temperatura": {
         "media_anual_C": 15.159,
-        "amplitude_C": 35.276
+        "amplitude_C": 35.276,
+        "amplitude_diurna_C": 21.986
       },
       "relevo": {
         "elevacao_media_m": 1542.1,
         "rugosidade_desvio_m": 277.9,
         "declividade_media_graus": 3.334,
+        "declividade_3km_graus": 2.116,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3044,12 +3267,14 @@
       "lon": -113.0,
       "temperatura": {
         "media_anual_C": 13.773,
-        "amplitude_C": 36.555
+        "amplitude_C": 36.555,
+        "amplitude_diurna_C": 17.76
       },
       "relevo": {
         "elevacao_media_m": 1456.7,
         "rugosidade_desvio_m": 260.6,
         "declividade_media_graus": 2.082,
+        "declividade_3km_graus": 1.335,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3069,12 +3294,14 @@
       "lon": -111.0,
       "temperatura": {
         "media_anual_C": 7.264,
-        "amplitude_C": 35.708
+        "amplitude_C": 35.708,
+        "amplitude_diurna_C": 16.009
       },
       "relevo": {
         "elevacao_media_m": 2205.4,
         "rugosidade_desvio_m": 473.7,
         "declividade_media_graus": 4.522,
+        "declividade_3km_graus": 2.243,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3094,12 +3321,14 @@
       "lon": -109.0,
       "temperatura": {
         "media_anual_C": 9.473,
-        "amplitude_C": 39.664
+        "amplitude_C": 39.664,
+        "amplitude_diurna_C": 19.135
       },
       "relevo": {
         "elevacao_media_m": 2040.6,
         "rugosidade_desvio_m": 286.2,
         "declividade_media_graus": 2.523,
+        "declividade_3km_graus": 1.318,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3119,12 +3348,14 @@
       "lon": -123.0,
       "temperatura": {
         "media_anual_C": 10.622,
-        "amplitude_C": 22.242
+        "amplitude_C": 22.242,
+        "amplitude_diurna_C": 8.453
       },
       "relevo": {
         "elevacao_media_m": 835.9,
         "rugosidade_desvio_m": 484.9,
         "declividade_media_graus": 6.345,
+        "declividade_3km_graus": 2.521,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3144,12 +3375,14 @@
       "lon": -121.0,
       "temperatura": {
         "media_anual_C": 10.348,
-        "amplitude_C": 30.157
+        "amplitude_C": 30.157,
+        "amplitude_diurna_C": 16.66
       },
       "relevo": {
         "elevacao_media_m": 1513.2,
         "rugosidade_desvio_m": 200.8,
         "declividade_media_graus": 2.452,
+        "declividade_3km_graus": 1.421,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3169,12 +3402,14 @@
       "lon": -119.0,
       "temperatura": {
         "media_anual_C": 12.266,
-        "amplitude_C": 35.052
+        "amplitude_C": 35.052,
+        "amplitude_diurna_C": 19.727
       },
       "relevo": {
         "elevacao_media_m": 1490.4,
         "rugosidade_desvio_m": 220.6,
         "declividade_media_graus": 2.481,
+        "declividade_3km_graus": 1.424,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3194,12 +3429,14 @@
       "lon": -19.0,
       "temperatura": {
         "media_anual_C": -1.304,
-        "amplitude_C": 20.822
+        "amplitude_C": 20.822,
+        "amplitude_diurna_C": 6.359
       },
       "relevo": {
         "elevacao_media_m": 449.4,
         "rugosidade_desvio_m": 359.7,
         "declividade_media_graus": 3.835,
+        "declividade_3km_graus": 2.38,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3219,12 +3456,14 @@
       "lon": -17.0,
       "temperatura": {
         "media_anual_C": 0.87,
-        "amplitude_C": 19.987
+        "amplitude_C": 19.987,
+        "amplitude_diurna_C": 7.287
       },
       "relevo": {
         "elevacao_media_m": 128.1,
         "rugosidade_desvio_m": 263.6,
         "declividade_media_graus": 2.556,
+        "declividade_3km_graus": 1.938,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3244,12 +3483,14 @@
       "lon": -15.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -3269,12 +3510,14 @@
       "lon": -19.0,
       "temperatura": {
         "media_anual_C": -3.706,
-        "amplitude_C": 21.787
+        "amplitude_C": 21.787,
+        "amplitude_diurna_C": 5.584
       },
       "relevo": {
         "elevacao_media_m": 651.4,
         "rugosidade_desvio_m": 288.3,
         "declividade_media_graus": 4.879,
+        "declividade_3km_graus": 2.43,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3294,12 +3537,14 @@
       "lon": -17.0,
       "temperatura": {
         "media_anual_C": -4.758,
-        "amplitude_C": 20.978
+        "amplitude_C": 20.978,
+        "amplitude_diurna_C": 5.494
       },
       "relevo": {
         "elevacao_media_m": 804.6,
         "rugosidade_desvio_m": 427.8,
         "declividade_media_graus": 3.174,
+        "declividade_3km_graus": 2.011,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3319,12 +3564,14 @@
       "lon": -15.0,
       "temperatura": {
         "media_anual_C": -2.807,
-        "amplitude_C": 21.082
+        "amplitude_C": 21.082,
+        "amplitude_diurna_C": 5.599
       },
       "relevo": {
         "elevacao_media_m": 524.2,
         "rugosidade_desvio_m": 299.0,
         "declividade_media_graus": 5.281,
+        "declividade_3km_graus": 2.581,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3344,12 +3591,14 @@
       "lon": -19.0,
       "temperatura": {
         "media_anual_C": -3.685,
-        "amplitude_C": 20.874
+        "amplitude_C": 20.874,
+        "amplitude_diurna_C": 4.733
       },
       "relevo": {
         "elevacao_media_m": 338.1,
         "rugosidade_desvio_m": 246.3,
         "declividade_media_graus": 12.883,
+        "declividade_3km_graus": 5.121,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3369,12 +3618,14 @@
       "lon": -17.0,
       "temperatura": {
         "media_anual_C": -1.241,
-        "amplitude_C": 21.809
+        "amplitude_C": 21.809,
+        "amplitude_diurna_C": 6.74
       },
       "relevo": {
         "elevacao_media_m": 186.2,
         "rugosidade_desvio_m": 177.8,
         "declividade_media_graus": 2.845,
+        "declividade_3km_graus": 1.728,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3394,12 +3645,14 @@
       "lon": -15.0,
       "temperatura": {
         "media_anual_C": -1.234,
-        "amplitude_C": 20.654
+        "amplitude_C": 20.654,
+        "amplitude_diurna_C": 6.429
       },
       "relevo": {
         "elevacao_media_m": 155.4,
         "rugosidade_desvio_m": 111.3,
         "declividade_media_graus": 3.011,
+        "declividade_3km_graus": 1.514,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3419,12 +3672,14 @@
       "lon": -91.0,
       "temperatura": {
         "media_anual_C": -18.535,
-        "amplitude_C": 45.941
+        "amplitude_C": 45.941,
+        "amplitude_diurna_C": 2.301
       },
       "relevo": {
         "elevacao_media_m": 239.6,
         "rugosidade_desvio_m": 94.1,
         "declividade_media_graus": 2.155,
+        "declividade_3km_graus": 1.267,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3444,12 +3699,14 @@
       "lon": -89.0,
       "temperatura": {
         "media_anual_C": -18.547,
-        "amplitude_C": 46.685
+        "amplitude_C": 46.685,
+        "amplitude_diurna_C": 2.516
       },
       "relevo": {
         "elevacao_media_m": 181.3,
         "rugosidade_desvio_m": 77.1,
         "declividade_media_graus": 1.398,
+        "declividade_3km_graus": 0.746,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3469,12 +3726,14 @@
       "lon": -87.0,
       "temperatura": {
         "media_anual_C": -18.72,
-        "amplitude_C": 45.59
+        "amplitude_C": 45.59,
+        "amplitude_diurna_C": 2.561
       },
       "relevo": {
         "elevacao_media_m": 240.1,
         "rugosidade_desvio_m": 85.8,
         "declividade_media_graus": 1.287,
+        "declividade_3km_graus": 0.718,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3494,12 +3753,14 @@
       "lon": -91.0,
       "temperatura": {
         "media_anual_C": -19.553,
-        "amplitude_C": 49.323
+        "amplitude_C": 49.323,
+        "amplitude_diurna_C": 2.32
       },
       "relevo": {
         "elevacao_media_m": 197.5,
         "rugosidade_desvio_m": 80.6,
         "declividade_media_graus": 1.69,
+        "declividade_3km_graus": 0.973,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3519,12 +3780,14 @@
       "lon": -89.0,
       "temperatura": {
         "media_anual_C": -19.752,
-        "amplitude_C": 46.224
+        "amplitude_C": 46.224,
+        "amplitude_diurna_C": 2.247
       },
       "relevo": {
         "elevacao_media_m": 242.4,
         "rugosidade_desvio_m": 102.4,
         "declividade_media_graus": 2.32,
+        "declividade_3km_graus": 1.285,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3544,12 +3807,14 @@
       "lon": -87.0,
       "temperatura": {
         "media_anual_C": -19.912,
-        "amplitude_C": 45.686
+        "amplitude_C": 45.686,
+        "amplitude_diurna_C": 2.122
       },
       "relevo": {
         "elevacao_media_m": 352.6,
         "rugosidade_desvio_m": 137.1,
         "declividade_media_graus": 2.561,
+        "declividade_3km_graus": 1.477,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3569,12 +3834,14 @@
       "lon": -91.0,
       "temperatura": {
         "media_anual_C": -19.805,
-        "amplitude_C": 48.757
+        "amplitude_C": 48.757,
+        "amplitude_diurna_C": 2.16
       },
       "relevo": {
         "elevacao_media_m": 160.9,
         "rugosidade_desvio_m": 126.3,
         "declividade_media_graus": 2.146,
+        "declividade_3km_graus": 1.307,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3594,12 +3861,14 @@
       "lon": -89.0,
       "temperatura": {
         "media_anual_C": -19.398,
-        "amplitude_C": 46.994
+        "amplitude_C": 46.994,
+        "amplitude_diurna_C": 1.985
       },
       "relevo": {
         "elevacao_media_m": 208.3,
         "rugosidade_desvio_m": 167.3,
         "declividade_media_graus": 3.143,
+        "declividade_3km_graus": 2.156,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3619,12 +3888,14 @@
       "lon": -87.0,
       "temperatura": {
         "media_anual_C": -19.629,
-        "amplitude_C": 49.209
+        "amplitude_C": 49.209,
+        "amplitude_diurna_C": 2.18
       },
       "relevo": {
         "elevacao_media_m": 309.4,
         "rugosidade_desvio_m": 264.9,
         "declividade_media_graus": 2.915,
+        "declividade_3km_graus": 2.053,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3644,12 +3915,14 @@
       "lon": 11.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -3669,12 +3942,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": -8.413,
-        "amplitude_C": 32.409
+        "amplitude_C": 32.409,
+        "amplitude_diurna_C": 1.604
       },
       "relevo": {
         "elevacao_media_m": 99.1,
         "rugosidade_desvio_m": 153.2,
         "declividade_media_graus": 5.441,
+        "declividade_3km_graus": 3.645,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3694,12 +3969,14 @@
       "lon": 15.0,
       "temperatura": {
         "media_anual_C": -10.77,
-        "amplitude_C": 29.551
+        "amplitude_C": 29.551,
+        "amplitude_diurna_C": 1.614
       },
       "relevo": {
         "elevacao_media_m": 317.3,
         "rugosidade_desvio_m": 217.6,
         "declividade_media_graus": 8.026,
+        "declividade_3km_graus": 3.849,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3719,12 +3996,14 @@
       "lon": 11.0,
       "temperatura": {
         "media_anual_C": -10.469,
-        "amplitude_C": 29.283
+        "amplitude_C": 29.283,
+        "amplitude_diurna_C": 0.831
       },
       "relevo": {
         "elevacao_media_m": 266.9,
         "rugosidade_desvio_m": 220.2,
         "declividade_media_graus": 7.798,
+        "declividade_3km_graus": 3.936,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3744,12 +4023,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": -12.925,
-        "amplitude_C": 30.915
+        "amplitude_C": 30.915,
+        "amplitude_diurna_C": 1.276
       },
       "relevo": {
         "elevacao_media_m": 467.1,
         "rugosidade_desvio_m": 285.0,
         "declividade_media_graus": 6.924,
+        "declividade_3km_graus": 3.565,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3769,12 +4050,14 @@
       "lon": 15.0,
       "temperatura": {
         "media_anual_C": -11.554,
-        "amplitude_C": 35.578
+        "amplitude_C": 35.578,
+        "amplitude_diurna_C": 1.447
       },
       "relevo": {
         "elevacao_media_m": 420.5,
         "rugosidade_desvio_m": 293.4,
         "declividade_media_graus": 11.295,
+        "declividade_3km_graus": 5.365,
         "fonte": "SRTMGL30"
       },
       "gelo": {
@@ -3794,12 +4077,14 @@
       "lon": 11.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -3819,12 +4104,14 @@
       "lon": 13.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": null,
         "rugosidade_desvio_m": null,
         "declividade_media_graus": null,
+        "declividade_3km_graus": null,
         "fonte": null
       },
       "gelo": {
@@ -3844,12 +4131,14 @@
       "lon": 15.0,
       "temperatura": {
         "media_anual_C": null,
-        "amplitude_C": null
+        "amplitude_C": null,
+        "amplitude_diurna_C": null
       },
       "relevo": {
         "elevacao_media_m": 33.6,
         "rugosidade_desvio_m": 24.1,
         "declividade_media_graus": 3.666,
+        "declividade_3km_graus": null,
         "fonte": "SRTMGL30"
       },
       "gelo": {

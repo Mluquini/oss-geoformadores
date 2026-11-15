@@ -7,7 +7,10 @@ O que ele faz, em português simples:
      (Mars Odyssey/GRS). Não precisa de senha: os dois são públicos.
   2. Para cada um dos 6 locais, mede os pixels num círculo de 1 grau de raio
      ao redor do local (janela de ~2 graus).
-  3. Salva tudo no JSON. O que NÃO conseguimos medir fica null, com o motivo.
+  3. Se existir data/mars_rovers.json (rode antes o scripts/02b_marte_rovers.py), junta a temperatura do solo e a
+     amplitude dia/noite medidas NO LOCAL pelos rovers (Gale: Curiosity/REMS; Jezero: Perseverance/MEDA). Os outros
+     locais não têm esse dado: ficam null.
+  4. Salva tudo no JSON. O que NÃO conseguimos medir fica null, com o motivo.
 
 Como rodar (pelo caminho do script, passando as pastas):
     python scripts/02_marte.py --raw raw --saida data
@@ -25,6 +28,8 @@ PDS = "https://pds-geosciences.wustl.edu"
 MOLA_URL = f"{PDS}/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb"
 GRS_URL = f"{PDS}/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5"
 RAIO_MARTE_M = 3_396_000.0
+# Escala comum da declividade (pixels de ~3,7 km): o MOLA de 16 pixels/grau já está nela (1° = 59,3 km). Terra e Lua
+# são reduzidas para essa mesma escala nos scripts 01 e 03.
 
 # Centros OFICIAIS (graus; lon em Leste 0-360), do Gazetteer da IAU (campos center_lat / center_lon).
 # Atenção: "Meridiani Planum" é o centro da planície inteira (~1000 km), não o ponto de pouso do Opportunity.
@@ -45,16 +50,62 @@ MOTIVOS_NULOS = {
         "já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que "
         "NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são "
         "enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó "
-        "Atmospheres do PDS (não verificado)."),
+        "Atmospheres do PDS (não verificado). Só Gale (Curiosity/REMS) e Jezero (Perseverance/MEDA) têm temperatura medida no "
+        "local por rover (scripts/02b_marte_rovers.py); nos outros locais não há medida."),
     "geologia": (
         "Não encontrei no PDS um mapa global pronto de índice de composição silicática do MGS/TES. "
         "O Si do GRS (Odyssey) é abundância de silício, uma medida diferente e não comparável com o "
         "índice de emissividade do ASTER nem com o Christiansen Feature do Diviner."),
+    "amplitude_diurna": (
+        "Não encontrei no PDS um produto global pronto de temperatura de superfície de Marte por hora do dia "
+        "(TES/MCS): o que existe são os dados por observação (mgs-m-tes-3-tsdr-v2), enormes e sem agregação em mapa, "
+        "e o mapa de inércia térmica, que NÃO é temperatura. Só Gale e Jezero têm essa amplitude, medida no local pelos "
+        "rovers; nos outros locais ela fica de fora (não foi estimada)."),
     "vento": (
         "Não existe medição orbital global direta de vento na superfície de Marte. Opacidade de "
         "poeira (TES/MCS) seria um proxy, mas não encontrei um mapa global pronto no PDS "
         "(não verificado)."),
 }
+
+
+def aplicar_rovers(locais, saida):
+    """Preenche temperatura e amplitude dia/noite de Gale e Jezero com o resumo dos rovers (data/mars_rovers.json)."""
+    import json
+    arq = Path(saida) / "mars_rovers.json"
+    if not arq.exists():
+        print("  AVISO: data/mars_rovers.json não existe; temperatura e amplitude dia/noite de Marte ficam null "
+              "(rode scripts/02b_marte_rovers.py).", file=sys.stderr)
+        return
+    rov = json.load(open(arq, encoding="utf-8"))["locais"]
+    for l in locais:
+        r = rov.get(l["id"])
+        if not r:
+            continue
+        comum = dict(
+            produto=r["produto"], instrumento=r["instrumento"], versao="-", periodo=r["periodo"],
+            resolucao="1 medida por segundo, resumida em 24 faixas de hora local; amostra de "
+                      f"{len(r['sols_com_curva'])} sols com curva completa (de {len(r['sols_amostrados'])} sols sorteados)",
+            link=r["link"], papel="medida no local por rover (um ponto, não uma janela de 2°; média de sols amostrados)")
+        a = l["aspectos"]
+        a["temperatura"] = c.campo(
+            r["temperatura_media_K"], unidade="K (temperatura do solo, média das 24 faixas de hora e dos sols amostrados)",
+            metodo="Temperatura do SOLO medida pelo rover (REMS: sensor GTS, temperatura de brilho; MEDA: sensor TIRS, a partir do "
+                   "infravermelho térmico supondo emissividade 1, o que subestima um pouco). Média dos sols amostrados; "
+                   "é uma estimativa da média anual, não uma média de todos os sols.",
+            incerteza_1sigma=round(r["temperatura_media_K_desvio_entre_sols"], 2), **comum)
+        a["amplitude_diurna"] = c.campo(
+            r["amplitude_diurna_K"], unidade="K (máximo - mínimo da curva do dia, média dos sols amostrados)",
+            metodo="Máximo menos mínimo da curva média por hora local do sol, médio entre os sols amostrados.",
+            incerteza_1sigma=round(r["amplitude_diurna_K_desvio_entre_sols"], 2), **comum)
+        if r.get("vento_ms") is not None:
+            ate = max(r["sols_com_vento"]); de = min(r["sols_com_vento"])
+            a["vento"]["motivo_nulo"] = (
+                f"O rover mediu vento, mas só em {len(r['sols_com_vento'])} dos sols amostrados (sols {de} a {ate}, o vento derivado "
+                "deixa de existir depois), a ~1,5 m de altura (o vento da Terra no site vem do MERRA-2 a 50-70 m). A média "
+                f"({r['vento_ms']:.1f} m/s) não cobre o ano todo e por isso NÃO entra no cálculo. Fica em extras.vento_rover_ms.")
+            l["extras"]["vento_rover_ms"] = round(r["vento_ms"], 2)
+        else:
+            a["vento"]["motivo_nulo"] = r["vento_motivo_nulo"] + " Não entra no cálculo."
 
 
 def main():
@@ -107,6 +158,12 @@ def main():
         mola_args = dict(produto=mola_id, instrumento="MGS/MOLA", versao=et["PRODUCT_VERSION_ID"],
                          periodo=mola_periodo, resolucao=mola_res,
                          link=MOLA_URL + ".img")
+        decl_campo = c.campo(
+            decl, unidade="graus (declividade média na escala de ~3,7 km)",
+            metodo=f"Gradiente do MOLA de 16 pixels/grau (~3,7 km por pixel) dentro do círculo de {c.RAIO_JANELA_GRAUS:g}° "
+                   "de raio, sem a borda de 1 pixel. Mesma escala usada na Terra (blocos de 4x4 pixels de 30\") e na Lua "
+                   "(blocos de 2x2 do LOLA de 16 pixels/grau), porque a declividade muda com o tamanho do pixel.",
+            motivo_nulo=None if decl is not None else "Sem pixels válidos na janela.", **mola_args)
         rel_metodo = f"Círculo de {c.RAIO_JANELA_GRAUS:g}° de raio ao redor do centro; {e['n_pixels']} pixels."
         locais_saida.append(dict(
             id=id_, nome=nome, lat=lat0, lon_leste=lon0, coord_verificada=True, coord_fonte=COORD_FONTE,
@@ -128,6 +185,9 @@ def main():
                              incerteza_1sigma=h2o_sig,
                              motivo_nulo=None if h2o is not None else
                              "O produto GRS marca este bin como 'não aplicável' (9999.999)."),
+                declividade=decl_campo,
+                amplitude_diurna=c.campo(None, produto="-", instrumento="-", versao="-", periodo="-", resolucao="-",
+                                         link="-", unidade="K", motivo_nulo=MOTIVOS_NULOS["amplitude_diurna"]),
                 geologia=c.campo(None, produto="-", instrumento="-", versao="-", periodo="-", resolucao="-",
                                  link="-", unidade="-", motivo_nulo=MOTIVOS_NULOS["geologia"]),
                 vento=c.campo(None, produto="-", instrumento="-", versao="-", periodo="-", resolucao="-",
@@ -142,6 +202,7 @@ def main():
             ),
         ))
 
+    aplicar_rovers(locais_saida, saida)
     c.salvar_json(dict(
         corpo="Marte",
         gerado_por="scripts/02_marte.py",

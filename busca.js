@@ -24,8 +24,12 @@
       faixaDe: "temperatura", tol: 8, slider: { min: -250, max: 100, passo: 1, inicial: -20 } },
     { id: "amplitude", grupo: "temperatura", unidade: "°C", casas: 0,
       faixaDe: "amplitude", tol: 8, slider: { min: 0, max: 60, passo: 1, inicial: 20 } },
+    { id: "diurna", grupo: "temperatura", unidade: "°C", casas: 0,
+      faixaDe: "diurna", tol: 15, slider: { min: 0, max: 350, passo: 5, inicial: 25 } },
     { id: "relevo", grupo: "relevo", unidade: "m", casas: 0,
       faixaDe: "relevo", tol: 250, slider: { min: 0, max: 3000, passo: 50, inicial: 300 } },
+    { id: "declividade", grupo: "relevo", unidade: "°", casas: 1,
+      faixaDe: "declividade", tol: 1, slider: { min: 0, max: 15, passo: 0.5, inicial: 2 } },
     { id: "gelo", grupo: "gelo", unidade: "%", casas: 0, fator: 100,
       faixaDe: "gelo", tol: 15, slider: { min: 0, max: 100, passo: 5, inicial: 50 } },
     { id: "geologia", grupo: "geologia", unidade: "", casas: 3,
@@ -45,14 +49,15 @@
   // valor = unidade do controle; imp = importância (1 a 3). Aspecto que não aparece fica em "tanto faz".
   const MODELOS = [
     { id: "rover",
-      valores: { relevo: { valor: 1500, imp: 3 }, poeira: { valor: 60, imp: 1 } } },
+      valores: { relevo: { valor: 1500, imp: 2 }, declividade: { valor: 4, imp: 3 }, poeira: { valor: 60, imp: 1 } } },
     { id: "isru",
       valores: { gelo: { valor: 60, imp: 3 }, temperatura: { valor: -20, imp: 2 }, relevo: { valor: 100, imp: 1 } } },
     { id: "frio",
       valores: { temperatura: { valor: -50, imp: 3 }, amplitude: { valor: 40, imp: 2 },
                  vento: { valor: 8, imp: 2 }, gelo: { valor: 80, imp: 1 } } },
     { id: "pouso",
-      valores: { relevo: { valor: 50, imp: 3 }, vento: { valor: 3, imp: 2 }, poeira: { valor: 20, imp: 1 } } }
+      valores: { relevo: { valor: 50, imp: 3 }, declividade: { valor: 1, imp: 3 }, vento: { valor: 3, imp: 2 },
+                 poeira: { valor: 20, imp: 1 } } }
   ];
 
   // ---------- 3. Contas básicas ----------
@@ -107,6 +112,8 @@
     switch (id) {
       case "temperatura": return cel.temp;
       case "amplitude": return cel.amp;
+      case "diurna": return cel.diu;                 // diferença dia - noite (MODIS), em °C = K
+      case "declividade": return cel.decl3;          // graus, na escala de ~3,7 km (a mesma de Marte e da Lua)
       case "relevo": return cel.rug;
       case "gelo": {
         const p = [cel.neve, cel.t0].filter(v => v !== null && v !== undefined);
@@ -328,6 +335,8 @@
           testes.push(v <= -20 ? "test.temp.frio" : v >= 25 ? "test.temp.quente" : "test.temp.medio");
           break;
         case "amplitude": if (v >= 30) testes.push("test.amplitude"); break;
+        case "diurna": if (v >= 100) testes.push("test.diurna"); break;
+        case "declividade": testes.push(v >= 3 ? "test.decl.alta" : "test.decl.baixa"); break;
         case "vento": if (v >= 8) testes.push("test.vento"); break;
         case "poeira": if (v >= 50) testes.push("test.poeira"); break;
         case "geologia": testes.push("test.geologia"); break;

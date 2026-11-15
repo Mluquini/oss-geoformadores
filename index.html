@@ -24,6 +24,9 @@
       <button class="idioma-btn" type="button" data-lang="pt" aria-pressed="false" lang="pt">PT</button>
     </div>
 
+    <!-- Atalho para a seção de referências -->
+    <a class="refs-link" href="#referencias" data-i18n="nav.refs">References</a>
+
     <!-- Modo do site: Explorar (lugar da Terra -> Marte/Lua) ou Planejar missão (busca reversa) -->
     <div class="modo" role="group" aria-label="Site mode" data-i18n-attr="aria-label:mode.aria">
       <button id="modo-explorar" class="modo-btn ativo" type="button" data-i18n="mode.explore">🌍 Explore</button>
@@ -201,9 +204,67 @@
       <li data-i18n-html="como.lim.4"></li>
       <li data-i18n-html="como.lim.5"></li>
       <li data-i18n-html="como.lim.6"></li>
+      <li data-i18n-html="como.lim.7"></li>
+      <li data-i18n-html="como.lim.8"></li>
     </ul>
     <p class="nota" id="como-gerado"></p>
     <p class="nota" data-i18n-html="como.verified"></p>
+  </section>
+
+  <!-- ===== REFERÊNCIAS / REFERENCES ===== -->
+  <section class="como refs" id="referencias">
+    <h2 data-i18n="ref.title">References</h2>
+    <p data-i18n="ref.intro"></p>
+
+    <h3 class="ref-nasa" data-i18n="ref.res.title"></h3>
+    <p class="nota" data-i18n="ref.res.intro"></p>
+    <div class="tabela-rolar"><table class="pesos refs-tab"><thead><tr><th data-i18n="ref.th.resource"></th><th data-i18n="ref.th.used"></th><th data-i18n="ref.th.how"></th></tr></thead><tbody>
+    <tr><td><a href="https://search.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA Earthdata Search</a></td><td><span class="selo-ref sim" data-i18n="ref.yes.cat">YES (through its catalog)</span></td><td data-i18n="ref.r.earthdata"></td></tr>
+    <tr><td><a href="https://pds.nasa.gov/" target="_blank" rel="noopener">NASA Planetary Data System (PDS)</a></td><td><span class="selo-ref sim" data-i18n="ref.yes">YES</span></td><td data-i18n="ref.r.pds"></td></tr>
+    <tr><td><a href="https://pds-geosciences.wustl.edu/missions/lro/" target="_blank" rel="noopener">NASA Lunar Reconnaissance Orbiter (LRO)</a></td><td><span class="selo-ref sim" data-i18n="ref.yes">YES</span></td><td data-i18n="ref.r.lro"></td></tr>
+    <tr><td><a href="https://pds-geosciences.wustl.edu/missions/lro/diviner.htm" target="_blank" rel="noopener">LRO Diviner (polar and resources data)</a></td><td><span class="selo-ref sim" data-i18n="ref.yes">YES</span></td><td data-i18n="ref.r.diviner"></td></tr>
+    </tbody></table></div>
+    <p class="nota" data-i18n="ref.res.note"></p>
+
+    <h3 data-i18n="ref.prod.title"></h3>
+    <h4 data-i18n="ref.earth"></h4>
+    <div class="tabela-rolar"><table class="pesos refs-tab"><thead><tr><th data-i18n="ref.th.product"></th><th data-i18n="ref.th.gives"></th><th data-i18n="ref.th.link"></th></tr></thead><tbody>
+    <tr><td>MOD11C3 v061 (MODIS/Terra LST)</td><td data-i18n="ref.g.mod11"></td><td><a href="https://doi.org/10.5067/MODIS/MOD11C3.061" target="_blank" rel="noopener">doi:10.5067/MODIS/MOD11C3.061</a></td></tr>
+    <tr><td>MOD10CM v61 (MODIS/Terra snow)</td><td data-i18n="ref.g.mod10"></td><td><a href="https://doi.org/10.5067/MODIS/MOD10CM.061" target="_blank" rel="noopener">doi:10.5067/MODIS/MOD10CM.061</a></td></tr>
+    <tr><td>SRTMGL30 v002 (SRTM 30")</td><td data-i18n="ref.g.srtm"></td><td><a href="https://doi.org/10.5067/MEASURES/SRTM/SRTMGL30.002" target="_blank" rel="noopener">doi:10.5067/MEASURES/SRTM/SRTMGL30.002</a></td></tr>
+    <tr><td>MERRA-2 M2TMNXFLX / M2TMNXAER v5.12.4</td><td data-i18n="ref.g.merra"></td><td><a href="https://doi.org/10.5067/0JRLVL8YV2Y4" target="_blank" rel="noopener">doi:10.5067/0JRLVL8YV2Y4</a><br><a href="https://doi.org/10.5067/FH9A0MLJPC7N" target="_blank" rel="noopener">doi:10.5067/FH9A0MLJPC7N</a></td></tr>
+    <tr><td>ASTER GED AG5KMMOH v041</td><td data-i18n="ref.g.aster"></td><td><a href="https://doi.org/10.5067/COMMUNITY/ASTER_GED/AG5KMMOH.041" target="_blank" rel="noopener">doi:10.5067/COMMUNITY/ASTER_GED/AG5KMMOH.041</a></td></tr>
+  </tbody></table></div>
+    <h4 data-i18n="ref.mars"></h4>
+    <div class="tabela-rolar"><table class="pesos refs-tab"><thead><tr><th data-i18n="ref.th.product"></th><th data-i18n="ref.th.gives"></th><th data-i18n="ref.th.link"></th></tr></thead><tbody>
+    <tr><td>MGS/MOLA MEGDR · MGS-M-MOLA-5-MEGDR-L3-V1.0</td><td data-i18n="ref.g.mola"></td><td><a href="https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/" target="_blank" rel="noopener">PDS Geosciences Node</a></td></tr>
+    <tr><td>Mars Odyssey/GRS · ODY-M-GRS-5-ELEMENTS-V1.0</td><td data-i18n="ref.g.grs"></td><td><a href="https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/" target="_blank" rel="noopener">PDS Geosciences Node</a></td></tr>
+    <tr><td>MSL/Curiosity REMS · msl_rems_bundle</td><td data-i18n="ref.g.rems"></td><td><a href="https://atmos.nmsu.edu/data_and_services/atmospheres_data/MARS/curiosity/rems.html" target="_blank" rel="noopener">PDS Atmospheres Node</a></td></tr>
+    <tr><td>Mars 2020/Perseverance MEDA · mars2020_meda</td><td data-i18n="ref.g.meda"></td><td><a href="https://atmos.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/" target="_blank" rel="noopener">PDS Atmospheres Node</a></td></tr>
+  </tbody></table></div>
+    <h4 data-i18n="ref.moon"></h4>
+    <div class="tabela-rolar"><table class="pesos refs-tab"><thead><tr><th data-i18n="ref.th.product"></th><th data-i18n="ref.th.gives"></th><th data-i18n="ref.th.link"></th></tr></thead><tbody>
+    <tr><td>LRO/LOLA GDR · LRO-L-LOLA-4-GDR-V1.0</td><td data-i18n="ref.g.lola"></td><td><a href="https://pds-geosciences.wustl.edu/missions/lro/lola.htm" target="_blank" rel="noopener">PDS Geosciences Node</a></td></tr>
+    <tr><td>LRO/Diviner GCP · LRO-L-DLRE-5-GCP-V1.0</td><td data-i18n="ref.g.gcp"></td><td><a href="https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/" target="_blank" rel="noopener">PDS Geosciences Node</a></td></tr>
+    <tr><td>LRO/Diviner PRP · LRO-L-DLRE-5-PRP-V2.0</td><td data-i18n="ref.g.prp"></td><td><a href="https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_prp/" target="_blank" rel="noopener">PDS Geosciences Node</a></td></tr>
+    <tr><td>LRO/Diviner CF · LRO-L-DLRE-5-GDR-V1.0</td><td data-i18n="ref.g.cf"></td><td><a href="https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/" target="_blank" rel="noopener">PDS Geosciences Node</a></td></tr>
+  </tbody></table></div>
+
+    <h3 data-i18n="ref.other.title"></h3>
+    <div class="tabela-rolar"><table class="pesos refs-tab"><thead><tr><th data-i18n="ref.th.product"></th><th data-i18n="ref.th.gives"></th><th data-i18n="ref.th.link"></th></tr></thead><tbody>
+    <tr><td>ETOPO 2022 (60")</td><td data-i18n="ref.g.etopo"></td><td><a href="https://doi.org/10.25921/fd45-gt74" target="_blank" rel="noopener">doi:10.25921/fd45-gt74</a></td></tr>
+    <tr><td>GTOPO30</td><td data-i18n="ref.g.gtopo"></td><td><a href="https://doi.org/10.5066/F7DF6PQS" target="_blank" rel="noopener">doi:10.5066/F7DF6PQS</a></td></tr>
+    <tr><td>IAU Gazetteer of Planetary Nomenclature</td><td data-i18n="ref.g.iau"></td><td><a href="https://planetarynames.wr.usgs.gov/" target="_blank" rel="noopener">planetarynames.wr.usgs.gov</a></td></tr>
+    <tr><td>Wikimedia Commons</td><td data-i18n="ref.g.commons"></td><td><a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">commons.wikimedia.org</a><br><a href="assets/lugares/CREDITOS.md" target="_blank" rel="noopener"><span data-i18n="ref.credits">Photo credits (file)</span></a></td></tr>
+  </tbody></table></div>
+
+    <h3 data-i18n="ref.check.title"></h3>
+    <div class="tabela-rolar"><table class="pesos refs-tab"><thead><tr><th data-i18n="ref.th.product"></th><th data-i18n="ref.th.gives"></th><th data-i18n="ref.th.link"></th></tr></thead><tbody>
+    <tr><td>Wikidata (P625 coordinates)</td><td data-i18n="ref.g.wikidata"></td><td><a href="https://www.wikidata.org/" target="_blank" rel="noopener">wikidata.org</a></td></tr>
+    <tr><td>NASA NSSDC Planetary Fact Sheets</td><td data-i18n="ref.g.fact"></td><td><a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html" target="_blank" rel="noopener">Mars</a> · <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html" target="_blank" rel="noopener">Moon</a></td></tr>
+    <tr><td>Williams et al. (2017), Icarus 283, 300–325</td><td data-i18n="ref.g.williams"></td><td><a href="https://doi.org/10.1016/j.icarus.2016.08.012" target="_blank" rel="noopener">doi:10.1016/j.icarus.2016.08.012</a></td></tr>
+    <tr><td>relatorio/verificacao_dados.md</td><td data-i18n="ref.g.report"></td><td><a href="https://github.com/Mluquini/oss-geoformadores/blob/main/relatorio/verificacao_dados.md" target="_blank" rel="noopener">GitHub</a></td></tr>
+  </tbody></table></div>
   </section>
 
   <footer class="rodape" data-i18n-html="footer"></footer>

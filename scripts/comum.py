@@ -148,6 +148,14 @@ def estatisticas_janela(grade, lat_topo, lon_oeste, ppd, lat0, lon0, valido=None
     )
 
 
+def reduzir_grade(grade, fator):
+    """Junta blocos de fator x fator pixels (média) para deixar o mapa mais grosso. Usada para medir a declividade
+    na MESMA escala em Marte, na Lua e na Terra (a inclinação depende do tamanho do pixel)."""
+    n_l, n_c = grade.shape
+    n_l, n_c = (n_l // fator) * fator, (n_c // fator) * fator
+    return grade[:n_l, :n_c].reshape(n_l // fator, fator, n_c // fator, fator).mean(axis=(1, 3))
+
+
 def declividade_media_graus(sub, lat_c, dentro, ppd, raio_corpo_m):
     """Declividade média (graus) dentro da janela, a partir do gradiente da elevação.
     sub: elevações em metros [linhas, colunas]; raio_corpo_m: raio do planeta/lua (m)."""

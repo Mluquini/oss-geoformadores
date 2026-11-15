@@ -40,6 +40,9 @@ def centro_da_celula(lat, lon, passo=2.0):
     return -90 + passo / 2 + passo * i, -180 + passo / 2 + passo * j
 
 
+ASPECTOS_TODOS = ("temperatura", "diurna", "relevo", "declividade", "gelo", "vento")
+
+
 def produtos_unicos(js):
     """Lista 'Instrumento: produto (versão)' sem repetir, a partir dos metadados de Marte/Lua."""
     vistos = []
@@ -81,8 +84,10 @@ def main():
         if g and s:
             item["valores"] = dict(
                 temperatura_C=g["temperatura"]["media_anual_C"], amplitude_C=g["temperatura"]["amplitude_C"],
+                amplitude_diurna_C=g["temperatura"].get("amplitude_diurna_C"),
                 elevacao_m=g["relevo"]["elevacao_media_m"], rugosidade_m=g["relevo"]["rugosidade_desvio_m"],
-                declividade_graus=g["relevo"]["declividade_media_graus"], fonte_relevo=g["relevo"]["fonte"],
+                declividade_graus=g["relevo"]["declividade_media_graus"],
+                declividade_3km_graus=g["relevo"].get("declividade_3km_graus"), fonte_relevo=g["relevo"]["fonte"],
                 frac_neve=g["gelo"]["frac_neve"], frac_T_abaixo_0C=g["gelo"]["frac_T_abaixo_0C"],
                 vento_ms=g["vento"]["vento_ms"], poeira_ugm3=g["vento"]["poeira_ugm3"])
             item["notas"] = s["notas"]
@@ -103,14 +108,19 @@ def main():
 
     def valores_marte(l):
         a_ = l["aspectos"]
-        return dict(relevo_m=a_["relevo"]["valor"], agua_pct=a_["gelo"]["valor"])
+        t = a_["temperatura"]["valor"]
+        return dict(temperatura_C=None if t is None else t - 273.15,
+                    amplitude_diurna_K=a_.get("amplitude_diurna", {}).get("valor"),
+                    relevo_m=a_["relevo"]["valor"], declividade_graus=a_.get("declividade", {}).get("valor"),
+                    agua_pct=a_["gelo"]["valor"], vento_rover_ms=l["extras"].get("vento_rover_ms"))
 
     def valores_lua(l):
         a_ = l["aspectos"]
         t = a_["temperatura"]
         return dict(temperatura_C=None if t["valor"] is None else t["valor"] - 273.15,
                     temperatura_max_C=None if t.get("maximo_K") is None else t["maximo_K"] - 273.15,
-                    relevo_m=a_["relevo"]["valor"],
+                    amplitude_diurna_K=a_.get("amplitude_diurna", {}).get("valor"),
+                    relevo_m=a_["relevo"]["valor"], declividade_graus=a_.get("declividade", {}).get("valor"),
                     armadilha_fria_pct=None if a_["gelo"]["valor"] is None else 100 * a_["gelo"]["valor"])
 
     lista_marte = alvo(marte, meta_marte, sim["notas_marte"], valores_marte)
@@ -118,26 +128,30 @@ def main():
 
     # ---------------- Status (calculado do que realmente existe) ----------------
     def aspectos_com_dado(notas_por_item):
-        return [k for k in ("temperatura", "relevo", "gelo", "vento")
+        return [k for k in ASPECTOS_TODOS
                 if any(n.get(k) is not None for n in notas_por_item)]
 
     asp_terra = aspectos_com_dado([t["notas"] for t in terra if t["tem_dado"]])
     asp_marte = aspectos_com_dado([x["notas"] for x in lista_marte])
     asp_lua = aspectos_com_dado([x["notas"] for x in lista_lua])
-    sem_terra = [k for k in ("temperatura", "relevo", "gelo", "vento") if k not in asp_terra]
+    sem_terra = [k for k in ASPECTOS_TODOS if k not in asp_terra]
     n_com = sum(1 for t in terra if t["tem_dado"])
     # Só números e códigos: o site monta a frase no idioma escolhido.
-    status = dict(n_com=n_com, n_total=len(terra), terra_sem_dado=sem_terra, marte_usa=asp_marte, lua_usa=asp_lua,
-                  completo=not sem_terra and {"temperatura", "relevo", "gelo"} <= set(asp_marte))
+    # Aspectos de Marte que só alguns locais têm (os medidos por rover): quais e em que locais
+    marte_todos = [k for k in ASPECTOS_TODOS if all(x["notas"].get(k) is not None for x in lista_marte)]
+    marte_parcial = [k for k in ASPECTOS_TODOS if k in asp_marte and k not in marte_todos]
+    marte_locais_parcial = [x["id"] for x in lista_marte if any(x["notas"].get(k) is not None for k in marte_parcial)]
+    status = dict(n_com=n_com, n_total=len(terra), terra_sem_dado=sem_terra, marte_usa=marte_todos,
+                  marte_usa_so_em=dict(aspectos=marte_parcial, locais=marte_locais_parcial), lua_usa=asp_lua)
 
     # ---------------- Fontes ----------------
     # Só lista a fonte de um aspecto se ele tem dado em alguma célula (não cita produto que falhou).
     def tem_valor(chave, campos):
         return any(c[chave][f] is not None for c in grid["celulas"] for f in campos)
     presentes = dict(
-        temperatura=tem_valor("temperatura", ["media_anual_C"]),
+        temperatura=tem_valor("temperatura", ["media_anual_C", "amplitude_diurna_C"]),
         gelo=tem_valor("gelo", ["frac_neve", "frac_T_abaixo_0C"]),
-        relevo=tem_valor("relevo", ["rugosidade_desvio_m"]),
+        relevo=tem_valor("relevo", ["rugosidade_desvio_m", "declividade_3km_graus"]),
         vento=tem_valor("vento", ["vento_ms", "poeira_ugm3"]))
     # Produto e versão de cada aspecto da Terra (nomes neutros; o site traduz o nome do aspecto).
     PRODUTOS_TERRA = dict(temperatura=("MOD11C3", "061"), gelo=("MOD10CM + MOD11C3", "61 / 061"),
@@ -152,7 +166,7 @@ def main():
 
     # ---------------- Células para a busca reversa ("Planejar missão") ----------------
     # Lista compacta: só células de TERRA (as de mar não têm temperatura, relevo nem neve). Arredondado para ficar leve.
-    campos = ["lat", "lon", "temp", "amp", "elev", "rug", "neve", "t0", "vento", "poeira", "qi"]
+    campos = ["lat", "lon", "temp", "amp", "elev", "rug", "neve", "t0", "vento", "poeira", "qi", "diu", "decl3"]
 
     def arred(x, n):
         return None if x is None else round(x, n)
@@ -164,7 +178,8 @@ def main():
         linhas.append([c["lat"], c["lon"], arred(t["media_anual_C"], 1), arred(t["amplitude_C"], 1),
                        arred(r_["elevacao_media_m"], 0), arred(r_["rugosidade_desvio_m"], 0),
                        arred(gl["frac_neve"], 3), arred(gl["frac_T_abaixo_0C"], 3),
-                       arred(v["vento_ms"], 2), arred(v["poeira_ugm3"], 1), arred(ge["indice_quartzo"], 4)])
+                       arred(v["vento_ms"], 2), arred(v["poeira_ugm3"], 1), arred(ge["indice_quartzo"], 4),
+                       arred(t.get("amplitude_diurna_C"), 1), arred(r_.get("declividade_3km_graus"), 2)])
     celulas_js = dict(gerado_em=date.today().isoformat(), tamanho_graus=grid.get("passo_graus", 2), campos=campos,
                       total_celulas_no_grid=len(grid["celulas"]), anos=grid.get("anos"), dados=linhas)
     (d / "celulas.js").write_text(

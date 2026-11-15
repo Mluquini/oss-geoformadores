@@ -52,6 +52,11 @@ SRTM_NODATA = -32768
 ETOPO_URL = ("https://www.ngdc.noaa.gov/thredds/fileServer/global/ETOPO2022/60s/"
              "60s_surface_elev_netcdf/ETOPO_2022_v1_60s_N90W180_surface.nc")
 RAIO_TERRA_M = 6_371_000.0
+# Declividade COMPARÁVEL com Marte e a Lua: a declividade depende da escala (quanto mais grosso o mapa, menor a
+# inclinação). Marte (MOLA) e a Lua (LOLA, já reduzida) são medidas com pixels de ~3,7 km; na Terra, juntamos blocos de
+# 4x4 pixels de 30" (~0,93 km) para chegar à mesma escala (~3,7 km) antes de calcular a inclinação.
+FATOR_BASE_TERRA = 4
+PPD_BASE_TERRA = 120 // FATOR_BASE_TERRA     # 30 pixels por grau (~3,7 km)
 
 
 # =====================================================================
@@ -79,14 +84,22 @@ def estatisticas_tile(arr, lat_n):
     """Estatísticas por célula de 2° de um tile SRTM (arr [linhas, colunas] em metros, topo = lat_n).
     O SRTM marca o mar com 0 m e áreas sem dado com -32768: os dois ficam de fora (pixels com exatamente
     0 m são descartados, o que também descarta alguma terra ao nível do mar).
-    Devolve (media, desvio, n_pixels, declividade_media), todos [células, células] na ordem SUL-primeiro."""
+    Devolve (media, desvio, n_pixels, declividade_media, declividade_na_escala_de_3,7_km), todos [células, células]
+    na ordem SUL-primeiro."""
     valido = (arr != SRTM_NODATA) & (arr != 0)
     el = np.where(valido, arr, np.nan)
     lat_lin = lat_n - (np.arange(arr.shape[0]) + 0.5) / 120.0
     dec = declividade_graus(el, lat_lin, 120)
     m, d, n = estatisticas_blocos(np.nan_to_num(el), valido, 240, 240)
     md, _, _ = estatisticas_blocos(np.nan_to_num(dec), valido & np.isfinite(dec), 240, 240)
-    return ao_sul_primeiro(m), ao_sul_primeiro(d), ao_sul_primeiro(n), ao_sul_primeiro(md)
+    # Declividade na escala comparável (~3,7 km): blocos de 4x4 pixels (só com pelo menos metade de terra válida)
+    f = FATOR_BASE_TERRA
+    grosso, ng = agregar_blocos(np.nan_to_num(el), valido, f, f)
+    grosso = np.where(ng >= (f * f) // 2, grosso, np.nan)
+    lat_g = lat_n - (np.arange(grosso.shape[0]) + 0.5) / PPD_BASE_TERRA
+    dec_g = declividade_graus(grosso, lat_g, PPD_BASE_TERRA)
+    mb, _, _ = estatisticas_blocos(np.nan_to_num(dec_g), np.isfinite(dec_g), 240 // f, 240 // f)
+    return ao_sul_primeiro(m), ao_sul_primeiro(d), ao_sul_primeiro(n), ao_sul_primeiro(md), ao_sul_primeiro(mb)
 
 
 def salvar_cache(raw, chave, meta, **arrs):
@@ -292,9 +305,20 @@ def autoteste():
     assert indices_tile(-10, 6000, -180) == (15, 0) and lat_c[15] == -59.0        # 10S..60S, 180W
     # 2.10 tile sintético: metade norte = 100 m, metade sul = 0 m (mar) -> célula sul sem dado, célula norte = 100 m
     tile = np.zeros((480, 480), np.int16); tile[:240, :] = 100
-    m, d, n, md = estatisticas_tile(tile, 10.0)       # borda norte em 10°N, cobre 10N..6N (2 células de 2°)
+    m, d, n, md, mb = estatisticas_tile(tile, 10.0)   # borda norte em 10°N, cobre 10N..6N (2 células de 2°)
     assert m.shape == (2, 2) and n[0, 0] == 0 and n[1, 0] == 57600 and np.isclose(m[1, 0], 100.0) and np.isclose(d[1, 0], 0.0)
     assert np.isnan(m[0, 0])                           # o mar (0 m) não vira "elevação 0"
+    # 2.10b declividade na escala de ~3,7 km: terra plana = 0°; rampa de 100 m a cada 3,7 km = ~1,5°
+    plano = np.full((480, 480), 100, np.int16)
+    _, _, _, _, mb0 = estatisticas_tile(plano, 10.0)
+    assert np.allclose(mb0[np.isfinite(mb0)], 0.0, atol=1e-6) and np.isfinite(mb0).any()
+    rampa = np.tile((np.arange(480) * 100 / 4.0 / 1.0).astype(np.int16), (480, 1)) + 1   # +25 m a cada pixel de ~0,93 km
+    _, _, _, _, mbr = estatisticas_tile(rampa, 0.0)
+    assert 0.9 < np.nanmean(mbr) < 1.8, np.nanmean(mbr)
+    # 2.10c amplitude diurna: 300 K de dia, 280 K de noite, o ano todo -> 20 K; com poucos meses -> NaN
+    assert np.allclose(amplitude_diurna_pixel(np.full((12, 2, 2), 300.0), np.full((12, 2, 2), 280.0)), 20.0)
+    d4 = np.full((12, 2, 2), 300.0); d4[:4] = np.nan
+    assert np.isnan(amplitude_diurna_pixel(d4, np.full((12, 2, 2), 280.0))).all()
     # 2.11 cache: guarda e recupera; parâmetros diferentes invalidam
     import tempfile
     with tempfile.TemporaryDirectory() as tmp:
@@ -310,6 +334,18 @@ def autoteste():
 # =====================================================================
 # 3. DOWNLOADS (earthaccess) E LEITURA
 # =====================================================================
+def amplitude_diurna_pixel(dia_k, noite_k):
+    """dia_k, noite_k: arrays [mes, lin, col] em Kelvin (NaN = sem dado).
+    Amplitude diurna por pixel = média, ao longo do ano, de (temperatura de DIA - temperatura de NOITE) do MODIS
+    (passagens por volta de 13h30 e 01h30, hora local). Exige >= MIN_MESES_T meses com os dois valores.
+    É uma aproximação: o máximo e o mínimo reais do dia são um pouco mais extremos que essas duas passagens."""
+    dif = dia_k - noite_k
+    n = np.isfinite(dif).sum(axis=0)
+    with np.errstate(invalid="ignore", all="ignore"):
+        m = np.nanmean(dif, axis=0)
+    return np.where(n >= MIN_MESES_T, m, np.nan)
+
+
 def entrar_earthdata():
     import earthaccess
     if not any(os.environ.get(k) for k in ("EARTHDATA_TOKEN", "EARTHDATA_USERNAME")):
@@ -346,6 +382,12 @@ def diagnosticar_download(ea, granulo):
 
 def buscar_e_baixar(ea, short_name, versao, anos, pasta, bbox=None, limite=None, filtro=None):
     pasta.mkdir(parents=True, exist_ok=True)
+    if ea is None:      # modo --local: usa só os arquivos que já estão na pasta (sem login, sem internet)
+        achados = sorted(p for p in pasta.iterdir() if any(f".A{ano}" in p.name for ano in anos))
+        if not achados:
+            raise RuntimeError(f"--local: nenhum arquivo de {short_name} em {pasta} para os anos {anos}")
+        print(f"  {short_name} v{versao}: {len(achados)} arquivo(s) locais")
+        return achados
     resultados = []
     for ano in anos:
         kw = dict(short_name=short_name, version=versao, temporal=(f"{ano}-01-01", f"{ano}-12-31"))
@@ -428,6 +470,7 @@ def processar_modis(ea, anos, raw, log):
         with np.errstate(all="ignore"):
             dia[mes - 1] = np.nanmean(acc_d, axis=0); noi[mes - 1] = np.nanmean(acc_n, axis=0)
     med, ampl, n_meses, abaixo = temperatura_pixel(dia, noi)
+    diurna = amplitude_diurna_pixel(dia, noi)
     del dia, noi
 
     neve = np.full((12, 3600, 7200), 255, np.uint8)
@@ -450,8 +493,8 @@ def processar_modis(ea, anos, raw, log):
         return ao_sul_primeiro(np.where(bom, m, np.nan))
 
     log["modis"] = "ok"
-    return dict(temp_media_C=celula(med), temp_amplitude_C=celula(ampl), frac_T_abaixo_0C=celula(abaixo),
-                frac_neve=celula(frac_neve)), terra
+    return dict(temp_media_C=celula(med), temp_amplitude_C=celula(ampl), temp_diurna_C=celula(diurna),
+                frac_T_abaixo_0C=celula(abaixo), frac_neve=celula(frac_neve)), terra
 
 
 # ---------------------------------------------------------------------
@@ -478,6 +521,9 @@ def ler_tile_srtm(caminho):
 
 
 def processar_srtm(ea, raw, regiao, log):
+    if ea is None:      # modo --local: todos os tiles já baixados
+        arqs = sorted(p for p in (raw / "SRTMGL30").iterdir() if p.name.lower().endswith(".zip"))
+        return _srtm_dos_arquivos(arqs, log)
     regs = normalizar_regioes(regiao)
     # SRTMGL30 não tem data útil para filtro temporal (fev/2000): busca sem 'temporal'.
     # Uma busca por caixa; tiles repetidos entram uma vez só.
@@ -493,29 +539,34 @@ def processar_srtm(ea, raw, regiao, log):
         resultados = ea.search_data(short_name="SRTMGL30", version="002", count=100)
     pasta = raw / "SRTMGL30"; pasta.mkdir(parents=True, exist_ok=True)
     arqs = [Path(p) for p in ea.download(resultados, str(pasta))]
+    return _srtm_dos_arquivos(arqs, log)
+
+
+def _srtm_dos_arquivos(arqs, log):
     print(f"  SRTMGL30: {len(arqs)} tile(s)")
-    elev = np.full((N_LAT, N_LON), np.nan); rug = elev.copy(); decl = elev.copy(); npx = np.zeros((N_LAT, N_LON), int)
+    elev = np.full((N_LAT, N_LON), np.nan); rug = elev.copy(); decl = elev.copy(); declb = elev.copy()
+    npx = np.zeros((N_LAT, N_LON), int)
     ordens = set()
     for p in arqs:
         arr, lat_n, lon_w, dt = ler_tile_srtm(p)
         ordens.add(dt)
-        m, d, n, md = estatisticas_tile(arr, lat_n)
+        m, d, n, md, mb = estatisticas_tile(arr, lat_n)
         i0, j0 = indices_tile(lat_n, arr.shape[0], lon_w)
         sl = (slice(i0, i0 + m.shape[0]), slice(j0, j0 + m.shape[1]))
         usa = n >= 25
         elev[sl] = np.where(usa, m, elev[sl]); rug[sl] = np.where(usa, d, rug[sl])
-        decl[sl] = np.where(usa, md, decl[sl]); npx[sl] = np.where(usa, n, npx[sl])
+        decl[sl] = np.where(usa, md, decl[sl]); declb[sl] = np.where(usa, mb, declb[sl]); npx[sl] = np.where(usa, n, npx[sl])
     fonte = np.where(np.isfinite(elev), "SRTMGL30", "")
     log["srtm_ordem_bytes"] = sorted(ordens)
-    return elev, rug, decl, fonte
+    return elev, rug, decl, fonte, declb
 
 
-def complemento_etopo(raw, elev, rug, decl, fonte, regiao):
+def complemento_etopo(raw, elev, rug, decl, fonte, regiao, declb):
     """Preenche as células sem SRTM com ETOPO 2022 (NOAA, 60 arco-segundos, superfície com gelo).
     Só usa pixels acima do nível do mar (terra e gelo) para não misturar batimetria."""
     precisa = ~np.isfinite(elev) & mascara_celulas(regiao)
     if not precisa.any():
-        return elev, rug, decl, fonte, False
+        return elev, rug, decl, fonte, False, declb
     import netCDF4
     arq = c.baixar(ETOPO_URL, raw / "ETOPO" / "ETOPO_2022_v1_60s_N90W180_surface.nc")
     ds = netCDF4.Dataset(arq)
@@ -533,9 +584,15 @@ def complemento_etopo(raw, elev, rug, decl, fonte, regiao):
         elev[i, j] = bloco[terra].mean(); rug[i, j] = bloco[terra].std()
         d = declividade_graus(np.where(terra, bloco, np.nan), lat[a[0]:a[-1] + 1], 60)
         decl[i, j] = np.nanmean(d) if np.isfinite(d).any() else np.nan
+        # escala comparável (~3,7 km): o ETOPO tem 60" (~1,85 km), então juntamos blocos de 2x2
+        h, w = (bloco.shape[0] // 2) * 2, (bloco.shape[1] // 2) * 2
+        gros, ng = agregar_blocos(np.nan_to_num(np.where(terra, bloco, 0.0))[:h, :w], terra[:h, :w], 2, 2)
+        gros = np.where(ng >= 2, gros, np.nan)
+        dg = declividade_graus(gros, lat[a[0]:a[0] + h:2] + (lat[1] - lat[0]) / 2, 30)
+        declb[i, j] = np.nanmean(dg) if np.isfinite(dg).any() else np.nan
         fonte[i, j] = "ETOPO2022 (complemento NOAA)"
     ds.close()
-    return elev, rug, decl, fonte, True
+    return elev, rug, decl, fonte, True, declb
 
 
 # ---------------------------------------------------------------------
@@ -617,7 +674,9 @@ METADADOS_PRODUTOS = {
         link="https://doi.org/10.5067/MODIS/MOD11C3.061", unidade_media="°C", unidade_amplitude="°C",
         metodo="Por pixel: média dos 12 meses de (LST dia + LST noite)/2, em °C; amplitude = máx - mín das médias mensais; "
                f"exige ≥{MIN_MESES_T} meses válidos. Por célula: média dos pixels de terra válidos "
-               f"(terra = Percent_land_in_grid ≥ 50; célula exige ≥{MIN_FRAC_VALIDA:.0%} dos pixels de terra válidos)."),
+               f"(terra = Percent_land_in_grid ≥ 50; célula exige ≥{MIN_FRAC_VALIDA:.0%} dos pixels de terra válidos). "
+               "amplitude_diurna_C = média, ao longo do ano, de (LST dia - LST noite): o MODIS/Terra passa por volta de 13h30 e 01h30 "
+               "(hora local), então é uma aproximação do máximo menos o mínimo do dia (que é um pouco maior)."),
     "gelo": dict(
         produto="MOD10CM (neve) + MOD11C3 (T<0 °C)", versao="61 / 061", instrumento="Terra/MODIS", resolucao="0,05° (células de 2°)",
         link="https://doi.org/10.5067/MODIS/MOD10CM.061", unidade="fração do tempo (0 a 1)",
@@ -627,7 +686,7 @@ METADADOS_PRODUTOS = {
     "relevo": dict(
         produto="SRTMGL30", versao="002", instrumento="SRTM (Shuttle)", resolucao="30 arco-seg (~1 km), células de 2°",
         link="https://doi.org/10.5067/MEASURES/SRTM/SRTMGL30.002", unidade="m (elevação, desvio padrão) e graus (declividade)",
-        metodo="Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30\". O SRTMGL30 (NASA, LP DAAC) vai de 90°N a 60°S, mas o radar do SRTM só cobriu 60°N a 56°S: acima de 60°N (Holuhraun, Haughton, Svalbard) os valores vêm, quase com certeza, do GTOPO30 (USGS), que o produto usa para preencher o que o radar não alcançou. Fora do SRTMGL30 (extremo sul, McMurdo) usamos ETOPO 2022 60\" (NOAA, COMPLEMENTO, não é NASA), só pixels acima do nível do mar."),
+        metodo="Por célula: média, desvio padrão (rugosidade) da elevação e média da declividade (gradiente) dos pixels de 30\". O SRTMGL30 (NASA, LP DAAC) vai de 90°N a 60°S, mas o radar do SRTM só cobriu 60°N a 56°S: acima de 60°N (Holuhraun, Haughton, Svalbard) os valores vêm, quase com certeza, do GTOPO30 (USGS), que o produto usa para preencher o que o radar não alcançou. declividade_3km_graus = declividade média depois de juntar blocos de 4x4 pixels (~3,7 km), a MESMA escala usada em Marte (MOLA) e na Lua (LOLA) para as comparações. Fora do SRTMGL30 (extremo sul, McMurdo) usamos ETOPO 2022 60\" (NOAA, COMPLEMENTO, não é NASA), só pixels acima do nível do mar."),
     "geologia": dict(
         produto="AG5KMMOH", versao="041", instrumento="Terra/ASTER (GED)", resolucao="0,05° (células de 2°)",
         link="https://doi.org/10.5067/COMMUNITY/ASTER_GED/AG5KMMOH.041", unidade="índice sem unidade (≈1)",
@@ -659,6 +718,9 @@ def main():
     ap.add_argument("--mes-aster", type=int, default=7, help="mês do ASTER GED (1-12)")
     ap.add_argument("--so", nargs="+", choices=["modis", "srtm", "aster", "merra"],
                     help="roda só estes produtos (os outros ficam null)")
+    ap.add_argument("--local", action="store_true",
+                    help="NÃO entra no Earthdata: usa só os arquivos MODIS e SRTM que já estão em raw/terra (sem login). "
+                         "Sem --so, recalcula só modis e srtm; ASTER e MERRA-2 vêm do cache.")
     ap.add_argument("--autoteste", action="store_true", help="testa as contas com dados sintéticos e sai")
     a = ap.parse_args()
     if a.autoteste:
@@ -668,12 +730,12 @@ def main():
     if a.zonas == "estrategicas":
         a.regiao = zonas_estrategicas()
     a.regiao = normalizar_regioes(a.regiao)
-    quais = set(a.so or ["modis", "srtm", "aster", "merra"])
-    ea = entrar_earthdata()
+    quais = set(a.so or (["modis", "srtm"] if a.local else ["modis", "srtm", "aster", "merra"]))
+    ea = None if a.local else entrar_earthdata()
     log, problemas = {}, {}
     nan = np.full((N_LAT, N_LON), np.nan)
-    campos = dict(temp_media_C=nan, temp_amplitude_C=nan, frac_T_abaixo_0C=nan, frac_neve=nan,
-                  elev=nan, rug=nan, decl=nan, qi=nan, vento=nan, poeira=nan)
+    campos = dict(temp_media_C=nan, temp_amplitude_C=nan, temp_diurna_C=nan, frac_T_abaixo_0C=nan, frac_neve=nan,
+                  elev=nan, rug=nan, decl=nan, declb=nan, qi=nan, vento=nan, poeira=nan)
     fonte_relevo = np.full((N_LAT, N_LON), "", dtype=object)
     terra = None
 
@@ -696,29 +758,36 @@ def main():
         if r_:
             d, terra = r_
             campos.update(temp_media_C=d["temp_media_C"], temp_amplitude_C=d["temp_amplitude_C"],
+                          temp_diurna_C=d["temp_diurna_C"],
                           frac_T_abaixo_0C=d["frac_T_abaixo_0C"], frac_neve=d["frac_neve"])
             salvar_cache(raw, "modis", meta, **d)
     else:
         cd = carregar_cache(raw, "modis", meta)
         if cd:
             campos.update(cd); print("  MODIS: usando resultado guardado (cache)")
+            if "temp_diurna_C" not in cd:
+                print("  AVISO: o cache do MODIS é antigo (sem amplitude diurna). Rode com --so modis (ou --local).", file=sys.stderr)
 
     # --- SRTM + ETOPO (relevo) ---
     if "srtm" in quais:
         print("SRTM + ETOPO (relevo)")
         r_ = tentar("srtm", lambda: processar_srtm(ea, raw, a.regiao, log))
         if r_:
-            elev, rug, decl, fonte = r_
-            r2 = tentar("etopo", lambda: complemento_etopo(raw, elev, rug, decl, fonte, a.regiao))
+            elev, rug, decl, fonte, declb = r_
+            r2 = tentar("etopo", lambda: complemento_etopo(raw, elev, rug, decl, fonte, a.regiao, declb))
             if r2:
-                elev, rug, decl, fonte, usou = r2
+                elev, rug, decl, fonte, usou, declb = r2
                 log["etopo_usado"] = usou
-            campos.update(elev=elev, rug=rug, decl=decl); fonte_relevo = fonte
-            salvar_cache(raw, "srtm", meta, elev=elev, rug=rug, decl=decl, fonte=np.asarray(fonte).astype("U40"))
+            campos.update(elev=elev, rug=rug, decl=decl, declb=declb); fonte_relevo = fonte
+            salvar_cache(raw, "srtm", meta, elev=elev, rug=rug, decl=decl, declb=declb, fonte=np.asarray(fonte).astype("U40"))
     else:
         cd = carregar_cache(raw, "srtm", meta)
         if cd:
             campos.update(elev=cd["elev"], rug=cd["rug"], decl=cd["decl"]); fonte_relevo = cd["fonte"]
+            if "declb" in cd:
+                campos["declb"] = cd["declb"]
+            else:
+                print("  AVISO: o cache do SRTM é antigo (sem declividade comparável). Rode com --so srtm (ou --local).", file=sys.stderr)
             print("  SRTM: usando resultado guardado (cache)")
 
     # --- ASTER GED (geologia) ---
@@ -763,9 +832,11 @@ def main():
                 continue
             celulas.append(dict(
                 lat=float(lat[i]), lon=float(lon[j]),
-                temperatura=dict(media_anual_C=r(campos["temp_media_C"][i, j]), amplitude_C=r(campos["temp_amplitude_C"][i, j])),
+                temperatura=dict(media_anual_C=r(campos["temp_media_C"][i, j]), amplitude_C=r(campos["temp_amplitude_C"][i, j]),
+                                 amplitude_diurna_C=r(campos["temp_diurna_C"][i, j])),
                 relevo=dict(elevacao_media_m=r(campos["elev"][i, j], 1), rugosidade_desvio_m=r(campos["rug"][i, j], 1),
-                            declividade_media_graus=r(campos["decl"][i, j]), fonte=(fonte_relevo[i, j] or None)),
+                            declividade_media_graus=r(campos["decl"][i, j]),
+                            declividade_3km_graus=r(campos["declb"][i, j]), fonte=(fonte_relevo[i, j] or None)),
                 gelo=dict(frac_neve=r(campos["frac_neve"][i, j]), frac_T_abaixo_0C=r(campos["frac_T_abaixo_0C"][i, j])),
                 geologia=dict(indice_quartzo=r(campos["qi"][i, j], 4)),
                 vento=dict(vento_ms=r(campos["vento"][i, j]), poeira_ugm3=r(campos["poeira"][i, j]))))

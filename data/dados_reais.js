@@ -1,6 +1,6 @@
 // Gerado por scripts/05_exportar_site.py: NÃO edite à mão.
 window.DADOS_REAIS = {
- "gerado_em": "2026-11-14",
+ "gerado_em": "2026-11-15",
  "anos_terra": [
   2020
  ],
@@ -10,14 +10,26 @@ window.DADOS_REAIS = {
   "terra_sem_dado": [],
   "marte_usa": [
    "relevo",
+   "declividade",
    "gelo"
   ],
+  "marte_usa_so_em": {
+   "aspectos": [
+    "temperatura",
+    "diurna"
+   ],
+   "locais": [
+    "jezero",
+    "gale"
+   ]
+  },
   "lua_usa": [
    "temperatura",
+   "diurna",
    "relevo",
+   "declividade",
    "gelo"
-  ],
-  "completo": false
+  ]
  },
  "faixas": {
   "temperatura": {
@@ -31,6 +43,18 @@ window.DADOS_REAIS = {
    "max": 3000.0,
    "unidade": "m (desvio padrão da elevação numa janela de ~2°)",
    "motivo": "0 = planície perfeita. 3000 m já é o de Valles Marineris (cânion de ~7 km); acima disso a nota satura em 1."
+  },
+  "declividade": {
+   "min": 0.0,
+   "max": 15.0,
+   "unidade": "graus (inclinação média do terreno na escala de ~3,7 km por pixel)",
+   "motivo": "Nos valores calculados vai de ~0 a ~5° na Terra, ~0,3 a ~7,6° em Marte e ~0,7 a ~12° na Lua (bordas de crateras polares); 15° dá folga. A inclinação depende do tamanho do pixel, por isso os três corpos foram medidos na MESMA escala de ~3,7 km (Terra: blocos de 4x4 pixels de 30\"; Marte: MOLA de 16 pixels/grau; Lua: LOLA de 16 pixels/grau reduzido 2x2)."
+  },
+  "diurna": {
+   "min": 0.0,
+   "max": 350.0,
+   "unidade": "K ou °C (diferença entre a temperatura do dia e a da noite)",
+   "motivo": "Na Lua, de ~234 K (Tycho) a ~300 K (Tranquillitatis); na Terra, de ~1 a ~34 K (ar e solo úmidos amortecem o ciclo). Por isso nenhum lugar da Terra se parece com a Lua nesse aspecto: é uma diferença REAL, e não um erro. Marte não tem dado (ver relatório). Terra: média anual de (MODIS dia − noite), uma aproximação do máximo menos o mínimo do dia; Lua: máximo menos mínimo da curva do dia lunar (Diviner GCP)."
   },
   "gelo": {
    "min": 0.0,
@@ -47,14 +71,18 @@ window.DADOS_REAIS = {
  },
  "pesos": {
   "marte": {
-   "temperatura": 0.3333333333333333,
-   "relevo": 0.26666666666666666,
+   "temperatura": 0.16666666666666666,
+   "diurna": 0.16666666666666666,
+   "relevo": 0.13333333333333333,
+   "declividade": 0.13333333333333333,
    "gelo": 0.19999999999999998,
    "vento": 0.19999999999999998
   },
   "lua": {
-   "temperatura": 0.3529411764705882,
-   "relevo": 0.2941176470588235,
+   "temperatura": 0.1764705882352941,
+   "diurna": 0.1764705882352941,
+   "relevo": 0.14705882352941174,
+   "declividade": 0.14705882352941174,
    "gelo": 0.3529411764705882,
    "vento": 0.0
   }
@@ -106,8 +134,10 @@ window.DADOS_REAIS = {
    "etopo2022"
   ],
   "marte": [
+   "Mars 2020/Perseverance MEDA: mars2020_meda",
    "MGS/MOLA: MGS-M-MOLA-5-MEGDR-L3-V1.0",
-   "Mars Odyssey/GRS: ODY-M-GRS-5-ELEMENTS-V1.0"
+   "Mars Odyssey/GRS: ODY-M-GRS-5-ELEMENTS-V1.0",
+   "MSL/Curiosity REMS: msl_rems_bundle"
   ],
   "lua": [
    "LRO/Diviner: LRO-L-DLRE-5-PRP-V2.0",
@@ -153,9 +183,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 17.513,
     "amplitude_C": 17.531,
+    "amplitude_diurna_C": 33.544,
     "elevacao_m": 3266.3,
     "rugosidade_m": 1053.7,
     "declividade_graus": 4.275,
+    "declividade_3km_graus": 2.764,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.012,
     "frac_T_abaixo_0C": 0.022,
@@ -164,7 +196,9 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.7643,
+    "diurna": 0.0958,
     "relevo": 0.3512,
+    "declividade": 0.1843,
     "gelo": 0.017,
     "vento": 0.4845
    },
@@ -173,9 +207,23 @@ window.DADOS_REAIS = {
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 97.5,
+      "semelhanca": 88.3,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
+      "id": "hellas",
+      "nome": "Bacia de Hellas",
+      "semelhanca": 87.2,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -183,29 +231,23 @@ window.DADOS_REAIS = {
      {
       "id": "jezero",
       "nome": "Cratera Jezero",
-      "semelhanca": 83.9,
+      "semelhanca": 86.3,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "hellas",
-      "nome": "Bacia de Hellas",
-      "semelhanca": 82.3,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 77.1,
+      "semelhanca": 82.6,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -213,9 +255,10 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 74.7,
+      "semelhanca": 80.0,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -223,9 +266,10 @@ window.DADOS_REAIS = {
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 50.9,
+      "semelhanca": 61.3,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -235,21 +279,12 @@ window.DADOS_REAIS = {
      {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 82.8,
+      "semelhanca": 72.0,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 79.4,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -257,10 +292,24 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 68.9,
+      "semelhanca": 65.7,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 64.4,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -268,13 +317,14 @@ window.DADOS_REAIS = {
      {
       "id": "shackleton",
       "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 66.3,
+      "semelhanca": 62.4,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -315,9 +365,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": -28.642,
     "amplitude_C": 30.765,
+    "amplitude_diurna_C": 2.097,
     "elevacao_m": 636.2,
     "rugosidade_m": 492.9,
     "declividade_graus": 6.345,
+    "declividade_3km_graus": 4.831,
     "fonte_relevo": "ETOPO202",
     "frac_neve": 1.0,
     "frac_T_abaixo_0C": 1.0,
@@ -326,18 +378,47 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.6325,
+    "diurna": 0.006,
     "relevo": 0.1643,
+    "declividade": 0.3221,
     "gelo": 1.0,
     "vento": 0.6618
    },
    "ranking": {
     "marte": [
      {
+      "id": "gale",
+      "nome": "Cratera Gale",
+      "semelhanca": 51.1,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 50.1,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 37.7,
+      "semelhanca": 36.5,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -345,29 +426,10 @@ window.DADOS_REAIS = {
      {
       "id": "hellas",
       "nome": "Bacia de Hellas",
-      "semelhanca": 37.2,
+      "semelhanca": 36.4,
       "aspectos_usados": [
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 36.8,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "gale",
-      "nome": "Cratera Gale",
-      "semelhanca": 36.6,
-      "aspectos_usados": [
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -375,9 +437,10 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 36.3,
+      "semelhanca": 34.8,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -385,9 +448,10 @@ window.DADOS_REAIS = {
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 10.6,
+      "semelhanca": 21.9,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -397,32 +461,24 @@ window.DADOS_REAIS = {
      {
       "id": "shackleton",
       "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 42.0,
+      "semelhanca": 36.1,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      },
      {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 40.3,
+      "semelhanca": 34.2,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 40.1,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -430,10 +486,24 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 35.3,
+      "semelhanca": 29.9,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 29.6,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -477,9 +547,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 30.629,
     "amplitude_C": 31.627,
+    "amplitude_diurna_C": 26.873,
     "elevacao_m": 811.4,
     "rugosidade_m": 404.3,
     "declividade_graus": 1.378,
+    "declividade_3km_graus": 0.75,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.001,
     "frac_T_abaixo_0C": 0.0,
@@ -488,28 +560,21 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.8018,
+    "diurna": 0.0768,
     "relevo": 0.1348,
+    "declividade": 0.05,
     "gelo": 0.0005,
     "vento": 0.5403
    },
    "ranking": {
     "marte": [
      {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 97.7,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
       "id": "hellas",
       "nome": "Bacia de Hellas",
-      "semelhanca": 97.0,
+      "semelhanca": 94.8,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -517,9 +582,10 @@ window.DADOS_REAIS = {
      {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 92.6,
+      "semelhanca": 94.1,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -527,29 +593,47 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 90.7,
+      "semelhanca": 92.9,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
+     },
+     {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 87.3,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
      },
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 83.8,
+      "semelhanca": 81.5,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 34.6,
+      "semelhanca": 47.7,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -557,34 +641,27 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 84.6,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 83.9,
+      "semelhanca": 69.9,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
      },
      {
-      "id": "shackleton",
-      "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 62.6,
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 65.4,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -592,13 +669,26 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 62.0,
+      "semelhanca": 57.8,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "shackleton",
+      "nome": "Polo Sul (Cratera Shackleton)",
+      "semelhanca": 56.3,
+      "aspectos_usados": [
+       "temperatura",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -639,9 +729,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 36.873,
     "amplitude_C": 9.869,
+    "amplitude_diurna_C": 16.538,
     "elevacao_m": 145.7,
     "rugosidade_m": 244.6,
     "declividade_graus": 1.708,
+    "declividade_3km_graus": 1.03,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.0,
     "frac_T_abaixo_0C": 0.0,
@@ -650,38 +742,32 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.8196,
+    "diurna": 0.0473,
     "relevo": 0.0815,
+    "declividade": 0.0687,
     "gelo": 0.0,
     "vento": 0.455
    },
    "ranking": {
     "marte": [
      {
-      "id": "hellas",
-      "nome": "Bacia de Hellas",
-      "semelhanca": 96.1,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 95.6,
+      "semelhanca": 95.9,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
      },
      {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 95.1,
+      "id": "hellas",
+      "nome": "Bacia de Hellas",
+      "semelhanca": 95.2,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -689,29 +775,47 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 94.4,
+      "semelhanca": 94.8,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
+     },
+     {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 85.9,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
      },
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 79.8,
+      "semelhanca": 79.9,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 30.5,
+      "semelhanca": 45.6,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -719,34 +823,27 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 84.2,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 82.3,
+      "semelhanca": 68.7,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
      },
      {
-      "id": "shackleton",
-      "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 60.7,
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 64.1,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -754,13 +851,26 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 59.5,
+      "semelhanca": 57.0,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "shackleton",
+      "nome": "Polo Sul (Cratera Shackleton)",
+      "semelhanca": 55.9,
+      "aspectos_usados": [
+       "temperatura",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -801,9 +911,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 20.409,
     "amplitude_C": 6.223,
+    "amplitude_diurna_C": 15.125,
     "elevacao_m": 1247.9,
     "rugosidade_m": 937.0,
     "declividade_graus": 4.994,
+    "declividade_3km_graus": 4.757,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.004,
     "frac_T_abaixo_0C": 0.0,
@@ -812,7 +924,9 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.7726,
+    "diurna": 0.0432,
     "relevo": 0.3123,
+    "declividade": 0.3171,
     "gelo": 0.002,
     "vento": 0.6335
    },
@@ -821,9 +935,23 @@ window.DADOS_REAIS = {
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 95.8,
+      "semelhanca": 87.5,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
+      "id": "hellas",
+      "nome": "Bacia de Hellas",
+      "semelhanca": 85.4,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -831,29 +959,23 @@ window.DADOS_REAIS = {
      {
       "id": "jezero",
       "nome": "Cratera Jezero",
-      "semelhanca": 86.7,
+      "semelhanca": 83.9,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "hellas",
-      "nome": "Bacia de Hellas",
-      "semelhanca": 85.1,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 79.9,
+      "semelhanca": 80.4,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -861,9 +983,10 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 77.5,
+      "semelhanca": 77.4,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -871,9 +994,10 @@ window.DADOS_REAIS = {
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 48.0,
+      "semelhanca": 61.8,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -883,21 +1007,12 @@ window.DADOS_REAIS = {
      {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 83.6,
+      "semelhanca": 71.2,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 80.7,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -905,13 +1020,14 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 67.8,
+      "semelhanca": 68.7,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      },
      {
       "id": "shackleton",
@@ -920,6 +1036,20 @@ window.DADOS_REAIS = {
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 61.7,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -963,9 +1093,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": -4.758,
     "amplitude_C": 20.978,
+    "amplitude_diurna_C": 5.494,
     "elevacao_m": 804.6,
     "rugosidade_m": 427.8,
     "declividade_graus": 3.174,
+    "declividade_3km_graus": 2.011,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.725,
     "frac_T_abaixo_0C": 0.746,
@@ -974,18 +1106,47 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.7007,
+    "diurna": 0.0157,
     "relevo": 0.1426,
+    "declividade": 0.1341,
     "gelo": 0.7355,
     "vento": 0.769
    },
    "ranking": {
     "marte": [
      {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 63.3,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
+      "id": "gale",
+      "nome": "Cratera Gale",
+      "semelhanca": 62.6,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 55.0,
+      "semelhanca": 55.2,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -993,19 +1154,10 @@ window.DADOS_REAIS = {
      {
       "id": "hellas",
       "nome": "Bacia de Hellas",
-      "semelhanca": 54.5,
+      "semelhanca": 54.6,
       "aspectos_usados": [
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 54.2,
-      "aspectos_usados": [
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1013,19 +1165,10 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 53.6,
+      "semelhanca": 53.7,
       "aspectos_usados": [
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "gale",
-      "nome": "Cratera Gale",
-      "semelhanca": 52.9,
-      "aspectos_usados": [
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1033,9 +1176,10 @@ window.DADOS_REAIS = {
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 20.5,
+      "semelhanca": 32.1,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1043,23 +1187,14 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 55.2,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 55.1,
+      "semelhanca": 47.1,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1067,10 +1202,24 @@ window.DADOS_REAIS = {
      {
       "id": "shackleton",
       "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 52.8,
+      "semelhanca": 45.7,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 43.2,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1078,13 +1227,14 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 46.6,
+      "semelhanca": 40.7,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -1125,9 +1275,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": -19.752,
     "amplitude_C": 46.224,
+    "amplitude_diurna_C": 2.247,
     "elevacao_m": 242.4,
     "rugosidade_m": 102.4,
     "declividade_graus": 2.32,
+    "declividade_3km_graus": 1.285,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.666,
     "frac_T_abaixo_0C": 0.89,
@@ -1136,18 +1288,47 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.6579,
+    "diurna": 0.0064,
     "relevo": 0.0341,
+    "declividade": 0.0857,
     "gelo": 0.778,
     "vento": 0.5012
    },
    "ranking": {
     "marte": [
      {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 61.1,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
+      "id": "gale",
+      "nome": "Cratera Gale",
+      "semelhanca": 59.2,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
       "id": "meridiani",
       "nome": "Meridiani Planum",
       "semelhanca": 52.8,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1155,9 +1336,10 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 51.8,
+      "semelhanca": 51.7,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1165,29 +1347,10 @@ window.DADOS_REAIS = {
      {
       "id": "hellas",
       "nome": "Bacia de Hellas",
-      "semelhanca": 51.4,
+      "semelhanca": 51.5,
       "aspectos_usados": [
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 50.7,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "gale",
-      "nome": "Cratera Gale",
-      "semelhanca": 47.1,
-      "aspectos_usados": [
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1195,9 +1358,10 @@ window.DADOS_REAIS = {
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 12.2,
+      "semelhanca": 25.5,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1205,23 +1369,14 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 53.4,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 52.6,
+      "semelhanca": 44.4,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1229,10 +1384,24 @@ window.DADOS_REAIS = {
      {
       "id": "shackleton",
       "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 50.8,
+      "semelhanca": 42.6,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 41.4,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1240,13 +1409,14 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 43.3,
+      "semelhanca": 37.0,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -1287,9 +1457,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 29.431,
     "amplitude_C": 14.468,
+    "amplitude_diurna_C": 26.3,
     "elevacao_m": 653.6,
     "rugosidade_m": 304.4,
     "declividade_graus": 1.467,
+    "declividade_3km_graus": 0.771,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.0,
     "frac_T_abaixo_0C": 0.0,
@@ -1298,38 +1470,32 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.7984,
+    "diurna": 0.0751,
     "relevo": 0.1015,
+    "declividade": 0.0514,
     "gelo": 0.0,
     "vento": 0.5996
    },
    "ranking": {
     "marte": [
      {
-      "id": "hellas",
-      "nome": "Bacia de Hellas",
-      "semelhanca": 97.0,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 96.3,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 94.6,
+      "semelhanca": 95.3,
       "aspectos_usados": [
        "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.467
+     },
+     {
+      "id": "hellas",
+      "nome": "Bacia de Hellas",
+      "semelhanca": 94.8,
+      "aspectos_usados": [
+       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1337,29 +1503,47 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 93.1,
+      "semelhanca": 94.4,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
+     },
+     {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 87.3,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
      },
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 81.3,
+      "semelhanca": 80.9,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 32.0,
+      "semelhanca": 46.1,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1367,34 +1551,27 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 85.3,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 83.8,
+      "semelhanca": 69.8,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
      },
      {
-      "id": "shackleton",
-      "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 62.2,
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 65.5,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1402,13 +1579,26 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 61.2,
+      "semelhanca": 57.4,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "shackleton",
+      "nome": "Polo Sul (Cratera Shackleton)",
+      "semelhanca": 56.2,
+      "aspectos_usados": [
+       "temperatura",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -1449,9 +1639,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 23.692,
     "amplitude_C": 10.788,
+    "amplitude_diurna_C": 16.306,
     "elevacao_m": 137.2,
     "rugosidade_m": 114.9,
     "declividade_graus": 2.604,
+    "declividade_3km_graus": 1.36,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.0,
     "frac_T_abaixo_0C": 0.0,
@@ -1460,28 +1652,32 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.782,
+    "diurna": 0.0466,
     "relevo": 0.0383,
+    "declividade": 0.0907,
     "gelo": 0.0,
     "vento": 0.6135
    },
    "ranking": {
     "marte": [
      {
-      "id": "utopia",
-      "nome": "Utopia Planitia",
-      "semelhanca": 96.8,
+      "id": "meridiani",
+      "nome": "Meridiani Planum",
+      "semelhanca": 96.1,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
      },
      {
-      "id": "meridiani",
-      "nome": "Meridiani Planum",
-      "semelhanca": 96.2,
+      "id": "utopia",
+      "nome": "Utopia Planitia",
+      "semelhanca": 95.1,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1489,9 +1685,10 @@ window.DADOS_REAIS = {
      {
       "id": "hellas",
       "nome": "Bacia de Hellas",
-      "semelhanca": 93.3,
+      "semelhanca": 94.5,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1499,29 +1696,36 @@ window.DADOS_REAIS = {
      {
       "id": "jezero",
       "nome": "Cratera Jezero",
-      "semelhanca": 92.1,
+      "semelhanca": 86.8,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 76.6,
+      "semelhanca": 80.1,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 27.3,
+      "semelhanca": 44.0,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1529,34 +1733,27 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 86.5,
-      "aspectos_usados": [
-       "temperatura",
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 1.0
-     },
-     {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 83.6,
+      "semelhanca": 69.4,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
      },
      {
-      "id": "shackleton",
-      "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 61.9,
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 64.6,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1564,13 +1761,26 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 59.9,
+      "semelhanca": 57.8,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
+     },
+     {
+      "id": "shackleton",
+      "nome": "Polo Sul (Cratera Shackleton)",
+      "semelhanca": 57.2,
+      "aspectos_usados": [
+       "temperatura",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -1611,9 +1821,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 12.351,
     "amplitude_C": 29.991,
+    "amplitude_diurna_C": 15.635,
     "elevacao_m": 1501.4,
     "rugosidade_m": 333.2,
     "declividade_graus": 3.506,
+    "declividade_3km_graus": 1.96,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.167,
     "frac_T_abaixo_0C": 0.152,
@@ -1622,7 +1834,9 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.7496,
+    "diurna": 0.0447,
     "relevo": 0.1111,
+    "declividade": 0.1307,
     "gelo": 0.1595,
     "vento": 0.4243
    },
@@ -1634,6 +1848,7 @@ window.DADOS_REAIS = {
       "semelhanca": 92.3,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1644,16 +1859,7 @@ window.DADOS_REAIS = {
       "semelhanca": 91.9,
       "aspectos_usados": [
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 91.6,
-      "aspectos_usados": [
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1661,29 +1867,47 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 89.5,
+      "semelhanca": 89.0,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
+     },
+     {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 87.1,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
      },
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 81.1,
+      "semelhanca": 82.7,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 32.3,
+      "semelhanca": 47.8,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1691,23 +1915,27 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 84.7,
+      "id": "tycho",
+      "nome": "Cratera Tycho",
+      "semelhanca": 69.1,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
      },
      {
-      "id": "tycho",
-      "nome": "Cratera Tycho",
-      "semelhanca": 83.7,
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 63.4,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1715,24 +1943,26 @@ window.DADOS_REAIS = {
      {
       "id": "shackleton",
       "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 65.9,
+      "semelhanca": 61.0,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      },
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 63.0,
+      "semelhanca": 60.3,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -1773,9 +2003,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": 12.275,
     "amplitude_C": 36.684,
+    "amplitude_diurna_C": 18.188,
     "elevacao_m": 2021.4,
     "rugosidade_m": 481.7,
     "declividade_graus": 4.287,
+    "declividade_3km_graus": 2.352,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.191,
     "frac_T_abaixo_0C": 0.249,
@@ -1784,7 +2016,9 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.7494,
+    "diurna": 0.052,
     "relevo": 0.1606,
+    "declividade": 0.1568,
     "gelo": 0.22,
     "vento": 0.4559
    },
@@ -1793,19 +2027,10 @@ window.DADOS_REAIS = {
      {
       "id": "hellas",
       "nome": "Bacia de Hellas",
-      "semelhanca": 87.9,
+      "semelhanca": 88.0,
       "aspectos_usados": [
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 87.8,
-      "aspectos_usados": [
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1813,19 +2038,34 @@ window.DADOS_REAIS = {
      {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 86.5,
+      "semelhanca": 86.9,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
      },
      {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 85.5,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 84.1,
+      "semelhanca": 84.2,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1833,19 +2073,23 @@ window.DADOS_REAIS = {
      {
       "id": "gale",
       "nome": "Cratera Gale",
-      "semelhanca": 82.4,
+      "semelhanca": 83.1,
       "aspectos_usados": [
+       "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 0.467
+      "peso_original_coberto": 0.8
      },
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 35.4,
+      "semelhanca": 49.9,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1855,10 +2099,12 @@ window.DADOS_REAIS = {
      {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 81.6,
+      "semelhanca": 68.4,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1866,10 +2112,12 @@ window.DADOS_REAIS = {
      {
       "id": "tranquillitatis",
       "nome": "Mare Tranquillitatis",
-      "semelhanca": 81.5,
+      "semelhanca": 62.3,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -1877,24 +2125,26 @@ window.DADOS_REAIS = {
      {
       "id": "shackleton",
       "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 66.4,
+      "semelhanca": 61.8,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      },
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 63.5,
+      "semelhanca": 60.8,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -1935,9 +2185,11 @@ window.DADOS_REAIS = {
    "valores": {
     "temperatura_C": -12.925,
     "amplitude_C": 30.915,
+    "amplitude_diurna_C": 1.276,
     "elevacao_m": 467.1,
     "rugosidade_m": 285.0,
     "declividade_graus": 6.924,
+    "declividade_3km_graus": 3.565,
     "fonte_relevo": "SRTMGL30",
     "frac_neve": 0.9,
     "frac_T_abaixo_0C": 0.877,
@@ -1946,18 +2198,47 @@ window.DADOS_REAIS = {
    },
    "notas": {
     "temperatura": 0.6774,
+    "diurna": 0.0036,
     "relevo": 0.095,
+    "declividade": 0.2377,
     "gelo": 0.8885,
     "vento": 0.5642
    },
    "ranking": {
     "marte": [
      {
+      "id": "jezero",
+      "nome": "Cratera Jezero",
+      "semelhanca": 55.7,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
+      "id": "gale",
+      "nome": "Cratera Gale",
+      "semelhanca": 55.6,
+      "aspectos_usados": [
+       "temperatura",
+       "diurna",
+       "relevo",
+       "declividade",
+       "gelo"
+      ],
+      "peso_original_coberto": 0.8
+     },
+     {
       "id": "meridiani",
       "nome": "Meridiani Planum",
-      "semelhanca": 45.4,
+      "semelhanca": 44.8,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1965,9 +2246,10 @@ window.DADOS_REAIS = {
      {
       "id": "hellas",
       "nome": "Bacia de Hellas",
-      "semelhanca": 44.5,
+      "semelhanca": 44.3,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -1975,29 +2257,10 @@ window.DADOS_REAIS = {
      {
       "id": "utopia",
       "nome": "Utopia Planitia",
-      "semelhanca": 44.3,
+      "semelhanca": 43.2,
       "aspectos_usados": [
        "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "jezero",
-      "nome": "Cratera Jezero",
-      "semelhanca": 44.0,
-      "aspectos_usados": [
-       "relevo",
-       "gelo"
-      ],
-      "peso_original_coberto": 0.467
-     },
-     {
-      "id": "gale",
-      "nome": "Cratera Gale",
-      "semelhanca": 42.2,
-      "aspectos_usados": [
-       "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -2005,9 +2268,10 @@ window.DADOS_REAIS = {
      {
       "id": "valles",
       "nome": "Valles Marineris",
-      "semelhanca": 11.6,
+      "semelhanca": 24.6,
       "aspectos_usados": [
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 0.467
@@ -2015,34 +2279,39 @@ window.DADOS_REAIS = {
     ],
     "lua": [
      {
-      "id": "tranquillitatis",
-      "nome": "Mare Tranquillitatis",
-      "semelhanca": 46.7,
+      "id": "shackleton",
+      "nome": "Polo Sul (Cratera Shackleton)",
+      "semelhanca": 40.1,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      },
      {
       "id": "tycho",
       "nome": "Cratera Tycho",
-      "semelhanca": 46.4,
+      "semelhanca": 39.7,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
      },
      {
-      "id": "shackleton",
-      "nome": "Polo Sul (Cratera Shackleton)",
-      "semelhanca": 45.8,
+      "id": "tranquillitatis",
+      "nome": "Mare Tranquillitatis",
+      "semelhanca": 35.5,
       "aspectos_usados": [
        "temperatura",
+       "diurna",
        "relevo",
+       "declividade",
        "gelo"
       ],
       "peso_original_coberto": 1.0
@@ -2050,13 +2319,14 @@ window.DADOS_REAIS = {
      {
       "id": "malapert",
       "nome": "Monte Malapert",
-      "semelhanca": 38.8,
+      "semelhanca": 34.0,
       "aspectos_usados": [
        "temperatura",
        "relevo",
+       "declividade",
        "gelo"
       ],
-      "peso_original_coberto": 1.0
+      "peso_original_coberto": 0.824
      }
     ]
    }
@@ -2077,14 +2347,20 @@ window.DADOS_REAIS = {
    "lon_leste": 77.6873,
    "coord_verificada": true,
    "notas": {
-    "temperatura": null,
+    "temperatura": 0.5772222857142858,
+    "diurna": 0.22139000000000003,
     "relevo": 0.13888966666666666,
+    "declividade": 0.12843333333333334,
     "gelo": 0.03531,
     "vento": null
    },
    "valores": {
+    "temperatura_C": -47.97219999999999,
+    "amplitude_diurna_K": 77.4865,
     "relevo_m": 416.669,
-    "agua_pct": 3.531
+    "declividade_graus": 1.9265,
+    "agua_pct": 3.531,
+    "vento_rover_ms": 3.26
    }
   },
   {
@@ -2101,14 +2377,20 @@ window.DADOS_REAIS = {
    "lon_leste": 137.811,
    "coord_verificada": true,
    "notas": {
-    "temperatura": null,
+    "temperatura": 0.5732345714285715,
+    "diurna": 0.22086114285714287,
     "relevo": 0.34418896666666665,
+    "declividade": 0.30667333333333335,
     "gelo": 0.054029999999999995,
     "vento": null
    },
    "valores": {
+    "temperatura_C": -49.36789999999996,
+    "amplitude_diurna_K": 77.3014,
     "relevo_m": 1032.5669,
-    "agua_pct": 5.403
+    "declividade_graus": 4.6001,
+    "agua_pct": 5.403,
+    "vento_rover_ms": null
    }
   },
   {
@@ -2126,13 +2408,19 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": null,
+    "diurna": null,
     "relevo": 0.050382666666666666,
+    "declividade": 0.06993999999999999,
     "gelo": 0.05682,
     "vento": null
    },
    "valores": {
+    "temperatura_C": null,
+    "amplitude_diurna_K": null,
     "relevo_m": 151.148,
-    "agua_pct": 5.682
+    "declividade_graus": 1.0491,
+    "agua_pct": 5.682,
+    "vento_rover_ms": null
    }
   },
   {
@@ -2150,13 +2438,19 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": null,
+    "diurna": null,
     "relevo": 1.0,
+    "declividade": 0.5058733333333333,
     "gelo": 0.03306,
     "vento": null
    },
    "valores": {
+    "temperatura_C": null,
+    "amplitude_diurna_K": null,
     "relevo_m": 3190.4977,
-    "agua_pct": 3.306
+    "declividade_graus": 7.5881,
+    "agua_pct": 3.306,
+    "vento_rover_ms": null
    }
   },
   {
@@ -2174,13 +2468,19 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": null,
+    "diurna": null,
     "relevo": 0.1186012,
+    "declividade": 0.13207333333333335,
     "gelo": 0.04156,
     "vento": null
    },
    "valores": {
+    "temperatura_C": null,
+    "amplitude_diurna_K": null,
     "relevo_m": 355.8036,
-    "agua_pct": 4.156
+    "declividade_graus": 1.9811,
+    "agua_pct": 4.156,
+    "vento_rover_ms": null
    }
   },
   {
@@ -2198,13 +2498,19 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": null,
+    "diurna": null,
     "relevo": 0.0171563,
+    "declividade": 0.01798,
     "gelo": 0.04229,
     "vento": null
    },
    "valores": {
+    "temperatura_C": null,
+    "amplitude_diurna_K": null,
     "relevo_m": 51.4689,
-    "agua_pct": 4.229
+    "declividade_graus": 0.2697,
+    "agua_pct": 4.229,
+    "vento_rover_ms": null
    }
   }
  ],
@@ -2224,14 +2530,18 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": 0.20892171428571438,
+    "diurna": null,
     "relevo": 0.3178366,
+    "declividade": 0.8067666666666666,
     "gelo": 0.1317,
     "vento": null
    },
    "valores": {
     "temperatura_C": -176.87739999999997,
     "temperatura_max_C": 74.65000000000003,
+    "amplitude_diurna_K": null,
     "relevo_m": 953.5098,
+    "declividade_graus": 12.1015,
     "armadilha_fria_pct": 13.170000000000002
    }
   },
@@ -2250,14 +2560,18 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": 0.5552157142857144,
+    "diurna": 0.8583334285714286,
     "relevo": 0.04871453333333333,
+    "declividade": 0.04631333333333333,
     "gelo": 0.0,
     "vento": null
    },
    "valores": {
     "temperatura_C": -55.674499999999966,
     "temperatura_max_C": 121.18,
+    "amplitude_diurna_K": 300.4167,
     "relevo_m": 146.1436,
+    "declividade_graus": 0.6947,
     "armadilha_fria_pct": 0.0
    }
   },
@@ -2276,14 +2590,18 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": 0.5316211428571429,
+    "diurna": 0.6692685714285714,
     "relevo": 0.16456206666666667,
+    "declividade": 0.37715333333333334,
     "gelo": 0.0,
     "vento": null
    },
    "valores": {
     "temperatura_C": -63.93259999999998,
     "temperatura_max_C": 75.18,
+    "amplitude_diurna_K": 234.244,
     "relevo_m": 493.6862,
+    "declividade_graus": 5.6573,
     "armadilha_fria_pct": 0.0
    }
   },
@@ -2302,14 +2620,18 @@ window.DADOS_REAIS = {
    "coord_verificada": true,
    "notas": {
     "temperatura": 0.260794,
+    "diurna": null,
     "relevo": 0.5079971333333334,
+    "declividade": 0.75956,
     "gelo": 0.0257,
     "vento": null
    },
    "valores": {
     "temperatura_C": -158.72209999999998,
     "temperatura_max_C": 68.93,
+    "amplitude_diurna_K": null,
     "relevo_m": 1523.9914,
+    "declividade_graus": 11.3934,
     "armadilha_fria_pct": 2.5700000000000003
    }
   }

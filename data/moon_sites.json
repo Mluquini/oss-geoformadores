@@ -62,6 +62,30 @@
           "papel": "oficial",
           "motivo_nulo": "O mapa CF do Diviner só cobre ±60° de latitude; este local está fora (ou os pixels são inválidos)."
         },
+        "declividade": {
+          "valor": 12.1015,
+          "unidade": "graus (declividade média na escala de ~3,8 km)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do LOLA depois de juntar blocos de 2x2 pixels (de 16 para 8 pixels/grau, ~3,8 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada em Marte (MOLA) e na Terra (blocos de 4x4 de 30\")."
+        },
+        "amplitude_diurna": {
+          "valor": null,
+          "unidade": "K",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "O Diviner dá a temperatura por hora do dia lunar só no GCP (entre 80°S e 80°N). Perto do polo, o PRP traz só a média e o máximo do ano, sem a curva do dia, então não dá para calcular a amplitude diurna. Não foi estimada."
+        },
         "vento": {
           "valor": null,
           "unidade": "m/s",
@@ -141,6 +165,30 @@
           "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/cylindrical/img/dgdr_nen_cf_clc_cyl_032_img.img",
           "papel": "oficial",
           "metodo": "Média na janela de 1666 pixels; desvio 0.102 µm."
+        },
+        "declividade": {
+          "valor": 0.6947,
+          "unidade": "graus (declividade média na escala de ~3,8 km)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do LOLA depois de juntar blocos de 2x2 pixels (de 16 para 8 pixels/grau, ~3,8 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada em Marte (MOLA) e na Terra (blocos de 4x4 de 30\")."
+        },
+        "amplitude_diurna": {
+          "valor": 300.4167,
+          "unidade": "K (máximo - mínimo ao longo do dia lunar)",
+          "produto": "LRO-L-DLRE-5-GCP-V1.0 (derivado do mesmo GCP)",
+          "instrumento": "LRO/Diviner",
+          "versao": "002",
+          "periodo": "2009-07-05 a 2015-04-01",
+          "resolucao": "0,5° de lat/lon e 0,25 h de hora local",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_00n10n_002.tab",
+          "papel": "oficial",
+          "metodo": "Maior menos menor valor da curva de temperatura bolométrica média da janela, ao longo das faixas de hora local (as mesmas usadas na temperatura média). A Terra usa dia - noite do MODIS (aproximação)."
         },
         "vento": {
           "valor": null,
@@ -222,6 +270,30 @@
           "papel": "oficial",
           "metodo": "Média na janela de 1476 pixels; desvio 0.173 µm."
         },
+        "declividade": {
+          "valor": 5.6573,
+          "unidade": "graus (declividade média na escala de ~3,8 km)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do LOLA depois de juntar blocos de 2x2 pixels (de 16 para 8 pixels/grau, ~3,8 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada em Marte (MOLA) e na Terra (blocos de 4x4 de 30\")."
+        },
+        "amplitude_diurna": {
+          "valor": 234.244,
+          "unidade": "K (máximo - mínimo ao longo do dia lunar)",
+          "produto": "LRO-L-DLRE-5-GCP-V1.0 (derivado do mesmo GCP)",
+          "instrumento": "LRO/Diviner",
+          "versao": "002",
+          "periodo": "2009-07-05 a 2015-04-01",
+          "resolucao": "0,5° de lat/lon e 0,25 h de hora local",
+          "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gcp/global_cumul_avg_cyl_50s40s_002.tab",
+          "papel": "oficial",
+          "metodo": "Maior menos menor valor da curva de temperatura bolométrica média da janela, ao longo das faixas de hora local (as mesmas usadas na temperatura média). A Terra usa dia - noite do MODIS (aproximação)."
+        },
         "vento": {
           "valor": null,
           "unidade": "m/s",
@@ -301,6 +373,30 @@
           "link": "https://pds-geosciences.wustl.edu/lro/urn-nasa-pds-lro_diviner_derived1/data_derived_gdr_l3/cylindrical/img/dgdr_nen_cf_clc_cyl_032_img.img",
           "papel": "oficial",
           "motivo_nulo": "O mapa CF do Diviner só cobre ±60° de latitude; este local está fora (ou os pixels são inválidos)."
+        },
+        "declividade": {
+          "valor": 11.3934,
+          "unidade": "graus (declividade média na escala de ~3,8 km)",
+          "produto": "LRO-L-LOLA-4-GDR-V1.0 (ldem_16, versão do produto V3.1)",
+          "instrumento": "LRO/LOLA",
+          "versao": "V3.1",
+          "periodo": "2009-07-13 a 2016-11-29",
+          "resolucao": "16 pixels/grau (~1895 m/pixel)",
+          "link": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/cylindrical/img/ldem_16.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do LOLA depois de juntar blocos de 2x2 pixels (de 16 para 8 pixels/grau, ~3,8 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada em Marte (MOLA) e na Terra (blocos de 4x4 de 30\")."
+        },
+        "amplitude_diurna": {
+          "valor": null,
+          "unidade": "K",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "O Diviner dá a temperatura por hora do dia lunar só no GCP (entre 80°S e 80°N). Perto do polo, o PRP traz só a média e o máximo do ano, sem a curva do dia, então não dá para calcular a amplitude diurna. Não foi estimada."
         },
         "vento": {
           "valor": null,

@@ -183,6 +183,12 @@ def main():
                      periodo=f'{e["START_TIME"][:10]} a {e["STOP_TIME"][:10]}',
                      resolucao=f"{ppd:g} pixels/grau (~{c.numero(e['MAP_SCALE']):.0f} m/pixel)", link=LOLA_URL + ".img")
 
+    # Para a declividade, o LOLA é reduzido com blocos de 2x2 (16 -> 8 pixels/grau, ~3,8 km por pixel): é a mesma escala
+    # do MOLA em Marte (~3,7 km) e da Terra (blocos de 4x4 de 30" = ~3,7 km). A declividade depende do tamanho do pixel.
+    FATOR_BASE_LUA = 2
+    lola_base = c.reduzir_grade(lola, FATOR_BASE_LUA)
+    ppd_base = ppd / FATOR_BASE_LUA
+
     print("2/3 Diviner CF (composição)")
     clbl = c.baixar(CF_URL + ".lbl", raw / "dgdr_nen_cf_clc_cyl_032_img.lbl")
     cimg = c.baixar(CF_URL + ".img", raw / "dgdr_nen_cf_clc_cyl_032_img.img")
@@ -214,6 +220,16 @@ def main():
         else:
             decl = None
             relevo = c.campo(None, unidade="m", motivo_nulo="Sem pixels válidos na janela.", **lola_args)
+
+        sb = c.estatisticas_janela(lola_base, 90.0, 0.0, ppd_base, lat0, lon0)
+        decl_base = (c.declividade_media_graus(sb["_sub"], sb["_lat"], sb["_dentro"], ppd_base, RAIO_LUA_M)
+                     if sb["n_pixels"] else None)
+        declividade = c.campo(
+            decl_base, unidade="graus (declividade média na escala de ~3,8 km)",
+            metodo=f"Gradiente do LOLA depois de juntar blocos de 2x2 pixels (de {ppd:g} para {ppd_base:g} pixels/grau, "
+                   f"~3,8 km por pixel) dentro do círculo de {c.RAIO_JANELA_GRAUS:g}° de raio, sem a borda de 1 pixel. "
+                   "Mesma escala usada em Marte (MOLA) e na Terra (blocos de 4x4 de 30\").",
+            motivo_nulo=None if decl_base is not None else "Sem pixels válidos na janela.", **lola_args)
 
         # Geologia (CF)
         if abs(lat0) + c.RAIO_JANELA_GRAUS <= cf_lat_max:
@@ -284,11 +300,27 @@ def main():
             temp = nulo("K", motivo)
             gelo = nulo("fração", motivo)
 
+        # Amplitude diurna: máximo - mínimo da curva do dia lunar (só onde existe o GCP, que cobre o dia todo)
+        if t and t.get("media") is not None and fonte_t == "GCP":
+            amp_d = c.campo(
+                t["maximo"] - t["minimo"], unidade="K (máximo - mínimo ao longo do dia lunar)",
+                produto="LRO-L-DLRE-5-GCP-V1.0 (derivado do mesmo GCP)", instrumento="LRO/Diviner", versao="002",
+                periodo="2009-07-05 a 2015-04-01", resolucao="0,5° de lat/lon e 0,25 h de hora local",
+                link=GCP_URL.format(faixa=t["faixa"]) + ".tab",
+                metodo="Maior menos menor valor da curva de temperatura bolométrica média da janela, ao longo das faixas de "
+                       "hora local (as mesmas usadas na temperatura média). A Terra usa dia - noite do MODIS (aproximação).")
+        else:
+            amp_d = nulo("K", "O Diviner dá a temperatura por hora do dia lunar só no GCP (entre 80°S e 80°N). Perto do polo, "
+                              "o PRP traz só a média e o máximo do ano, sem a curva do dia, então não dá para calcular a "
+                              "amplitude diurna. Não foi estimada." if fonte_t != "GCP" else
+                         "Sem dado válido de temperatura para este local.")
+
         locais_saida.append(dict(
             id=id_, nome=nome, lat=lat0, lon_leste=lon0, coord_verificada=True, coord_fonte=COORD_FONTE,
             janela=f"círculo de {c.RAIO_JANELA_GRAUS:g}° de raio",
             aspectos=dict(
                 temperatura=temp, relevo=relevo, gelo=gelo, geologia=geologia,
+                declividade=declividade, amplitude_diurna=amp_d,
                 vento=c.campo(None, produto="-", instrumento="-", versao="-", periodo="-", resolucao="-", link="-",
                               unidade="m/s", motivo_nulo=NAO_SE_APLICA, nao_se_aplica=True)),
             extras=dict(

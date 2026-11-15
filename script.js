@@ -8,7 +8,7 @@
 
 // ---------- 1. CONFIGURAÇÕES ----------
 
-const ASPECTOS = ["temperatura", "relevo", "gelo", "vento"];
+const ASPECTOS = ["temperatura", "diurna", "relevo", "declividade", "gelo", "vento"];
 const nomeAsp = a => t("asp." + a);   // nome do aspecto no idioma escolhido
 
 // Cores dos tipos de ambiente (o nome de cada tipo vem de i18n.js: type.<id>)
@@ -227,9 +227,12 @@ function resumoAlvo(a) {
     p.push(t("res.temp", { v: fmt(v.temperatura_C, 0) }) +
       (semDado(v.temperatura_max_C) ? "" : ` (${t("res.tempmax", { v: fmt(v.temperatura_max_C, 0) })})`));
   }
+  if (!semDado(v.amplitude_diurna_K)) p.push(t("res.diurna", { v: fmt(v.amplitude_diurna_K, 0) }));
   if (!semDado(v.relevo_m)) p.push(t("res.relevo", { v: fmt(v.relevo_m, 0) }));
+  if (!semDado(v.declividade_graus)) p.push(t("res.decl", { v: fmt(v.declividade_graus, 1) }));
   if (!semDado(v.agua_pct)) p.push(t("res.agua", { v: fmt(v.agua_pct, 1) }));
   if (!semDado(v.armadilha_fria_pct)) p.push(t("res.frio", { v: fmt(v.armadilha_fria_pct, 0) }));
+  if (!semDado(v.vento_rover_ms)) p.push(t("res.ventorover", { v: fmt(v.vento_rover_ms, 1) }));
   return p.join(" · ") || "—";
 }
 
@@ -315,9 +318,11 @@ function preencherValores(local) {
   const linhas = [
     [t("val.temp"), fmt(v.temperatura_C, 1, "°C")],
     [t("val.amp"), fmt(v.amplitude_C, 1, "°C")],
+    [t("val.diurna"), fmt(v.amplitude_diurna_C, 1, "°C")],
     [t("val.elev"), fmt(v.elevacao_m, 0, "m")],
     [t("val.rug"), fmt(v.rugosidade_m, 0, "m")],
     [t("val.slope"), fmt(v.declividade_graus, 1, "°")],
+    [t("val.slope3"), fmt(v.declividade_3km_graus, 1, "°")],
     [t("val.snow"), pct(v.frac_neve)],
     [t("val.t0"), pct(v.frac_T_abaixo_0C)],
     [t("val.wind"), fmt(v.vento_ms, 1, "m/s")],
@@ -410,6 +415,11 @@ function preencherSecaoComo() {
   const st = D.status;
   const lista = ids => I18N.lista(ids.map(a => nomeAsp(a).toLowerCase()));
   let status = t("status.base", { n: st.n_com, total: st.n_total, mars: lista(st.marte_usa), moon: lista(st.lua_usa) });
+  const so = st.marte_usa_so_em;
+  if (so && so.aspectos.length) {
+    const nomes = so.locais.map(id => L(D.marte.find(a => a.id === id).nome).replace(/^(Cratera|Crater) /, ""));
+    status += t("status.marte_extra", { sites: I18N.lista(nomes), list: lista(so.aspectos) });
+  }
   if (st.terra_sem_dado.length) status += t("status.missing", { list: lista(st.terra_sem_dado) });
   document.getElementById("como-gerado").textContent =
     t("como.generated", { status, date: D.gerado_em, years: (D.anos_terra || []).join(", ") });

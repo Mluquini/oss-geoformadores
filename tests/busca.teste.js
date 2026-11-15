@@ -55,12 +55,18 @@ teste("MESMA CONTA do site: alvo real x célula dos 12 locais bate com o ranking
   console.log(`      (${comparados} comparações; maior diferença ${maior.toFixed(3)} ponto, só por arredondamento dos dados)`);
 });
 
-teste("alvo real de Marte usa só relevo e gelo; o da Lua usa temperatura, relevo e gelo", () => {
-  const m = B.alvoReal(D.marte.find(a => a.id === "jezero"), D.pesos.marte, D.faixas, D.faixas_busca);
+teste("alvo real de Marte usa relevo, declividade e gelo; o da Lua (polar) usa temperatura, relevo, declividade e gelo", () => {
+  const m = B.alvoReal(D.marte.find(a => a.id === "utopia"), D.pesos.marte, D.faixas, D.faixas_busca);
+  const mj = B.alvoReal(D.marte.find(a => a.id === "jezero"), D.pesos.marte, D.faixas, D.faixas_busca);
   const l = B.alvoReal(D.lua.find(a => a.id === "shackleton"), D.pesos.lua, D.faixas, D.faixas_busca);
   const ativos = al => B.ASPECTOS.filter(a => al.pesos[a.id] > 0).map(a => a.id);
-  assert.deepStrictEqual(ativos(m), ["relevo", "gelo"]);
-  assert.deepStrictEqual(ativos(l), ["temperatura", "relevo", "gelo"]);
+  assert.deepStrictEqual(ativos(m), ["relevo", "declividade", "gelo"]);
+  // Jezero e Gale têm temperatura e amplitude dia/noite medidas por rover (e só eles)
+  assert.deepStrictEqual(ativos(mj), ["temperatura", "diurna", "relevo", "declividade", "gelo"]);
+  assert.deepStrictEqual(D.marte.filter(a => a.notas.temperatura !== null).map(a => a.id).sort(), ["gale", "jezero"]);
+  assert.deepStrictEqual(ativos(l), ["temperatura", "relevo", "declividade", "gelo"]);   // polar: sem amplitude diurna
+  const eq = B.alvoReal(D.lua.find(a => a.id === "tranquillitatis"), D.pesos.lua, D.faixas, D.faixas_busca);
+  assert.deepStrictEqual(ativos(eq), ["temperatura", "diurna", "relevo", "declividade", "gelo"]);   // equatorial: com amplitude diurna
 });
 
 teste("modelo 'Base com gelo (ISRU)' leva a lugares frios e com gelo, e o Top 5 não repete a região", () => {
@@ -100,6 +106,21 @@ teste("as frases julgam pela diferença FÍSICA: 12 °C de diferença não é 'c
   c.valores.temperatura = 20; c.notas.temperatura = B.paraNota("temperatura", 20, D.faixas, D.faixas_busca);   // 40 °C de diferença
   const an2 = B.analisar(alvo, c, D.faixas, D.faixas_busca);
   assert.ok(an2.naoCombina.some(i => i.id === "temperatura"), "40 °C de diferença deveria ser 'não combina'");
+});
+
+teste("declividade e amplitude dia/noite existem nas células, na faixa certa, e o rover prefere encosta inclinada", () => {
+  const com = cel.filter(c => c.valores.declividade !== null);
+  assert.ok(com.length > 100 && com.every(c => c.valores.declividade >= 0 && c.valores.declividade <= 15), "declividade fora da faixa");
+  const dia = cel.filter(c => c.valores.diurna !== null);
+  assert.ok(dia.length > 100 && dia.every(c => c.valores.diurna >= 0 && c.valores.diurna <= 60), "amplitude dia/noite fora do possível");
+  const alvo = B.alvoPersonalizado({ declividade: { valor: 4, imp: 3 } }, D.faixas, D.faixas_busca);
+  const top = B.agrupar(B.buscar(alvo, cel), 3, 5);
+  assert.ok(top.every(t => t.cel.valores.declividade > 2.5), "o Top 3 de 'encosta de 4°' deveria ser inclinado: " + top.map(t => t.cel.valores.declividade));
+  const an = B.analisar(alvo, top[0].cel, D.faixas, D.faixas_busca);
+  assert.ok(B.testesRecomendados(an).includes("test.decl.alta"));
+  // a Lua equatorial tem amplitude diurna (~230-300 K) que nenhum lugar da Terra alcança: a nota do alvo é bem maior que a de qualquer célula
+  const lua = B.alvoReal(D.lua.find(x => x.id === "tranquillitatis"), D.pesos.lua, D.faixas, D.faixas_busca);
+  assert.ok(lua.notas.diurna > 0.8 && Math.max.apply(null, dia.map(c => c.notas.diurna)) < 0.2);
 });
 
 teste("sem aspecto ativo não há busca; aspecto sem dado na célula não vira zero", () => {

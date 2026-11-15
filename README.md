@@ -20,6 +20,26 @@ python -m http.server
 
 Depois abra <http://localhost:8000> no navegador. No Linux ou no Mac, talvez o comando seja `python3`.
 
+## Aspectos comparados (6)
+
+Temperatura média, **amplitude dia/noite**, rugosidade do relevo, **declividade**, gelo e vento/poeira. A amplitude dia/noite e a declividade foram acrescentadas por dividirem o peso da temperatura e o do relevo do desafio ao meio (o total de cada categoria não muda). Limites, em linguagem direta:
+
+- **Declividade:** depende do tamanho do pixel, então Terra, Marte e Lua foram medidas na mesma escala (~3,7 km por pixel).
+- **Amplitude dia/noite:** na Terra é a média do ano de (MODIS dia − noite); na Lua é máximo − mínimo do dia lunar (só locais equatoriais; nos polos o produto tem só médias); em Marte **não há dado** (fica nulo, com o motivo no JSON). A diferença real é enorme (Lua ~230 a 300 K, Terra ~1 a 34 K), então nenhum lugar da Terra se parece com a Lua nesse aspecto, e isso baixa a % dos locais equatoriais da Lua.
+- Para recalcular só esses dois campos da Terra sem login: `python scripts/01_terra.py --raw raw --saida data --anos 2020 --zonas estrategicas --local` (usa os arquivos MODIS e SRTM que já estão em `raw/terra`), depois `02`, `03`, `04` e `05`.
+
+## Referências no site
+
+O botão **References / Referências** (no topo do site) leva à seção com todas as fontes: (1) os recursos da aba "Resources" da página do desafio da NASA que foram usados e como (Earthdata Search pelo catálogo CMR, PDS, LRO e Diviner; Worldview e os parceiros CSA, ESA e JAXA não foram usados e por isso não aparecem); (2) os produtos de dados, com versão e DOI ou link; (3) as fontes que não são da NASA (ETOPO 2022, GTOPO30, IAU, Wikimedia Commons); (4) o que serviu só para conferir. O texto está em `i18n.js` (chaves `ref.*`) e a tabela em `index.html` (`id="referencias"`); o `07_verificar_dados.py` confere se todos os links respondem.
+
+## Temperatura de Marte (dados dos rovers)
+
+Não existe no PDS um mapa global pronto de temperatura da superfície de Marte, então a temperatura do solo e a amplitude dia/noite de Marte vêm **dos rovers**, só nos dois locais onde há rover: **Gale** (Curiosity, instrumento REMS) e **Jezero** (Perseverance, instrumento MEDA). Os outros 4 locais ficam sem esses aspectos (null, com o motivo escrito), e o site avisa quantos aspectos cada comparação usou.
+
+- `scripts/02b_marte_rovers.py` baixa 24 sols (dias marcianos) espalhados pelo primeiro ano marciano (~300 MB, só na primeira vez), resume a temperatura do solo em 24 faixas de hora local e grava `data/mars_rovers.json`. Depois rode `02_marte.py`, `04`, `05` e `07`.
+- É uma **amostra** de sols (cerca de 20 com curva completa), em **um ponto**, e não uma média de todos os sols numa janela de 2°. No Jezero a temperatura é calculada do infravermelho térmico supondo emissividade 1 (subestima alguns kelvin).
+- **Vento de Marte não entra no cálculo:** a REMS tem quase todo o vento descartado por qualidade, e o do Jezero só existe até o sol ~300 (meia estação), a ~1,5 m de altura. O valor do Jezero aparece no painel como informação.
+
 ## Idiomas (EN | PT)
 
 O site abre sempre em inglês. O botão **EN | PT** troca todo o texto na hora (inclusive o painel aberto e os resultados do Planejar missão) e lembra a escolha. Para corrigir ou acrescentar uma tradução, edite `i18n.js`. O teste `node tests/i18n.teste.js` confere que toda frase existe nos dois idiomas, que nenhuma palavra de um idioma "vazou" para o outro e que os nomes e descrições dos locais estão em `pt` e `en`.

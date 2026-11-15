@@ -25,15 +25,31 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import comum as c  # noqa: E402
 
-ASPECTOS = ["temperatura", "relevo", "gelo", "vento"]
+# "diurna" (amplitude de temperatura entre o dia e a noite) e "declividade" (inclinação média do terreno na escala de
+# ~3,7 km) são sub-aspectos de "temperatura" e de "relevo": dividem o peso da categoria do desafio ao meio, para a soma
+# de cada categoria continuar a mesma (não inventamos peso novo).
+ASPECTOS = ["temperatura", "diurna", "relevo", "declividade", "gelo", "vento"]
 
 # Pesos ORIGINAIS do desafio (com geologia). A geologia foi retirada do projeto (sem dado comparável),
 # então os pesos dos outros aspectos são renormalizados para somar 1. Isso NÃO muda o ranking (a conta já
 # renormaliza), só muda `peso_original_coberto`: agora é a fração dos pesos que ficaram no projeto.
-PESOS_ORIGINAIS = {
+PESOS_DO_DESAFIO = {   # os pesos do desafio por categoria
     "marte": dict(temperatura=0.25, relevo=0.20, gelo=0.15, geologia=0.25, vento=0.15),
     "lua":   dict(temperatura=0.30, relevo=0.25, gelo=0.30, geologia=0.15, vento=0.00),
 }
+SUBASPECTOS = {"temperatura": ("temperatura", "diurna"), "relevo": ("relevo", "declividade")}   # categoria -> partes
+
+
+def _dividir(p):
+    """Divide o peso de temperatura e de relevo em duas partes iguais (média e amplitude diurna; rugosidade e declividade)."""
+    out = {}
+    for k, v in p.items():
+        for parte in SUBASPECTOS.get(k, (k,)):
+            out[parte] = v / len(SUBASPECTOS.get(k, (k,)))
+    return out
+
+
+PESOS_ORIGINAIS = {corpo: _dividir(p) for corpo, p in PESOS_DO_DESAFIO.items()}
 
 
 def _sem_geologia(p):
@@ -54,6 +70,18 @@ FAIXAS = {
     "relevo": dict(
         min=0.0, max=3000.0, unidade="m (desvio padrão da elevação numa janela de ~2°)",
         motivo="0 = planície perfeita. 3000 m já é o de Valles Marineris (cânion de ~7 km); acima disso a nota satura em 1."),
+    "declividade": dict(
+        min=0.0, max=15.0, unidade="graus (inclinação média do terreno na escala de ~3,7 km por pixel)",
+        motivo="Nos valores calculados vai de ~0 a ~5° na Terra, ~0,3 a ~7,6° em Marte e ~0,7 a ~12° na Lua (bordas de crateras "
+               "polares); 15° dá folga. A inclinação depende do tamanho do pixel, por isso os três corpos foram medidos na MESMA "
+               "escala de ~3,7 km (Terra: blocos de 4x4 pixels de 30\"; Marte: MOLA de 16 pixels/grau; Lua: LOLA de 16 pixels/grau "
+               "reduzido 2x2)."),
+    "diurna": dict(
+        min=0.0, max=350.0, unidade="K ou °C (diferença entre a temperatura do dia e a da noite)",
+        motivo="Na Lua, de ~234 K (Tycho) a ~300 K (Tranquillitatis); na Terra, de ~1 a ~34 K (ar e solo úmidos amortecem o "
+               "ciclo). Por isso nenhum lugar da Terra se parece com a Lua nesse aspecto: é uma diferença REAL, e não um erro. "
+               "Marte não tem dado (ver relatório). Terra: média anual de (MODIS dia − noite), uma aproximação do máximo menos o "
+               "mínimo do dia; Lua: máximo menos mínimo da curva do dia lunar (Diviner GCP)."),
     "gelo": dict(
         min=0.0, max=1.0, unidade="fração 0-1",
         motivo="Terra = média de (fração do tempo com neve) e (fração do tempo com T < 0 °C). Lua = fração da área com "
@@ -110,12 +138,19 @@ def semelhanca(terra, alvo, pesos):
 # ---------------------------------------------------------------------
 # Conversão de cada corpo para notas 0-1
 # ---------------------------------------------------------------------
+def _valor(a, nome):
+    """Valor de um aspecto de Marte/Lua (None se o JSON for antigo ou o campo for nulo)."""
+    return a.get(nome, {}).get("valor")
+
+
 def notas_terra(cel):
     gelo_parts = [v for v in (cel["gelo"]["frac_neve"], cel["gelo"]["frac_T_abaixo_0C"]) if v is not None]
     gelo = sum(gelo_parts) / len(gelo_parts) if gelo_parts else None
     return dict(
         temperatura=normalizar(cel["temperatura"]["media_anual_C"], "temperatura"),
+        diurna=normalizar(cel["temperatura"].get("amplitude_diurna_C"), "diurna"),
         relevo=normalizar(cel["relevo"]["rugosidade_desvio_m"], "relevo"),
+        declividade=normalizar(cel["relevo"].get("declividade_3km_graus"), "declividade"),
         gelo=normalizar(gelo, "gelo"),
         vento=normalizar(cel["vento"]["vento_ms"], "vento"))
 
@@ -126,7 +161,9 @@ def notas_marte(local):
     t = a["temperatura"]["valor"]
     return dict(
         temperatura=None if t is None else normalizar(t - 273.15, "temperatura"),
+        diurna=normalizar(_valor(a, "amplitude_diurna"), "diurna"),
         relevo=normalizar(a["relevo"]["valor"], "relevo"),
+        declividade=normalizar(_valor(a, "declividade"), "declividade"),
         gelo=None if h2o is None else normalizar(h2o / 100.0, "gelo"),
         vento=None)
 
@@ -136,7 +173,9 @@ def notas_lua(local):
     t = a["temperatura"]["valor"]
     return dict(
         temperatura=None if t is None else normalizar(t - 273.15, "temperatura"),
+        diurna=normalizar(_valor(a, "amplitude_diurna"), "diurna"),
         relevo=normalizar(a["relevo"]["valor"], "relevo"),
+        declividade=normalizar(_valor(a, "declividade"), "declividade"),
         gelo=normalizar(a["gelo"]["valor"], "gelo"),
         vento=None)
 
@@ -174,18 +213,24 @@ def autoteste():
     assert normalizar(5000, "relevo") == 1 and normalizar(-5, "relevo") == 0
     assert normalizar(1.0, "geologia") is None and normalizar(None, "gelo") is None
     p = PESOS["marte"]
-    iguais = dict(temperatura=.5, relevo=.5, gelo=.5, vento=.5)
+    iguais = dict(temperatura=.5, diurna=.5, relevo=.5, declividade=.5, gelo=.5, vento=.5)
     assert semelhanca(iguais, iguais, p)["semelhanca"] == 100.0
     # Opostos em todos os aspectos disponíveis -> 0 %
-    zeros = dict(temperatura=0, relevo=0, gelo=0, vento=0)
-    uns = dict(temperatura=1, relevo=1, gelo=1, vento=1)
+    zeros = dict(temperatura=0, diurna=0, relevo=0, declividade=0, gelo=0, vento=0)
+    uns = dict(temperatura=1, diurna=1, relevo=1, declividade=1, gelo=1, vento=1)
     assert semelhanca(zeros, uns, p)["semelhanca"] == 0.0
     # Pesos renormalizados: só relevo e gelo disponíveis em Marte (pesos 0,20 e 0,15 do original); diferença 0,5 e 0
     t = dict(temperatura=.9, relevo=.5, gelo=.0, vento=.1)
     m = dict(temperatura=None, relevo=1.0, gelo=.0, vento=None)
     s = semelhanca(t, m, p)
-    esperado = round(100 * (1 - math.sqrt(0.20 / 0.35 * 0.25)), 1)
-    assert s["semelhanca"] == esperado and s["aspectos_usados"] == ["relevo", "gelo"] and s["peso_original_coberto"] == 0.467, s   # 0,35 de 0,75 (sem a geologia)
+    # relevo vale 0,10 e gelo 0,15 (o 0,20 do relevo foi dividido com a declividade); diferenças 0,5 e 0
+    esperado = round(100 * (1 - math.sqrt(0.10 / 0.25 * 0.25)), 1)
+    assert s["semelhanca"] == esperado and s["aspectos_usados"] == ["relevo", "gelo"] and s["peso_original_coberto"] == 0.333, s   # 0,25 de 0,75 (sem a geologia)
+    # Declividade entra junto com a rugosidade: com os três aspectos, os pesos 0,10 / 0,10 / 0,15 são renormalizados
+    t3 = dict(relevo=.5, declividade=.1, gelo=.0); m3 = dict(relevo=1.0, declividade=.1, gelo=.0)
+    s3 = semelhanca(t3, m3, p)
+    assert s3["aspectos_usados"] == ["relevo", "declividade", "gelo"] and s3["peso_original_coberto"] == 0.467
+    assert s3["semelhanca"] == round(100 * (1 - math.sqrt(0.10 / 0.35 * 0.25)), 1), s3
     # Lua: vento tem peso 0, nunca entra
     s = semelhanca(uns, uns, PESOS["lua"])
     assert "vento" not in s["aspectos_usados"]
@@ -194,7 +239,10 @@ def autoteste():
     # Pesos somam 1, e a geologia não existe mais
     for k in PESOS:
         assert abs(sum(PESOS[k].values()) - 1) < 1e-9 and "geologia" not in PESOS[k], k
-    assert abs(PESOS["marte"]["relevo"] - 0.20 / 0.75) < 1e-12 and abs(PESOS["lua"]["temperatura"] - 0.30 / 0.85) < 1e-12
+    # As partes (média + amplitude diurna; rugosidade + declividade) somam o peso da categoria do desafio, sem peso novo
+    assert abs(PESOS["marte"]["relevo"] + PESOS["marte"]["declividade"] - 0.20 / 0.75) < 1e-12
+    assert abs(PESOS["lua"]["temperatura"] + PESOS["lua"]["diurna"] - 0.30 / 0.85) < 1e-12
+    assert abs(PESOS["marte"]["relevo"] - PESOS["marte"]["declividade"]) < 1e-12 and PESOS["marte"]["diurna"] > 0
     print("  OK")
 
 
@@ -207,10 +255,13 @@ CONFERENCIAS = [
                                           ("sem neve: frac_neve < 0,05", ("gelo", "frac_neve"), "<", 0.05)]),
     ("Interior da Antártida", -80.0, 100.0, [("muito frio: média anual < -35 °C", ("temperatura", "media_anual_C"), "<", -35),
                                               ("muito gelo: frac_neve > 0,8", ("gelo", "frac_neve"), ">", 0.8),
-                                              ("quase sempre abaixo de 0 °C: frac_T_abaixo_0C > 0,9", ("gelo", "frac_T_abaixo_0C"), ">", 0.9)]),
+                                              ("quase sempre abaixo de 0 °C: frac_T_abaixo_0C > 0,9", ("gelo", "frac_T_abaixo_0C"), ">", 0.9),
+                                              ("planalto de gelo quase plano: declividade (3,7 km) < 0,5°", ("relevo", "declividade_3km_graus"), "<", 0.5)]),
     ("Saara (Argélia/Líbia)", 25.0, 10.0, [("quente: média anual > 20 °C", ("temperatura", "media_anual_C"), ">", 20),
-                                           ("sem neve: frac_neve < 0,05", ("gelo", "frac_neve"), "<", 0.05)]),
-    ("Himalaia (Nepal/Tibete sul)", 27.0, 87.0, [("relevo muito rugoso: desvio da elevação > 1000 m", ("relevo", "rugosidade_desvio_m"), ">", 1000)]),
+                                           ("sem neve: frac_neve < 0,05", ("gelo", "frac_neve"), "<", 0.05),
+                                           ("deserto seco: amplitude diurna > 15 K", ("temperatura", "amplitude_diurna_C"), ">", 15)]),
+    ("Himalaia (Nepal/Tibete sul)", 27.0, 87.0, [("relevo muito rugoso: desvio da elevação > 1000 m", ("relevo", "rugosidade_desvio_m"), ">", 1000),
+                                                 ("muito inclinado: declividade (3,7 km) > 3°", ("relevo", "declividade_3km_graus"), ">", 3)]),
     ("Planalto tibetano", 29.0, 87.0, [("muito alto: elevação média > 3000 m", ("relevo", "elevacao_media_m"), ">", 3000)]),
     ("Amazônia", -3.0, -61.0, [("quente e estável: média anual entre 22 e 32 °C", ("temperatura", "media_anual_C"), "between", (22, 32)),
                                ("sem neve: frac_neve < 0,02", ("gelo", "frac_neve"), "<", 0.02)]),
@@ -314,7 +365,10 @@ def escrever_relatorio(earth, marte, lua, pasta):
               f"Pesos base Marte: {_pct(PESOS['marte'])}. Pesos base Lua: {_pct(PESOS['lua'])}. "
               "(São os pesos do desafio sem a geologia, renormalizados.)\n")
     md.append("\n**Cada ranking traz `peso_original_coberto`**: a fração dos pesos originais que de fato entrou na conta. "
-              "Com Marte, hoje, só relevo e gelo entram (47% do peso); com a Lua entram temperatura, relevo e gelo (100% do peso). "
+              "Com Marte entram rugosidade, declividade e gelo (3 de 6 aspectos, 47% do peso) e, só em Gale e Jezero (onde um rover "
+              "mediu), também temperatura e amplitude dia/noite (5 de 6, 80% do peso); com a Lua entram até 5 aspectos "
+              "(temperatura, amplitude diurna, rugosidade, declividade e gelo; a amplitude diurna só existe nos locais equatoriais, "
+              "então nos polares o total é 82% do peso). "
               "Quanto menor esse número, menos a % de semelhança diz sobre o todo.\n")
     # 3. Nulos
     md.append("\n## 3. O que NÃO foi possível obter, e por quê\n")
@@ -333,7 +387,9 @@ def escrever_relatorio(earth, marte, lua, pasta):
             md.append(f"\nCélulas da Terra sem valor (de {len(cel)}):\n\n")
             cont = []
             for nome, get in (("temperatura média", lambda x: x["temperatura"]["media_anual_C"]),
+                              ("amplitude diurna", lambda x: x["temperatura"].get("amplitude_diurna_C")),
                               ("rugosidade do relevo", lambda x: x["relevo"]["rugosidade_desvio_m"]),
+                              ("declividade (escala de 3,7 km)", lambda x: x["relevo"].get("declividade_3km_graus")),
                               ("fração de neve", lambda x: x["gelo"]["frac_neve"]),
                               ("vento", lambda x: x["vento"]["vento_ms"])):
                 n = sum(1 for x in cel if get(x) is None)
@@ -359,7 +415,20 @@ def escrever_relatorio(earth, marte, lua, pasta):
   são quase com certeza do GTOPO30 (USGS) embutido no produto. No extremo sul (McMurdo) o relevo é do ETOPO 2022 (NOAA),
   que não é produto NASA. **Vento da Terra:** o MERRA-2 é uma reanálise (modelo corrigido por observações), não medida direta.
 - **Temperatura da Lua nos polos** vem do PRP, que é um produto derivado/modelado pela equipe Diviner, não uma medição direta.
-- **Marte:** só relevo (MOLA) e água (GRS) foram obtidos. O GRS tem pegada de ~300 km e vê só ~1 m de profundidade; o produto
+- **Declividade:** depende do tamanho do pixel, então Terra, Marte e Lua foram medidas na mesma escala (~3,7 km por pixel,
+  veja a seção 2). Em janelas de ~2° de diâmetro na Lua (~60 km) isso deixa poucos pixels (~16 de diâmetro).
+- **Amplitude diurna:** na Terra é a média anual de (temperatura MODIS do dia − da noite), passagens de ~13h30 e ~01h30, uma
+  aproximação do máximo menos o mínimo do dia. Na Lua é o máximo menos o mínimo da curva Diviner do dia lunar (só locais equatoriais,
+  GCP). Em Marte não há dado. Como a diferença real é enorme (Lua ~230 a 300 K, Terra ~1 a 34 K), nenhum lugar da Terra se
+  parece com a Lua nesse aspecto: isso é físico, e derruba a % de semelhança dos locais equatoriais da Lua.
+- **Pesos:** a amplitude diurna divide o peso da temperatura com a temperatura média, e a declividade divide o peso do relevo
+  com a rugosidade (meio a meio, escolha nossa; o desafio não os separa).
+- **Marte, temperatura e amplitude dia/noite:** só existem em Gale (Curiosity/REMS) e em Jezero (Perseverance/MEDA), medidas NO local
+  por rovers, em um ponto (não numa janela de 2°) e como média de uma amostra de sols do primeiro ano marciano (não de todos). Gale
+  mede a temperatura de brilho do solo; no Jezero ela é calculada do infravermelho térmico supondo emissividade 1 (subestima alguns
+  kelvin). Nos outros 4 locais de Marte não há temperatura. **Vento de Marte:** o rover mediu, mas o dado não cobre um ano (o vento
+  derivado do Jezero só existe até o sol ~300 e o da REMS é quase todo descartado), e é medido a ~1,5 m; por isso não entra no cálculo.
+- **Marte:** relevo (MOLA, rugosidade e declividade) e água (GRS) para os 6 locais; temperatura e amplitude dia/noite só em Gale e Jezero. O GRS tem pegada de ~300 km e vê só ~1 m de profundidade; o produto
   suavizado usado aqui não cobre as latitudes mais altas.
 - **Neve do MODIS:** os meses de noite polar (código 211) não têm dado e são descartados; a fração de neve polar pode ser
   subestimada. Células com poucos meses válidos ficam `null`.

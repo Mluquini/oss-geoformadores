@@ -84,6 +84,27 @@ def haversine(lat1, lon1, lat2, lon2):
     return np.degrees(np.arccos(np.clip(c, -1, 1)))
 
 
+def declividade_independente(z, lat_linhas, ppd, raio_corpo_m, bordas=False):
+    """Inclinação (graus) pixel a pixel por diferenças centrais EXPLÍCITAS (não usa np.gradient, ao contrário do pipeline).
+    z [lin, col] em metros (NaN = sem dado); lat_linhas = latitude do centro de cada linha. As bordas ficam NaN, a não ser
+    com bordas=True (diferença unilateral, como o pipeline faz dentro de uma célula do ETOPO sem margem)."""
+    dy = math.radians(1.0 / ppd) * raio_corpo_m
+    dx = np.maximum(dy * np.cos(np.radians(lat_linhas))[:, None], 1e-6)
+    gy = np.full(z.shape, np.nan); gx = np.full(z.shape, np.nan)
+    gy[1:-1, :] = (z[2:, :] - z[:-2, :]) / (2 * dy)
+    gx[:, 1:-1] = (z[:, 2:] - z[:, :-2]) / (2 * dx)
+    if bordas:
+        gy[0, :] = (z[1, :] - z[0, :]) / dy; gy[-1, :] = (z[-1, :] - z[-2, :]) / dy
+        gx[:, 0] = (z[:, 1] - z[:, 0]) / dx[:, 0]; gx[:, -1] = (z[:, -1] - z[:, -2]) / dx[:, 0]
+    return np.degrees(np.arctan(np.hypot(gy, gx)))
+
+
+def media_por_blocos(z, lado):
+    """Média de blocos lado x lado (sem NaN); recorta o que não completa um bloco."""
+    n_l, n_c = (z.shape[0] // lado) * lado, (z.shape[1] // lado) * lado
+    return z[:n_l, :n_c].reshape(n_l // lado, lado, n_c // lado, lado).mean(axis=(1, 3))
+
+
 def http(url, metodo="HEAD", timeout=60):
     req = urllib.request.Request(url, headers=UA, method=metodo)
     with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -270,6 +291,133 @@ def sec1_coordenadas(sem_rede):
         reg(S, nome, OK, detalhe)
 
 
+def sec3_rovers(marte, sem_rede):
+    """Temperatura e amplitude dia/noite de Gale (REMS) e Jezero (MEDA): refeitas dos arquivos brutos dos rovers."""
+    S = "3 Marte (rovers)"
+    import csv
+
+    def curva_e_stats(horas, temps):
+        """24 faixas de hora (média por faixa, >= 30 medidas), interpolação circular; devolve (media, amplitude) ou None."""
+        faixa = np.floor(np.asarray(horas)).astype(int) % 24
+        temps = np.asarray(temps, float)
+        curva = np.full(24, np.nan)
+        for h in range(24):
+            v = temps[(faixa == h) & np.isfinite(temps)]
+            if v.size >= 30:
+                curva[h] = v.mean()
+        ok = np.isfinite(curva)
+        if ok.sum() < 20:
+            return None
+        h = np.arange(24)
+        interp = np.interp(h, np.r_[h[ok] - 24, h[ok], h[ok] + 24], np.r_[curva[ok], curva[ok], curva[ok]])
+        return float(interp.mean()), float(np.nanmax(curva) - np.nanmin(curva))
+
+    def rems():
+        pasta = RAIZ / "raw" / "marte" / "rems"
+        por_sol = {}
+        for arq in sorted(pasta.glob("*.TAB")):
+            hs, ts = [], []
+            sol = None
+            with open(arq, newline="") as f:
+                for lin in csv.reader(f, skipinitialspace=True):
+                    sol = sol or int(lin[1].strip()[:5])
+                    bt = float(lin[7])
+                    if bt > -900 and lin[10].strip() == "1111":
+                        hh = lin[2].strip()
+                        hs.append(int(hh[6:8]) + int(hh[9:11]) / 60.0); ts.append(bt)
+            r = curva_e_stats(hs, ts)
+            if r:
+                por_sol[sol] = r
+        return por_sol
+
+    def meda():
+        pasta = RAIZ / "raw" / "marte" / "meda"
+        por_sol = {}
+        sigma = 5.670374419e-8
+        for arq in sorted(pasta.glob("WE__*DER_TIRS*.CSV")):
+            sol = int(arq.name[4:8])
+            hs, ts = [], []
+            with open(arq, newline="") as f:
+                for lin in csv.DictReader(f):
+                    up = lin["UPWARD_LW_IRRADIANCE"]
+                    if up and float(up) > 0 and lin["TIRS_GROUND_FOOTPRINT_NOT_IN_SHADOW"] == "1" and lin["ROVER_LOW_TILT"] == "1":
+                        hh = lin["LTST"].strip()
+                        hs.append(int(hh[5:7]) + int(hh[8:10]) / 60.0); ts.append((float(up) / sigma) ** 0.25)
+            r = curva_e_stats(hs, ts)
+            if r:
+                por_sol[sol] = r
+        return por_sol
+
+    def conferir(nome, por_sol, id_):
+        rov = json.load(open(RAIZ / "data" / "mars_rovers.json", encoding="utf-8"))["locais"][id_]
+        assert sorted(por_sol) == sorted(rov["sols_com_curva"]), f"{nome}: sols com curva completa diferem: {sorted(por_sol)} x {sorted(rov['sols_com_curva'])}"
+        media = float(np.mean([v[0] for v in por_sol.values()])); amp = float(np.mean([v[1] for v in por_sol.values()]))
+        assert abs(media - rov["temperatura_media_K"]) < 0.01 and abs(amp - rov["amplitude_diurna_K"]) < 0.01, \
+            f"{nome}: recalculado {media:.2f} K / {amp:.2f} K x JSON {rov['temperatura_media_K']:.2f} / {rov['amplitude_diurna_K']:.2f}"
+        loc = next(l for l in marte["locais"] if l["id"] == id_)["aspectos"]
+        assert abs(loc["temperatura"]["valor"] - media) < 1e-3 and abs(loc["amplitude_diurna"]["valor"] - amp) < 1e-3, f"{nome}: mars_sites.json difere do resumo"
+        assert 205 <= media <= 245 and 55 <= amp <= 100, f"{nome}: fora do esperado para o solo marciano ({media:.0f} K; {amp:.0f} K de amplitude)"
+        assert all(sol <= 668 for sol in por_sol) and len(por_sol) >= 12
+        reg(S, f"{nome}: temperatura do solo e amplitude dia/noite refeitas dos arquivos brutos do rover", OK,
+            f"{len(por_sol)} sols: média {media - 273.15:.1f} °C ({media:.1f} K), amplitude {amp:.1f} K; todos os sols de 1 a 668 (1º ano marciano)")
+    tentar(S, "Gale (REMS)", lambda: conferir("Gale / Curiosity REMS", rems(), "gale"))
+    tentar(S, "Jezero (MEDA)", lambda: conferir("Jezero / Perseverance MEDA", meda(), "jezero"))
+
+    def so_dois():
+        com = sorted(l["id"] for l in marte["locais"] if l["aspectos"]["temperatura"]["valor"] is not None)
+        assert com == ["gale", "jezero"], f"só Gale e Jezero deveriam ter temperatura de rover: {com}"
+        for l in marte["locais"]:
+            if l["id"] not in com:
+                assert l["aspectos"]["temperatura"]["valor"] is None and l["aspectos"]["temperatura"].get("motivo_nulo")
+            assert l["aspectos"]["vento"]["valor"] is None and l["aspectos"]["vento"].get("motivo_nulo"), f"{l['id']}: o vento de Marte não deveria entrar"
+        reg(S, "Nenhum valor de temperatura inventado para os outros 4 locais de Marte; vento de Marte fora do cálculo, com motivo", OK, "null com motivo escrito")
+    tentar(S, "Só dois locais", so_dois)
+
+    def links():
+        if sem_rede:
+            reg(S, "Arquivos dos rovers existem no PDS Atmospheres Node", PULADO, "rodado com --sem-rede"); return
+        rov = json.load(open(RAIZ / "data" / "mars_rovers.json", encoding="utf-8"))["locais"]
+        for k, r in rov.items():
+            st, _ = http(r["link"], "HEAD", timeout=60)
+            assert st == 200, f"{k}: {r['link']} respondeu {st}"
+        reg(S, "Os arquivos dos rovers existem no PDS Atmospheres Node (NASA)", OK, "; ".join(r["link"] for r in rov.values()))
+    tentar(S, "Links dos rovers", links)
+
+
+def sec1_referencias(sem_rede):
+    """Todos os links da seção "References" do site (index.html) respondem? (falha de rede ou bloqueio vira AVISO)."""
+    S = "1 Origem"
+    nome = "Links da seção Referências do site"
+    html = (RAIZ / "index.html").read_text(encoding="utf-8")
+    sec = html[html.index('id="referencias"'):html.index('<footer')]
+    links = sorted(set(re.findall(r'href="(https?://[^"]+)"', sec)))
+    assert len(links) >= 25, f"esperava ao menos 25 links na seção Referências, achei {len(links)}"
+    locais = sorted(set(re.findall(r'href="(?!https?://)([^"#][^"]*)"', sec)))
+    for l in locais:
+        assert (RAIZ / l).exists(), f"link local da seção Referências não existe: {l}"
+    if sem_rede:
+        reg(S, nome, PULADO, "rodado com --sem-rede"); return
+    def responde(u):
+        """HEAD primeiro; alguns portais recusam HEAD ou o nosso User-Agent, então tenta de novo com GET e User-Agent de navegador."""
+        try:
+            return http(u, "HEAD", timeout=40)[0] < 400
+        except Exception:                                                # noqa: BLE001
+            req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=40) as r:
+                return r.status < 400
+    ruins = []
+    for u in links:
+        try:
+            if not responde(u):
+                ruins.append(u)
+        except Exception as e:                                           # noqa: BLE001
+            ruins.append(f"{u} ({type(e).__name__} {getattr(e, 'code', '')})")
+    if ruins:
+        reg(S, nome, AVISO, f"{len(links) - len(ruins)} de {len(links)} respondem; sem resposta: " + "; ".join(ruins))
+    else:
+        reg(S, nome, OK, f"{len(links)} links externos e {len(locais)} locais respondem")
+
+
 def textos_i18n():
     """Lê o dicionário de i18n.js: { chave: (inglês, português) }. Os textos do site em cada idioma ficam nesse arquivo."""
     t = (RAIZ / "i18n.js").read_text(encoding="utf-8")
@@ -322,7 +470,7 @@ def sec2_nada_falso(grid, marte, lua, sim, D, C):
 
     def faixas_fisicas():
         lim = {"temp": (-95, 60), "amp": (0, 80), "rug": (0, 4000), "neve": (0, 1), "t0": (0, 1), "vento": (0, 40),
-               "poeira": (0, 1000), "qi": (0.9, 1.2), "elev": (-500, 9000)}
+               "poeira": (0, 1000), "qi": (0.9, 1.2), "elev": (-500, 9000), "diu": (0, 60), "decl3": (0, 15)}
         cab = C["campos"]
         n = 0
         for linha in C["dados"]:
@@ -343,7 +491,9 @@ def sec2_nada_falso(grid, marte, lua, sim, D, C):
             pares = [(v["temperatura_C"], c["temperatura"]["media_anual_C"]), (v["amplitude_C"], c["temperatura"]["amplitude_C"]),
                      (v["elevacao_m"], c["relevo"]["elevacao_media_m"]), (v["rugosidade_m"], c["relevo"]["rugosidade_desvio_m"]),
                      (v["frac_neve"], c["gelo"]["frac_neve"]), (v["frac_T_abaixo_0C"], c["gelo"]["frac_T_abaixo_0C"]),
-                     (v["vento_ms"], c["vento"]["vento_ms"]), (v["poeira_ugm3"], c["vento"]["poeira_ugm3"])]
+                     (v["vento_ms"], c["vento"]["vento_ms"]), (v["poeira_ugm3"], c["vento"]["poeira_ugm3"]),
+                     (v["amplitude_diurna_C"], c["temperatura"]["amplitude_diurna_C"]),
+                     (v["declividade_3km_graus"], c["relevo"]["declividade_3km_graus"])]
             for a, b in pares:
                 assert a == b, f"{t['id']}: o site mostra {a} mas o pipeline tem {b}"
         reg(S, "Os 12 locais do site mostram exatamente o que o pipeline calculou", OK, "dados_reais.js == earth_grid.json")
@@ -353,10 +503,11 @@ def sec2_nada_falso(grid, marte, lua, sim, D, C):
             c = cel[(linha[0], linha[1])]
             esperado = [c["temperatura"]["media_anual_C"], c["temperatura"]["amplitude_C"], c["relevo"]["elevacao_media_m"],
                         c["relevo"]["rugosidade_desvio_m"], c["gelo"]["frac_neve"], c["gelo"]["frac_T_abaixo_0C"],
-                        c["vento"]["vento_ms"], c["vento"]["poeira_ugm3"], c["geologia"]["indice_quartzo"]]
-            obtido = [linha[cab.index(k)] for k in ("temp", "amp", "elev", "rug", "neve", "t0", "vento", "poeira", "qi")]
+                        c["vento"]["vento_ms"], c["vento"]["poeira_ugm3"], c["geologia"]["indice_quartzo"],
+                        c["temperatura"]["amplitude_diurna_C"], c["relevo"]["declividade_3km_graus"]]
+            obtido = [linha[cab.index(k)] for k in ("temp", "amp", "elev", "rug", "neve", "t0", "vento", "poeira", "qi", "diu", "decl3")]
             # tolerância = o arredondamento que o celulas.js aplica (temp/amp 0,1; elev/rug 1 m; neve/t0 0,001; vento 0,01; poeira 0,1; qi 0,0001)
-            tols = [0.0501, 0.0501, 0.5001, 0.5001, 0.0011, 0.0011, 0.0051, 0.0501, 0.00011]
+            tols = [0.0501, 0.0501, 0.5001, 0.5001, 0.0011, 0.0011, 0.0051, 0.0501, 0.00011, 0.0501, 0.0051]
             for e, o, tol in zip(esperado, obtido, tols):
                 assert (e is None and o is None) or (e is not None and o is not None and abs(e - o) <= tol), \
                     f"celulas.js difere do pipeline em {linha[0]},{linha[1]}: {e} x {o}"
@@ -391,7 +542,9 @@ def sec2_nada_falso(grid, marte, lua, sim, D, C):
         for js, lista, corpo in ((marte, D["marte"], "marte"), (lua, D["lua"], "lua")):
             for l in js["locais"]:
                 a = l["aspectos"]; site = next(x for x in lista if x["id"] == l["id"])
-                esp = {"relevo": nota("relevo", a["relevo"]["valor"])}
+                esp = {"relevo": nota("relevo", a["relevo"]["valor"]), "declividade": nota("declividade", a["declividade"]["valor"])}
+                if a["amplitude_diurna"]["valor"] is not None:
+                    esp["diurna"] = nota("diurna", a["amplitude_diurna"]["valor"])
                 if corpo == "marte":
                     esp["gelo"] = nota("gelo", a["gelo"]["valor"] / 100.0)
                 else:
@@ -420,7 +573,7 @@ def sec3_terra(grid):
         assert len(arq_t) == 12 and len(arq_n) == 12
         sd_t = [SD(str(p), SDC.READ) for p in arq_t]
         sd_n = [SD(str(p), SDC.READ) for p in arq_n]
-        esp = {"temp": [], "amp": [], "t0": [], "neve": []}; obt = {"temp": [], "amp": [], "t0": [], "neve": []}
+        esp = {"temp": [], "amp": [], "t0": [], "neve": [], "diu": []}; obt = {"temp": [], "amp": [], "t0": [], "neve": [], "diu": []}
         for c in cel:
             # linha 0 do arquivo = 90°N; 20 pixels por grau (0,05°); célula = 2° x 2° = 40 x 40 pixels
             r0 = int(round((90 - (c["lat"] + 1)) * 20)); c0 = int(round((c["lon"] - 1 + 180) * 20))
@@ -440,8 +593,13 @@ def sec3_terra(grid):
                     abaixo = np.where(ok, tm < 273.15, False).sum(0) / np.maximum(n_m, 1)
                 obt["temp"].append(float(media[bom].mean())); obt["amp"].append(float(ampl[bom].mean()))
                 obt["t0"].append(float(abaixo[bom].mean()))
+                # amplitude diurna = média do ano de (LST dia - LST noite), refeita aqui direto dos dois campos
+                dif = np.where(ok, (dia - noi) * 0.02, np.nan)
+                with np.errstate(all="ignore"):
+                    dm = np.nanmean(dif, 0)
+                obt["diu"].append(float(dm[bom].mean()))
             else:
-                for k in ("temp", "amp", "t0"): obt[k].append(None)
+                for k in ("temp", "amp", "t0", "diu"): obt[k].append(None)
             # neve (códigos 0-100 = % de neve; 211, 250, 253, 254, 255 = sem dado)
             cod = np.array([s.select("Snow_Cover_Monthly_CMG")[sl] for s in sd_n], float)
             val = (cod >= 0) & (cod <= 100)
@@ -451,10 +609,12 @@ def sec3_terra(grid):
             obt["neve"].append(float(frac[bom_n].mean()) if (n_terra >= 5 and bom_n.sum() >= 0.25 * n_terra) else None)
             esp["temp"].append(c["temperatura"]["media_anual_C"]); esp["amp"].append(c["temperatura"]["amplitude_C"])
             esp["t0"].append(c["gelo"]["frac_T_abaixo_0C"]); esp["neve"].append(c["gelo"]["frac_neve"])
-        tol = {"temp": 0.01, "amp": 0.01, "t0": 0.002, "neve": 0.002}
+            esp["diu"].append(c["temperatura"]["amplitude_diurna_C"])
+        tol = {"temp": 0.01, "amp": 0.01, "t0": 0.002, "neve": 0.002, "diu": 0.01}
         nomes = {"temp": "temperatura média anual (MOD11C3)", "amp": "amplitude anual (MOD11C3)",
-                 "t0": "fração do ano abaixo de 0 °C (MOD11C3)", "neve": "fração do ano com neve (MOD10CM)"}
-        for k in ("temp", "amp", "t0", "neve"):
+                 "t0": "fração do ano abaixo de 0 °C (MOD11C3)", "neve": "fração do ano com neve (MOD10CM)",
+                 "diu": "amplitude diurna, média do ano de (dia − noite) (MOD11C3)"}
+        for k in ("temp", "amp", "diu", "t0", "neve"):
             n, erros, maior, ex = comparar(k, esp[k], obt[k], tol[k])
             if erros:
                 reg(S, f"{nomes[k]}, {n} células", FALHA, f"{erros} diferenças; maior {maior:.4f}; ex.: {ex}")
@@ -479,11 +639,12 @@ def sec3_terra(grid):
         nc = netCDF4.Dataset(str(next((base / "ETOPO").glob("*.nc"))))
         la_e, lo_e = np.array(nc["lat"][:]), np.array(nc["lon"][:])
         esp_e, obt_e, esp_r, obt_r = [], [], [], []
+        esp_d, obt_d = [], []; pulados = []
         for c in cel:
             la0, lo0 = c["lat"] - 1, c["lon"] - 1               # canto sudoeste da célula
             lat_n = 90 if la0 >= 40 else (40 if la0 >= -10 else (-10 if la0 >= -60 else None))
             lon_w = int(math.floor((lo0 + 180) / 40.0)) * 40 - 180
-            media = desv = None
+            media = desv = None; decl = None; borda = False
             if lat_n is not None and (lat_n, lon_w) in tiles:
                 a = tiles[(lat_n, lon_w)]
                 r0 = int(round((lat_n - (la0 + 2)) * 120)); c0 = int(round((lo0 - lon_w) * 120))
@@ -491,18 +652,47 @@ def sec3_terra(grid):
                 v = bloco[(bloco != -32768) & (bloco != 0)]           # -32768 = sem dado; 0 = mar
                 if v.size >= 25:
                     media, desv = float(v.mean()), float(v.std())
+                    # Declividade na escala de ~3,7 km: blocos de 4x4, com 1 bloco de margem para o gradiente nas bordas da célula
+                    ra, rb = max(r0 - 4, 0), min(r0 + 244, a.shape[0]); ca, cb = max(c0 - 4, 0), min(c0 + 244, a.shape[1])
+                    borda = (ra != r0 - 4) or (rb != r0 + 244) or (ca != c0 - 4) or (cb != c0 + 244)
+                    ext = a[ra:rb, ca:cb].astype(float)
+                    bom = (ext != -32768) & (ext != 0)
+                    soma = media_por_blocos(np.where(bom, ext, 0.0), 4) * 16; nb = media_por_blocos(bom.astype(float), 4) * 16
+                    grosso = np.where(nb >= 8, soma / np.maximum(nb, 1), np.nan)
+                    lat_g = lat_n - (ra + 2 + 4 * np.arange(grosso.shape[0])) / 120.0
+                    dg = declividade_independente(grosso, lat_g, 30, 6_371_000.0)
+                    i_ini, j_ini = (r0 - ra) // 4, (c0 - ca) // 4
+                    miolo = dg[i_ini:i_ini + 60, j_ini:j_ini + 60]
+                    decl = float(np.nanmean(miolo)) if np.isfinite(miolo).any() else None
             if media is None:                                          # fora do SRTMGL30: ETOPO 2022 (NOAA, complemento)
                 ia = np.where((la_e >= la0) & (la_e < la0 + 2))[0]; ib = np.where((lo_e >= lo0) & (lo_e < lo0 + 2))[0]
                 z = np.array(nc["z"][ia[0]:ia[-1] + 1, ib[0]:ib[-1] + 1], float)
                 v = z[z > 0]
                 if v.size >= 25:
                     media, desv = float(v.mean()), float(v.std())
+                    # ETOPO (60"): blocos de 2x2 (~3,7 km); o gradiente é só dentro da célula (sem margem), como no pipeline
+                    terra_e = z > 0
+                    h, w = (z.shape[0] // 2) * 2, (z.shape[1] // 2) * 2
+                    bom = terra_e[:h, :w]
+                    soma = media_por_blocos(np.where(bom, z[:h, :w], 0.0), 2) * 4; nb = media_por_blocos(bom.astype(float), 2) * 4
+                    grosso = np.where(nb >= 2, soma / np.maximum(nb, 1), np.nan)
+                    lat_g = la_e[ia[0]:ia[0] + h:2] + (la_e[1] - la_e[0]) / 2
+                    dg = declividade_independente(grosso, lat_g, 30, 6_371_000.0, bordas=True)
+                    decl = float(np.nanmean(dg)) if np.isfinite(dg).any() else None
             obt_e.append(media); obt_r.append(desv)
             esp_e.append(c["relevo"]["elevacao_media_m"]); esp_r.append(c["relevo"]["rugosidade_desvio_m"])
+            if borda:       # célula colada na borda de um tile SRTM: o gradiente da borda é unilateral no pipeline; não comparável
+                pulados.append(f"{c['lat']:g},{c['lon']:g}"); esp_d.append(None); obt_d.append(None)
+            else:
+                esp_d.append(c["relevo"]["declividade_3km_graus"]); obt_d.append(decl)
         for nome, e, o in (("elevação média (SRTMGL30; ETOPO só onde falta)", esp_e, obt_e), ("rugosidade do relevo", esp_r, obt_r)):
             n, erros, maior, ex = comparar(nome, e, o, 0.06)
             if erros: reg(S, f"{nome}, {n} células", FALHA, f"{erros} diferenças; maior {maior:.2f} m; ex.: {ex}")
             else: reg(S, f"{nome}: relido do arquivo bruto, {sum(1 for v in e if v is not None)} células com valor", OK, f"maior diferença {maior:.3f} m")
+        n, erros, maior, ex = comparar("declividade", esp_d, obt_d, 0.01)
+        if erros: reg(S, f"declividade na escala de 3,7 km, {n} células", FALHA, f"{erros} diferenças; maior {maior:.3f}°; ex.: {ex}")
+        else: reg(S, f"declividade na escala de 3,7 km (blocos 4x4 do SRTM; 2x2 do ETOPO), refeita com diferenças centrais próprias: {sum(1 for v in esp_d if v is not None)} células", OK,
+                  f"maior diferença {maior:.4f}°" + (f"; {len(pulados)} células coladas na borda de um tile ficaram de fora da comparação" if pulados else ""))
         # pontos famosos (fatos públicos): checa que a decodificação e a orientação estão certas
         def janela(lat_n, lon_w, la, lo, r):
             a = tiles[(lat_n, lon_w)]
@@ -599,6 +789,26 @@ def sec3_marte_lua(marte, lua):
             n, erros, maior, ex = comparar(nome, e, o, 0.2)
             assert not erros, f"MOLA {nome}: {erros} diferenças, ex.: {ex}"
             reg(S, f"MOLA: {nome} dos {n} locais de Marte, relida do arquivo bruto", OK, f"maior diferença {maior:.3f} m")
+        # declividade na escala de ~3,7 km (o MOLA de 16 pixels/grau já está nela), diferenças centrais próprias
+        lat_all = 90 - (np.arange(2880) + 0.5) / 16
+        dec = declividade_independente(mola, lat_all, 16, 3_396_000.0)
+        lon_all = (np.arange(5760) + 0.5) / 16
+        esp_dc, obt_dc = [], []
+        for l in marte["locais"]:
+            d_ = haversine(lat_all[:, None], lon_all[None, :], l["lat"], l["lon_leste"])
+            m_ = (d_ <= 1.0) & np.isfinite(dec)
+            obt_dc.append(float(dec[m_].mean())); esp_dc.append(l["aspectos"]["declividade"]["valor"])
+        n, erros, maior, ex = comparar("declividade", esp_dc, obt_dc, 0.02)
+        assert not erros, f"MOLA declividade: {erros} diferenças, ex.: {ex}"
+        v_ = dict(zip([l["id"] for l in marte["locais"]], esp_dc))
+        assert v_["valles"] == max(v_.values()) and v_["utopia"] == min(v_.values()), f"Valles deveria ser o mais inclinado e Utopia o mais plano: {v_}"
+        reg(S, f"MOLA: declividade (escala de 3,7 km) dos {n} locais de Marte, refeita do arquivo bruto", OK,
+            f"maior diferença {maior:.4f}°; Valles Marineris {v_['valles']:.1f}° (o mais inclinado) x Utopia {v_['utopia']:.1f}° (o mais plano)")
+        sem_rover = [l for l in marte["locais"] if l["id"] not in ("gale", "jezero")]
+        for l in sem_rover:
+            ad = l["aspectos"]["amplitude_diurna"]
+            assert ad["valor"] is None and ad.get("motivo_nulo"), f"{l['id']}: amplitude diurna deveria ser nula, com motivo (só Gale e Jezero têm rover)"
+        reg(S, "Marte: amplitude diurna fica nula nos locais sem rover, com o motivo escrito (nada foi estimado)", OK, f"{len(sem_rover)} locais")
     tentar(S, "MOLA", mola)
 
     # --- Marte: GRS (água no solo) ------------------------------------------------------------------------
@@ -636,6 +846,22 @@ def sec3_marte_lua(marte, lua):
             n, erros, maior, ex = comparar(nome, e, o, 0.2)
             assert not erros, f"LOLA {nome}: {erros} diferenças, ex.: {ex}"
             reg(S, f"LOLA: {nome} dos {n} locais da Lua, relida do arquivo bruto", OK, f"maior diferença {maior:.3f} m")
+        # declividade: LOLA de 16 pixels/grau reduzido por blocos de 2x2 (8 pixels/grau, ~3,8 km), diferenças centrais próprias
+        h2 = media_por_blocos(h, 2)
+        lat_all = 90 - (np.arange(h2.shape[0]) + 0.5) / 8
+        lon_all = (np.arange(h2.shape[1]) + 0.5) / 8
+        dec = declividade_independente(h2, lat_all, 8, 1_737_400.0)
+        esp_dc, obt_dc = [], []
+        for l in lua["locais"]:
+            d_ = haversine(lat_all[:, None], lon_all[None, :], l["lat"], l["lon_leste"])
+            m_ = (d_ <= 1.0) & np.isfinite(dec)
+            obt_dc.append(float(dec[m_].mean())); esp_dc.append(l["aspectos"]["declividade"]["valor"])
+        n, erros, maior, ex = comparar("declividade", esp_dc, obt_dc, 0.05)
+        assert not erros, f"LOLA declividade: {erros} diferenças, ex.: {ex}"
+        v_ = dict(zip([l["id"] for l in lua["locais"]], esp_dc))
+        assert v_["tranquillitatis"] == min(v_.values()) and max(v_.values()) > 5, f"o mare deveria ser o mais plano e os polos/Tycho mais inclinados: {v_}"
+        reg(S, f"LOLA: declividade (escala de 3,8 km) dos {n} locais da Lua, refeita do arquivo bruto", OK,
+            f"maior diferença {maior:.4f}°; Tranquillitatis {v_['tranquillitatis']:.1f}° (o mais plano) x Shackleton {v_['shackleton']:.1f}°")
     tentar(S, "LOLA", lola)
 
     # --- Lua: Diviner CF (composição; fora do cálculo, mas continua nos JSONs) -----------------------------
@@ -677,6 +903,12 @@ def sec3_marte_lua(marte, lua):
             assert abs(tmed - a["valor"]) < 0.3 and abs(tmax - a["maximo_K"]) < 0.3 and abs(tmin - a["minimo_K"]) < 0.3, \
                 f"GCP {l['id']}: recalculado {tmed:.1f}/{tmax:.1f}/{tmin:.1f} K x JSON {a['valor']}/{a['maximo_K']}/{a['minimo_K']}"
             resumo[l["id"]] = (tmin, tmax, tmed)
+            ad = l["aspectos"]["amplitude_diurna"]["valor"]
+            assert ad is not None and abs(ad - (tmax - tmin)) < 0.6, f"amplitude diurna {l['id']}: JSON {ad} x recalculada {tmax - tmin:.1f} K"
+        for l in lua["locais"]:
+            if l["extras"].get("temperatura_fonte") != "GCP":
+                ad = l["aspectos"]["amplitude_diurna"]
+                assert ad["valor"] is None and ad.get("motivo_nulo"), f"{l['id']}: sem GCP, a amplitude diurna deveria ser nula, com motivo"
         assert resumo, "nenhum local usa GCP"
         reg(S, "Diviner GCP: temperatura média, máxima e mínima relidas dos arquivos brutos", OK,
             "; ".join(f"{k}: {v[0]:.0f}-{v[1]:.0f} K (média {v[2]:.0f})" for k, v in resumo.items()))
@@ -833,9 +1065,11 @@ def main():
     C = ler_js(d / "celulas.js", "CELULAS_TERRA")
     sec1_origem(a.sem_rede, grid, marte, lua)
     sec1_coordenadas(a.sem_rede)
+    sec1_referencias(a.sem_rede)
     sec2_nada_falso(grid, marte, lua, sim, D, C)
     sec3_terra(grid)
     sec3_marte_lua(marte, lua)
+    sec3_rovers(marte, a.sem_rede)
     resumo = {}
     for sec, nome, st, det in RESULTADOS:
         if nome.startswith("Diviner GCP: temperatura") and st == OK:

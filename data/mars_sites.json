@@ -13,16 +13,17 @@
       "janela": "círculo de 1° de raio",
       "aspectos": {
         "temperatura": {
-          "valor": null,
-          "unidade": "K",
-          "produto": "-",
-          "instrumento": "-",
+          "valor": 225.1778,
+          "unidade": "K (temperatura do solo, média das 24 faixas de hora e dos sols amostrados)",
+          "produto": "mars2020_meda (data_derived_env, produtos DER_TIRS de infravermelho térmico e DER_WS de vento)",
+          "instrumento": "Mars 2020/Perseverance MEDA",
           "versao": "-",
-          "periodo": "-",
-          "resolucao": "-",
-          "link": "-",
-          "papel": "oficial",
-          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado)."
+          "periodo": "primeiro ano marciano (sols 1 a 668), amostra de sols",
+          "resolucao": "1 medida por segundo, resumida em 24 faixas de hora local; amostra de 17 sols com curva completa (de 23 sols sorteados)",
+          "link": "https://atmos.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_derived_env/",
+          "papel": "medida no local por rover (um ponto, não uma janela de 2°; média de sols amostrados)",
+          "metodo": "Temperatura do SOLO medida pelo rover (REMS: sensor GTS, temperatura de brilho; MEDA: sensor TIRS, a partir do infravermelho térmico supondo emissividade 1, o que subestima um pouco). Média dos sols amostrados; é uma estimativa da média anual, não uma média de todos os sols.",
+          "incerteza_1sigma": 5.12
         },
         "relevo": {
           "valor": 416.669,
@@ -49,6 +50,31 @@
           "metodo": "Bin de 5° mais próximo do centro (centro do bin: lat 17.5, lon 77.5). Concentração em camada superficial de ~1 m, não é gelo exposto.",
           "incerteza_1sigma": 0.363
         },
+        "declividade": {
+          "valor": 1.9265,
+          "unidade": "graus (declividade média na escala de ~3,7 km)",
+          "produto": "MGS-M-MOLA-5-MEGDR-L3-V1.0 (arquivo megt90n000eb, versão do produto 2.0)",
+          "instrumento": "MGS/MOLA",
+          "versao": "2.0",
+          "periodo": "1997-09-15 a 2001-06-30",
+          "resolucao": "16 pixels/grau (~3.71 km/pixel no equador)",
+          "link": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do MOLA de 16 pixels/grau (~3,7 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada na Terra (blocos de 4x4 pixels de 30\") e na Lua (blocos de 2x2 do LOLA de 16 pixels/grau), porque a declividade muda com o tamanho do pixel."
+        },
+        "amplitude_diurna": {
+          "valor": 77.4865,
+          "unidade": "K (máximo - mínimo da curva do dia, média dos sols amostrados)",
+          "produto": "mars2020_meda (data_derived_env, produtos DER_TIRS de infravermelho térmico e DER_WS de vento)",
+          "instrumento": "Mars 2020/Perseverance MEDA",
+          "versao": "-",
+          "periodo": "primeiro ano marciano (sols 1 a 668), amostra de sols",
+          "resolucao": "1 medida por segundo, resumida em 24 faixas de hora local; amostra de 17 sols com curva completa (de 23 sols sorteados)",
+          "link": "https://atmos.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_derived_env/",
+          "papel": "medida no local por rover (um ponto, não uma janela de 2°; média de sols amostrados)",
+          "metodo": "Máximo menos mínimo da curva média por hora local do sol, médio entre os sols amostrados.",
+          "incerteza_1sigma": 10.79
+        },
         "geologia": {
           "valor": null,
           "unidade": "-",
@@ -71,7 +97,7 @@
           "resolucao": "-",
           "link": "-",
           "papel": "oficial",
-          "motivo_nulo": "Não existe medição orbital global direta de vento na superfície de Marte. Opacidade de poeira (TES/MCS) seria um proxy, mas não encontrei um mapa global pronto no PDS (não verificado)."
+          "motivo_nulo": "O rover mediu vento, mas só em 9 dos sols amostrados (sols 62 a 292, o vento derivado deixa de existir depois), a ~1,5 m de altura (o vento da Terra no site vem do MERRA-2 a 50-70 m). A média (3.3 m/s) não cobre o ano todo e por isso NÃO entra no cálculo. Fica em extras.vento_rover_ms."
         }
       },
       "extras": {
@@ -79,7 +105,8 @@
         "elevacao_minima_m": -3258.0,
         "elevacao_maxima_m": -780.0,
         "declividade_media_graus": 1.927,
-        "n_pixels_mola": 848
+        "n_pixels_mola": 848,
+        "vento_rover_ms": 3.26
       }
     },
     {
@@ -92,16 +119,17 @@
       "janela": "círculo de 1° de raio",
       "aspectos": {
         "temperatura": {
-          "valor": null,
-          "unidade": "K",
-          "produto": "-",
-          "instrumento": "-",
+          "valor": 223.7821,
+          "unidade": "K (temperatura do solo, média das 24 faixas de hora e dos sols amostrados)",
+          "produto": "msl_rems_bundle (produtos RMD, dados ambientais corrigidos; sensor GTS de temperatura do solo e sensor de vento da REMS)",
+          "instrumento": "MSL/Curiosity REMS",
           "versao": "-",
-          "periodo": "-",
-          "resolucao": "-",
-          "link": "-",
-          "papel": "oficial",
-          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado)."
+          "periodo": "primeiro ano marciano (sols 1 a 668), amostra de sols",
+          "resolucao": "1 medida por segundo, resumida em 24 faixas de hora local; amostra de 21 sols com curva completa (de 24 sols sorteados)",
+          "link": "https://atmos.nmsu.edu/PDS/data/PDS4/msl_rems_bundle/data_calibrated/",
+          "papel": "medida no local por rover (um ponto, não uma janela de 2°; média de sols amostrados)",
+          "metodo": "Temperatura do SOLO medida pelo rover (REMS: sensor GTS, temperatura de brilho; MEDA: sensor TIRS, a partir do infravermelho térmico supondo emissividade 1, o que subestima um pouco). Média dos sols amostrados; é uma estimativa da média anual, não uma média de todos os sols.",
+          "incerteza_1sigma": 8.21
         },
         "relevo": {
           "valor": 1032.5669,
@@ -128,6 +156,31 @@
           "metodo": "Bin de 5° mais próximo do centro (centro do bin: lat -7.5, lon 137.5). Concentração em camada superficial de ~1 m, não é gelo exposto.",
           "incerteza_1sigma": 0.364
         },
+        "declividade": {
+          "valor": 4.6001,
+          "unidade": "graus (declividade média na escala de ~3,7 km)",
+          "produto": "MGS-M-MOLA-5-MEGDR-L3-V1.0 (arquivo megt90n000eb, versão do produto 2.0)",
+          "instrumento": "MGS/MOLA",
+          "versao": "2.0",
+          "periodo": "1997-09-15 a 2001-06-30",
+          "resolucao": "16 pixels/grau (~3.71 km/pixel no equador)",
+          "link": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do MOLA de 16 pixels/grau (~3,7 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada na Terra (blocos de 4x4 pixels de 30\") e na Lua (blocos de 2x2 do LOLA de 16 pixels/grau), porque a declividade muda com o tamanho do pixel."
+        },
+        "amplitude_diurna": {
+          "valor": 77.3014,
+          "unidade": "K (máximo - mínimo da curva do dia, média dos sols amostrados)",
+          "produto": "msl_rems_bundle (produtos RMD, dados ambientais corrigidos; sensor GTS de temperatura do solo e sensor de vento da REMS)",
+          "instrumento": "MSL/Curiosity REMS",
+          "versao": "-",
+          "periodo": "primeiro ano marciano (sols 1 a 668), amostra de sols",
+          "resolucao": "1 medida por segundo, resumida em 24 faixas de hora local; amostra de 21 sols com curva completa (de 24 sols sorteados)",
+          "link": "https://atmos.nmsu.edu/PDS/data/PDS4/msl_rems_bundle/data_calibrated/",
+          "papel": "medida no local por rover (um ponto, não uma janela de 2°; média de sols amostrados)",
+          "metodo": "Máximo menos mínimo da curva média por hora local do sol, médio entre os sols amostrados.",
+          "incerteza_1sigma": 8.5
+        },
         "geologia": {
           "valor": null,
           "unidade": "-",
@@ -150,7 +203,7 @@
           "resolucao": "-",
           "link": "-",
           "papel": "oficial",
-          "motivo_nulo": "Não existe medição orbital global direta de vento na superfície de Marte. Opacidade de poeira (TES/MCS) seria um proxy, mas não encontrei um mapa global pronto no PDS (não verificado)."
+          "motivo_nulo": "Dado insuficiente: 338 medidas de vento em 24 sols, cobrindo só 0 das 24 faixas de hora local (mínimo 20, cada uma com dados de pelo menos 4 sols). O vento tem ciclo diário forte, então uma média de poucas horas seria enganosa. Não entra no cálculo."
         }
       },
       "extras": {
@@ -180,7 +233,7 @@
           "resolucao": "-",
           "link": "-",
           "papel": "oficial",
-          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado)."
+          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado). Só Gale (Curiosity/REMS) e Jezero (Perseverance/MEDA) têm temperatura medida no local por rover (scripts/02b_marte_rovers.py); nos outros locais não há medida."
         },
         "relevo": {
           "valor": 151.148,
@@ -206,6 +259,30 @@
           "papel": "oficial",
           "metodo": "Bin de 5° mais próximo do centro (centro do bin: lat -2.5, lon 357.5). Concentração em camada superficial de ~1 m, não é gelo exposto.",
           "incerteza_1sigma": 0.396
+        },
+        "declividade": {
+          "valor": 1.0491,
+          "unidade": "graus (declividade média na escala de ~3,7 km)",
+          "produto": "MGS-M-MOLA-5-MEGDR-L3-V1.0 (arquivo megt90n000eb, versão do produto 2.0)",
+          "instrumento": "MGS/MOLA",
+          "versao": "2.0",
+          "periodo": "1997-09-15 a 2001-06-30",
+          "resolucao": "16 pixels/grau (~3.71 km/pixel no equador)",
+          "link": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do MOLA de 16 pixels/grau (~3,7 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada na Terra (blocos de 4x4 pixels de 30\") e na Lua (blocos de 2x2 do LOLA de 16 pixels/grau), porque a declividade muda com o tamanho do pixel."
+        },
+        "amplitude_diurna": {
+          "valor": null,
+          "unidade": "K",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não encontrei no PDS um produto global pronto de temperatura de superfície de Marte por hora do dia (TES/MCS): o que existe são os dados por observação (mgs-m-tes-3-tsdr-v2), enormes e sem agregação em mapa, e o mapa de inércia térmica, que NÃO é temperatura. Só Gale e Jezero têm essa amplitude, medida no local pelos rovers; nos outros locais ela fica de fora (não foi estimada)."
         },
         "geologia": {
           "valor": null,
@@ -259,7 +336,7 @@
           "resolucao": "-",
           "link": "-",
           "papel": "oficial",
-          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado)."
+          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado). Só Gale (Curiosity/REMS) e Jezero (Perseverance/MEDA) têm temperatura medida no local por rover (scripts/02b_marte_rovers.py); nos outros locais não há medida."
         },
         "relevo": {
           "valor": 3190.4977,
@@ -285,6 +362,30 @@
           "papel": "oficial",
           "metodo": "Bin de 5° mais próximo do centro (centro do bin: lat -12.5, lon 302.5). Concentração em camada superficial de ~1 m, não é gelo exposto.",
           "incerteza_1sigma": 0.316
+        },
+        "declividade": {
+          "valor": 7.5881,
+          "unidade": "graus (declividade média na escala de ~3,7 km)",
+          "produto": "MGS-M-MOLA-5-MEGDR-L3-V1.0 (arquivo megt90n000eb, versão do produto 2.0)",
+          "instrumento": "MGS/MOLA",
+          "versao": "2.0",
+          "periodo": "1997-09-15 a 2001-06-30",
+          "resolucao": "16 pixels/grau (~3.71 km/pixel no equador)",
+          "link": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do MOLA de 16 pixels/grau (~3,7 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada na Terra (blocos de 4x4 pixels de 30\") e na Lua (blocos de 2x2 do LOLA de 16 pixels/grau), porque a declividade muda com o tamanho do pixel."
+        },
+        "amplitude_diurna": {
+          "valor": null,
+          "unidade": "K",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não encontrei no PDS um produto global pronto de temperatura de superfície de Marte por hora do dia (TES/MCS): o que existe são os dados por observação (mgs-m-tes-3-tsdr-v2), enormes e sem agregação em mapa, e o mapa de inércia térmica, que NÃO é temperatura. Só Gale e Jezero têm essa amplitude, medida no local pelos rovers; nos outros locais ela fica de fora (não foi estimada)."
         },
         "geologia": {
           "valor": null,
@@ -338,7 +439,7 @@
           "resolucao": "-",
           "link": "-",
           "papel": "oficial",
-          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado)."
+          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado). Só Gale (Curiosity/REMS) e Jezero (Perseverance/MEDA) têm temperatura medida no local por rover (scripts/02b_marte_rovers.py); nos outros locais não há medida."
         },
         "relevo": {
           "valor": 355.8036,
@@ -364,6 +465,30 @@
           "papel": "oficial",
           "metodo": "Bin de 5° mais próximo do centro (centro do bin: lat -42.5, lon 72.5). Concentração em camada superficial de ~1 m, não é gelo exposto.",
           "incerteza_1sigma": 0.569
+        },
+        "declividade": {
+          "valor": 1.9811,
+          "unidade": "graus (declividade média na escala de ~3,7 km)",
+          "produto": "MGS-M-MOLA-5-MEGDR-L3-V1.0 (arquivo megt90n000eb, versão do produto 2.0)",
+          "instrumento": "MGS/MOLA",
+          "versao": "2.0",
+          "periodo": "1997-09-15 a 2001-06-30",
+          "resolucao": "16 pixels/grau (~3.71 km/pixel no equador)",
+          "link": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do MOLA de 16 pixels/grau (~3,7 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada na Terra (blocos de 4x4 pixels de 30\") e na Lua (blocos de 2x2 do LOLA de 16 pixels/grau), porque a declividade muda com o tamanho do pixel."
+        },
+        "amplitude_diurna": {
+          "valor": null,
+          "unidade": "K",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não encontrei no PDS um produto global pronto de temperatura de superfície de Marte por hora do dia (TES/MCS): o que existe são os dados por observação (mgs-m-tes-3-tsdr-v2), enormes e sem agregação em mapa, e o mapa de inércia térmica, que NÃO é temperatura. Só Gale e Jezero têm essa amplitude, medida no local pelos rovers; nos outros locais ela fica de fora (não foi estimada)."
         },
         "geologia": {
           "valor": null,
@@ -417,7 +542,7 @@
           "resolucao": "-",
           "link": "-",
           "papel": "oficial",
-          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado)."
+          "motivo_nulo": "Não encontrei no PDS um mapa global de temperatura de superfície de Marte (TES ou MCS) já agregado. O que existe para o MGS/TES é inércia térmica (mgs-m-tes-5-timap-v1), que NÃO é temperatura, e os dados de temperatura por observação (mgs-m-tes-3-tsdr-v2) são enormes e exigem um processamento próprio. Candidato a investigar: MRO/MCS no nó Atmospheres do PDS (não verificado). Só Gale (Curiosity/REMS) e Jezero (Perseverance/MEDA) têm temperatura medida no local por rover (scripts/02b_marte_rovers.py); nos outros locais não há medida."
         },
         "relevo": {
           "valor": 51.4689,
@@ -443,6 +568,30 @@
           "papel": "oficial",
           "metodo": "Bin de 5° mais próximo do centro (centro do bin: lat 47.5, lon 117.5). Concentração em camada superficial de ~1 m, não é gelo exposto.",
           "incerteza_1sigma": 0.518
+        },
+        "declividade": {
+          "valor": 0.2697,
+          "unidade": "graus (declividade média na escala de ~3,7 km)",
+          "produto": "MGS-M-MOLA-5-MEGDR-L3-V1.0 (arquivo megt90n000eb, versão do produto 2.0)",
+          "instrumento": "MGS/MOLA",
+          "versao": "2.0",
+          "periodo": "1997-09-15 a 2001-06-30",
+          "resolucao": "16 pixels/grau (~3.71 km/pixel no equador)",
+          "link": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+          "papel": "oficial",
+          "metodo": "Gradiente do MOLA de 16 pixels/grau (~3,7 km por pixel) dentro do círculo de 1° de raio, sem a borda de 1 pixel. Mesma escala usada na Terra (blocos de 4x4 pixels de 30\") e na Lua (blocos de 2x2 do LOLA de 16 pixels/grau), porque a declividade muda com o tamanho do pixel."
+        },
+        "amplitude_diurna": {
+          "valor": null,
+          "unidade": "K",
+          "produto": "-",
+          "instrumento": "-",
+          "versao": "-",
+          "periodo": "-",
+          "resolucao": "-",
+          "link": "-",
+          "papel": "oficial",
+          "motivo_nulo": "Não encontrei no PDS um produto global pronto de temperatura de superfície de Marte por hora do dia (TES/MCS): o que existe são os dados por observação (mgs-m-tes-3-tsdr-v2), enormes e sem agregação em mapa, e o mapa de inércia térmica, que NÃO é temperatura. Só Gale e Jezero têm essa amplitude, medida no local pelos rovers; nos outros locais ela fica de fora (não foi estimada)."
         },
         "geologia": {
           "valor": null,

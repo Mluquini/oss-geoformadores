@@ -43,7 +43,7 @@ teste("toda chave usada no HTML e no JavaScript existe", () => {
     for (const m of l.matchAll(/"([a-z]+\.[\w.]*\w)"/g)) if (K[m[1]]) usadas.add(m[1]);
   }));
   // chaves montadas na hora ("asp." + id etc.): confere todas as combinações possíveis
-  ["temperatura", "relevo", "gelo", "vento"].forEach(a => usadas.add("asp." + a));
+  ["temperatura", "diurna", "relevo", "declividade", "gelo", "vento"].forEach(a => usadas.add("asp." + a));
   ["deserto", "polar", "vulcânico", "caverna"].forEach(a => usadas.add("type." + a));
   ["marte", "lua"].forEach(c => {
     ["body.", "where.", "bodyof.", "top.title.", "top.empty."].forEach(p => usadas.add(p + c));
