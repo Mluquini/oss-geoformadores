@@ -2,6 +2,38 @@
 
 Project for the **NASA Space Apps Challenge 2026**, challenge **Terrestrial Analogs**.
 
+## About the project
+
+**Team:** Oss Geoformadores: Alice Suye Gonçalves Alves de Pinho, Maria Eduarda Diniz Rodrigues, Maria Luisa Garcia Luquini, Mariane Soares Simões Batista and Nicolas Verni Silva Ribeiro.
+
+**Challenge 10:** *Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars.*
+
+The full project document, as submitted, is here: [docs/Os-geoformadores.pdf](docs/Os-geoformadores.pdf).
+
+**Summary.** Planning space missions to Mars and the Moon requires extensive prior study and testing. One of the difficulties is finding places on Earth with geographic characteristics similar to those of these celestial bodies. Although tests and simulations are already carried out in terrestrial environments, identifying the most suitable locations can be challenging. This identification is important because it allows scientists and researchers to study terrain similar to what they may encounter during missions, preparing equipment, evaluating strategies and anticipating possible difficulties.
+
+**How it works.** Analog Globe – Geoformadores is an interactive website that uses a digital globe to make it easier to identify regions of Earth with characteristics similar to those found on Mars and the Moon. It works by exploring different places on the planet and comparing their geographic characteristics with those of extraterrestrial regions. This makes it possible to identify potential terrestrial analog environments that researchers can use in studies, research and space mission simulations. Instead of searching for these places manually, the tool makes visualization and comparison more accessible, helping to identify regions of interest.
+
+**Tools used.**
+- First, we analyzed the problem and discussed possible solutions as a group. From that discussion came the idea of developing a website with an interactive 3D globe that would make it easier to identify regions on Earth similar to areas of Mars and the Moon.
+- With the help of Artificial Intelligence, we presented our proposal and asked it to write a prompt, which was then used on the Claude Code platform to generate the initial version of the website.
+- After the prototype was created, we made several requests for improvements and changes that we considered necessary, such as adding images of the locations, creating a tab called "How to use?" in the upper left corner, and verifying the information and data presented against the "Resources" section provided by NASA's official website.
+- In addition, we used Artificial Intelligence as support throughout development, helping to fix code errors, implement new features and make the adjustments needed to improve the website's performance and browsing experience.
+
+**Project benefits.**
+- **Makes locations easier to identify:** helps find regions on Earth that are similar to the terrains of Mars and the Moon.
+- **Optimizes research:** makes the search for analog environments more practical and organized.
+- **Contributes to space exploration:** helps researchers prepare for future missions.
+- **Reduces research costs and time:** can lower the effort needed to locate regions suitable for studies and simulations.
+- **Encourages scientific knowledge:** brings Geography, Astronomy and technology closer together.
+- **Broadens access to information:** allows students, teachers and interested people to explore these comparisons interactively.
+
+The project makes it easier to search for terrestrial environments that can serve as a reference for studying Mars and the Moon, contributing to the advancement of research and space exploration.
+
+---
+
+## The site
+
 A 3D globe of Earth: you click a place (desert, pole, volcano or cave) and the site shows which places on **Mars** or the **Moon** are most similar to it, with a % of similarity.
 
 > ✅ The site uses **real data only**: for the 12 Earth places, the 6 Mars places and the 4 Moon places (NASA, plus one NOAA complement for the relief at McMurdo, flagged on the site). There is no example or estimated data left. Geology was left out of the calculation (we have no comparable data). See "How we calculate" on the site for what each number is and what the limits are.
